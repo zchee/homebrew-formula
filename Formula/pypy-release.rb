@@ -1,8 +1,7 @@
 class PypyRelease < Formula
   desc "Highly performant implementation of Python 2 in Python"
   homepage "https://pypy.org/"
-  url "https://bitbucket.org/pypy/pypy/get/release-pypy2.7-7.x.tar.gz"
-  sha256 "7d6a4add08924a89e08ee15a7cdf462622e3274a980cc533e51eaf2abfdd3306"
+  url "https://bitbucket.org/pypy/pypy/get/release-pypy2.7-v7.x.tar.gz"
   head "https://bitbucket.org/pypy/pypy", :using => :hg
 
   bottle do
