@@ -69,7 +69,7 @@ class PypyRelease < Formula
     # (like /opt) and symlinking in binaries as needed. Specifically,
     # we want to avoid putting PyPy's Python.h somewhere that configure
     # scripts will find it.
-    bin.install_symlink libexec/"bin/pypy"
+    bin.install_symlink libexec/"bin/pypy-release"
     lib.install_symlink libexec/"lib/libpypy-c.dylib"
   end
 
@@ -134,12 +134,12 @@ class PypyRelease < Formula
 
   # The HOMEBREW_PREFIX location of site-packages
   def prefix_site_packages
-    HOMEBREW_PREFIX+"lib/pypy/site-packages"
+    HOMEBREW_PREFIX+"lib/pypy-release/site-packages"
   end
 
   # Where setuptools will install executable scripts
   def scripts_folder
-    HOMEBREW_PREFIX+"share/pypy"
+    HOMEBREW_PREFIX+"share/pypy-release"
   end
 
   # The Cellar location of distutils
