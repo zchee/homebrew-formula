@@ -4,7 +4,7 @@ class Pypy3Release < Formula
   url "https://bitbucket.org/pypy/pypy/get/release-pypy3.6-v7.x.tar.gz"
 
   depends_on "pkg-config" => :build
-  depends_on "pypy" => :build
+  depends_on "zchee/formula/pypy-release" => :build
   depends_on :arch => :x86_64
   depends_on "gdbm"
   # pypy does not find system libffi, and its location cannot be given
