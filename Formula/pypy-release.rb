@@ -4,14 +4,6 @@ class PypyRelease < Formula
   url "https://bitbucket.org/pypy/pypy/get/release-pypy2.7-v7.x.tar.gz"
   head "https://bitbucket.org/pypy/pypy", :using => :hg
 
-  bottle do
-    cellar :any
-    rebuild 2
-    sha256 "9900f0310051127ad2935df61c22256f837b256cfa2475f114082fbb37a0f2d9" => :mojave
-    sha256 "f0e0ad67095ff19e37c1ea445c6b778928ea188a45c0bcea30a8a364e7b21b47" => :high_sierra
-    sha256 "102a0e56f25c1d7ee2e91ccf91e3fd157e53d94126d8a534a67f0b70fef18c5f" => :sierra
-  end
-
   depends_on "pkg-config" => :build
   depends_on :arch => :x86_64
   depends_on "gdbm"
