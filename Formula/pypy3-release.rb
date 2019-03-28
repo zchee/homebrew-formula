@@ -1,16 +1,7 @@
 class Pypy3Release < Formula
   desc "Implementation of Python 3 in Python"
   homepage "https://pypy.org/"
-  url "https://bitbucket.org/pypy/pypy/get/release-pypy3.6-7.x.tar.gz"
-  sha256 "1935f21b85858f6541c2ca8e5df77f7d1f8532288740bcf5114ceaa14eaa066e"
-
-  bottle do
-    cellar :any
-    rebuild 1
-    sha256 "a2da5d37954296140125b0d8b817c546375eeb074fe834bf3d1d933a74b369e0" => :mojave
-    sha256 "25f4b9222205b8d951cf54c771e70b0959daefb55bbe84f0c0529251d1f0a3b0" => :high_sierra
-    sha256 "2cb646b4b7bfb7b9c9f7381a376143d18e97eb570b2150bd7147b4cb06a5eacd" => :sierra
-  end
+  url "https://bitbucket.org/pypy/pypy/get/release-pypy3.6-v7.x.tar.gz"
 
   depends_on "pkg-config" => :build
   depends_on "pypy" => :build
