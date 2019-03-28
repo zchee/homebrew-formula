@@ -67,7 +67,7 @@ class Pypy3Release < Formula
     ENV["PYTHONPATH"] = ""
     ENV["PYPY_USESSION_DIR"] = buildpath
 
-    python = Formula["pypy"].opt_bin/"pypy"
+    python = Formula["pypy-release"].opt_bin/"pypy"
     cd "pypy/goal" do
       system python, buildpath/"rpython/bin/rpython",
              "-Ojit", "--shared", "--cc", ENV.cc, "--verbose",
@@ -96,7 +96,7 @@ class Pypy3Release < Formula
     # we want to avoid putting PyPy's Python.h somewhere that configure
     # scripts will find it.
     bin.install_symlink libexec/"bin/pypy3"
-    bin.install_symlink libexec/"bin/pypy" => "pypy3.5"
+    bin.install_symlink libexec/"bin/pypy" => "pypy3.6"
     lib.install_symlink libexec/"lib/libpypy3-c.dylib"
   end
 
@@ -160,12 +160,12 @@ class Pypy3Release < Formula
 
   # The HOMEBREW_PREFIX location of site-packages
   def prefix_site_packages
-    HOMEBREW_PREFIX+"lib/pypy3/site-packages"
+    HOMEBREW_PREFIX+"lib/pypy3-release/site-packages"
   end
 
   # Where setuptools will install executable scripts
   def scripts_folder
-    HOMEBREW_PREFIX+"share/pypy3"
+    HOMEBREW_PREFIX+"share/pypy3-release"
   end
 
   # The Cellar location of distutils
