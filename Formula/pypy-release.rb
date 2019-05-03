@@ -61,7 +61,8 @@ class PypyRelease < Formula
     # (like /opt) and symlinking in binaries as needed. Specifically,
     # we want to avoid putting PyPy's Python.h somewhere that configure
     # scripts will find it.
-    bin.install_symlink libexec/"bin/pypy-release"
+    bin.install_symlink libexec/"bin/pypy"
+    bin.install_symlink libexec/"bin/pypy" => "pypy2.7"
     lib.install_symlink libexec/"lib/libpypy-c.dylib"
   end
 
