@@ -12,7 +12,6 @@ class GitHead < Formula
   depends_on "libressl"
   depends_on "libmetalink"
   depends_on "libssh2"
-  depends_on "libssh"
   depends_on "rtmpdump"
   depends_on "libidn2"
   depends_on "nghttp2"
@@ -39,7 +38,7 @@ class GitHead < Formula
 
   def install
     ENV["CFLAGS"] = "-std=c17 -march=native -Ofast -flto"
-    ENV["LDFLAGS"] = "-march=native -Ofast -flto -L#{Formula["zlib"].lib} -L#{Formula["brotli"].lib} -L#{Formula["libressl"].lib} -L#{Formula["libmetalink"].lib} -L#{Formula["libssh2"].lib} -L#{Formula["libssh"].lib} -L#{Formula["rtmpdump"].lib} -L#{Formula["libidn2"].lib} -L#{Formula["nghttp2"].lib}"
+    ENV["LDFLAGS"] = "-march=native -Ofast -flto -L#{Formula["zlib"].lib} -L#{Formula["brotli"].lib} -L#{Formula["libressl"].lib} -L#{Formula["libmetalink"].lib} -L#{Formula["libssh2"].lib} -L#{Formula["rtmpdump"].lib} -L#{Formula["libidn2"].lib} -L#{Formula["nghttp2"].lib}"
     # If these things are installed, tell Git build system not to use them
     ENV["NO_FINK"] = "1"
     ENV["NO_DARWIN_PORTS"] = "1"
