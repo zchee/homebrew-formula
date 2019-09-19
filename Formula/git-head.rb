@@ -3,32 +3,32 @@ class GitHead < Formula
   homepage "https://git-scm.com"
   head "https://github.com/git/git.git", :shallow => false
 
-  depends_on "gettext"
-  depends_on "pcre2"
-
-  depends_on "curl-head"
-  depends_on "zlib"
   depends_on "brotli"
-  depends_on "libressl"
+  depends_on "curl-head"
+  depends_on "gettext"
+  depends_on "libidn2"
   depends_on "libmetalink"
   depends_on "libssh2"
-  depends_on "rtmpdump"
-  depends_on "libidn2"
   depends_on "nghttp2"
+  depends_on "pcre2"
+  depends_on "rtmpdump"
+  depends_on "zlib"
+  depends_on "asciidoc"
+  depends_on "xmlto"
 
   if MacOS.version < :yosemite
-    depends_on "openssl"
+    depends_on "openssl@1.1"
     depends_on "curl"
   end
 
   resource "html" do
-    url "https://www.kernel.org/pub/software/scm/git/git-htmldocs-2.21.0.tar.xz"
-    sha256 "b1758e9903b21bad5cb5694617df22b2aa23c093541fb282bf11862df4962ca1"
+    url "https://www.kernel.org/pub/software/scm/git/git-htmldocs-2.23.0.tar.xz"
+    sha256 "b7959afd19554aeaaa455c88eeed2c164854391f13319bd3fa7df2577c57ddc8"
   end
 
   resource "man" do
-    url "https://www.kernel.org/pub/software/scm/git/git-manpages-2.21.0.tar.xz"
-    sha256 "2f68dc24931c0d05f70167d9ffe6c33ef6b0b6c75b92301ddcda55b9b0f5ec51"
+    url "https://www.kernel.org/pub/software/scm/git/git-manpages-2.23.0.tar.xz"
+    sha256 "9558433f68ff4229bd55e84c4d26b74e5d3518ab0ec30186253b090ea887946a"
   end
 
   resource "Net::SMTP::SSL" do
@@ -50,6 +50,8 @@ class GitHead < Formula
     ENV["LIBPCREDIR"] = Formula["pcre2"].opt_prefix
     ENV["CURLDIR"] = Formula["curl-head"].opt_prefix
     ENV["V"] = "1" # build verbosely
+    ENV["JAVA_HOME"] = "/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home"
+    ENV["XML_CATALOG_FILES"] = "/usr/local/etc/xml/catalog"
 
     perl_version = Utils.popen_read("perl --version")[/v(\d+\.\d+)(?:\.\d+)?/, 1]
 
@@ -80,7 +82,7 @@ class GitHead < Formula
       args += %w[NO_OPENSSL=1 APPLE_COMMON_CRYPTO=1]
     end
 
-    system "make", "install", *args
+    system "make", "install", "install-man", *args
 
     git_core = libexec/"git-core"
 
