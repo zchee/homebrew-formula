@@ -6,7 +6,7 @@ class Quicktype < Formula
   # quicktype should only be updated every 10 releases on multiples of 10
   url "https://registry.npmjs.org/quicktype/-/quicktype-15.0.190.tgz"
   sha256 "7599458439999df9aef0297e4401bd1bfcf539ce307b1226f074040f66bddb17"
-  head "https://github.com/quicktype/quicktype"
+  head "https://github.com/quicktype/quicktype.git"
 
   bottle do
     cellar :any_skip_relocation
@@ -15,7 +15,10 @@ class Quicktype < Formula
     sha256 "ae61994a52d722d9781ed41f173be08f975c209b1bf335e51246697339369828" => :sierra
   end
 
+  depends_on "node@10"
+
   def install
+    system "npm", "install", *Language::Node.local_npm_install_args if build.head?
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
