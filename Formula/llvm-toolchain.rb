@@ -139,7 +139,6 @@ class LlvmToolchain < Formula
     args = %W[
       -DCMAKE_BUILD_TYPE=Release
       -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-      -DCMAKE_INSTALL_PREFIX=#{prefix}
       -DCMAKE_OSX_ARCHITECTURES=#{`uname -m`.chomp}
       -DCMAKE_OSX_DEPLOYMENT_TARGET=#{`xcrun --sdk macosx --show-sdk-version`.chomp}
       -DCMAKE_OSX_SYSROOT=#{`xcrun --sdk macosx --show-sdk-path`.chomp}
