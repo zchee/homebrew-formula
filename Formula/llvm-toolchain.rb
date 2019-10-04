@@ -137,6 +137,11 @@ class LlvmToolchain < Formula
     ENV.permit_arch_flags
 
     args = %W[
+      -DCMAKE_INSTALL_PREFIX=#{prefix}
+      -DCMAKE_BUILD_TYPE=Release
+      -DCMAKE_FIND_FRAMEWORK=LAST
+      -DCMAKE_VERBOSE_MAKEFILE=ON
+      -Wno-dev 
       -DCMAKE_BUILD_TYPE=Release
       -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
       -DCMAKE_OSX_ARCHITECTURES=#{`uname -m`.chomp}
@@ -181,7 +186,7 @@ class LlvmToolchain < Formula
     ]
 
     mkdir "build" do
-      system "cmake", "-G", "Ninja", "..", *(std_cmake_args + args)
+      system "cmake", "-G", "Ninja", "..", *args
       system "ninja"
       system "ninja", "install"
       system "ninja", "install-xcode-toolchain"
@@ -194,16 +199,19 @@ class LlvmToolchain < Formula
     man1.install_symlink share/"clang/tools/scan-build/man/scan-build.1"
 
     # install clang-extra-tools binaries
-    bin.install_symlink buildpath/"bin/modularize"
-    bin.install_symlink buildpath/"bin/clang-change-namespace"
-    bin.install_symlink buildpath/"bin/clang-move"
-    bin.install_symlink buildpath/"bin/clang-include-fixer"
-    bin.install_symlink buildpath/"bin/pp-trace"
-    bin.install_symlink buildpath/"bin/clang-reorder-fields"
-    bin.install_symlink buildpath/"bin/clang-query"
-    bin.install_symlink buildpath/"bin/clang-tidy"
-    bin.install_symlink buildpath/"bin/clang-doc"
     bin.install_symlink buildpath/"bin/clang-apply-replacements"
+    bin.install_symlink buildpath/"bin/clang-change-namespace"
+    bin.install_symlink buildpath/"bin/clang-diff"
+    bin.install_symlink buildpath/"bin/clang-doc"
+    bin.install_symlink buildpath/"bin/clang-include-fixer"
+    bin.install_symlink buildpath/"bin/clang-move"
+    bin.install_symlink buildpath/"bin/clang-query"
+    bin.install_symlink buildpath/"bin/clang-reorder-fields"
+    bin.install_symlink buildpath/"bin/clang-tidy"
+    bin.install_symlink buildpath/"bin/clangd-indexer"
+    bin.install_symlink buildpath/"bin/dexp"
+    bin.install_symlink buildpath/"bin/modularize"
+    bin.install_symlink buildpath/"bin/pp-trace"
 
     # install llvm python bindings
     (lib/"python2.7/site-packages").install buildpath/"bindings/python/llvm"
