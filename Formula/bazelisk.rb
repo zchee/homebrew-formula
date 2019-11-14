@@ -1,41 +1,29 @@
-# Copyright 2019 The Bazel Authors. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 class Bazelisk < Formula
   desc "User-friendly launcher for Bazel"
-  homepage "https://github.com/bazelbuild/bazelisk"
-  url "https://github.com/bazelbuild/bazelisk/releases/download/v1.0/bazelisk-darwin-amd64"
-  version "1.0"
+  homepage "https://github.com/bazelbuild/bazelisk/"
+  url "https://github.com/bazelbuild/bazelisk.git",
+      :tag      => "v1.0",
+      :revision => "52085079a69f26c142e6dc9c948a7baa7a38c9c8"
+  head "https://github.com/bazelbuild/bazelisk.git"
 
-  # To generate run:
-  # curl -LNs https://github.com/bazelbuild/bazelisk/releases/download/v1.0/bazelisk-darwin-amd64 | shasum -a 256 | awk '{print $1}'
-  sha256 "198456d96731ac5032636230918d74783fb313a709ede603d73c493e10f2f995"
-
-  bottle :unneeded
-
-  conflicts_with "bazelbuild/tap/bazel", :because => "Bazelisk replaces the bazel binary"
+  depends_on "bazel" => :build
 
   def install
-    bin.install "bazelisk-darwin-amd64" => "bazelisk"
-    bin.install_symlink "bazelisk" => "bazel"
+    system "bazel", "build", "--stamp",
+      "--workspace_status_command=#{buildpath}/stamp.sh",
+      "--platforms=@io_bazel_rules_go//go/toolchain:darwin_amd64",
+      "//:bazelisk"
+
+    bin.install "bazel-bin/darwin_amd64_pure_stripped/bazelisk" => "bazelisk"
   end
 
   test do
-    # Simply run bazelisk to see whether it finished. Use a hardcoded version
-    # number to avoid calling the GitHub API.
-    touch testpath/"WORKSPACE"
-    (testpath/".bazelversion").write "0.28.1"
-    system bin/"bazel", "version"
+    assert_match /v#{version}/, shell_output("#{bin}/bazelisk version")
+
+    # This is an older than current version, so that we can test that bazelisk
+    # will target an explicit version we specify. This version shouldn't need to
+    # be bumped.
+    ENV["USE_BAZEL_VERSION"] = "0.26.0"
+    assert_match /Build label: 0.26.0/, shell_output("#{bin}/bazelisk version")
   end
 end
