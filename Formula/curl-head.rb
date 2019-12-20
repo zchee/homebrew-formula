@@ -19,15 +19,15 @@ class CurlHead < Formula
     depends_on "libtool" => :build
     depends_on "libressl" => :build
 
-    depends_on "zlib" => :build
     depends_on "brotli" => :build
-    depends_on "libressl" => :build
-    depends_on "libmetalink" => :build
-    depends_on "libssh2" => :build
-    depends_on "libssh" => :build
-    depends_on "rtmpdump" => :build
     depends_on "libidn2" => :build
+    depends_on "libmetalink" => :build
+    depends_on "libressl" => :build
+    depends_on "libssh" => :build
+    depends_on "libssh2" => :build
     depends_on "nghttp2" => :build
+    depends_on "rtmpdump" => :build
+    depends_on "zlib" => :build
   end
 
   depends_on "pkg-config" => :build
