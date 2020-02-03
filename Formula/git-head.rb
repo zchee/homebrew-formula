@@ -22,13 +22,13 @@ class GitHead < Formula
   end
 
   resource "html" do
-    url "https://www.kernel.org/pub/software/scm/git/git-htmldocs-2.24.1.tar.xz"
-    sha256 "8b4da79e7931c5156f3f994c6d8162c7ccb525ebd3f71e26ae8f8430db038403"
+    url "https://www.kernel.org/pub/software/scm/git/git-htmldocs-2.25.0.tar.xz"
+    sha256 "a99d83260ff903102bf7556e673c1535e4b0fb276a718a5d2f32b501e39a000d"
   end
 
   resource "man" do
-    url "https://www.kernel.org/pub/software/scm/git/git-manpages-2.24.1.tar.xz"
-    sha256 "27304ab2674d5ad623a0a72c22116cb47df4a611499a53aef5c7ec39a32cfefb"
+    url "https://www.kernel.org/pub/software/scm/git/git-manpages-2.25.0.tar.xz"
+    sha256 "d396777bdd69dc2db06a49da6971a883fd95fe16ad1dcca7e6b491686658c8bd"
   end
 
   resource "Net::SMTP::SSL" do
