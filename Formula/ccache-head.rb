@@ -1,4 +1,4 @@
-class Ccache < Formula
+class CcacheHead < Formula
   desc "Object-file caching compiler wrapper"
   homepage "https://ccache.dev/"
 
@@ -10,12 +10,14 @@ class Ccache < Formula
     depends_on "asciidoc" => :build
     depends_on "autoconf" => :build
     depends_on "automake" => :build
+    depends_on "gnu-sed" => :build
     depends_on "libb2" => :build
     depends_on "libtool" => :build
   end
 
   def install
     ENV["XML_CATALOG_FILES"] = etc/"xml/catalog" if build.head?
+    ENV.prepend_path "PATH", Formula["gnu-sed"].opt_libexec/"gnubin"
 
     system "./autogen.sh" if build.head?
     system "./configure", "--prefix=#{prefix}", "--mandir=#{man}"
