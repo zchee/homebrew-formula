@@ -22,13 +22,13 @@ class GitHead < Formula
   end
 
   resource "html" do
-    url "https://www.kernel.org/pub/software/scm/git/git-htmldocs-2.25.1.tar.xz"
-    sha256 "2d8f206f12bfd7d9edd74dea25bc457e4bc9ca6eb1a14e09104b549342fcc377"
+    url "https://www.kernel.org/pub/software/scm/git/git-htmldocs-2.26.0.tar.xz"
+    sha256 "5be14d0835177f8ada0310c98b0248c7caaea0a302b7b58f1ccc0c0f7ece2466"
   end
 
   resource "man" do
-    url "https://www.kernel.org/pub/software/scm/git/git-manpages-2.25.1.tar.xz"
-    sha256 "30886372c1962a5e087f919998b02f816605368201b564d3f519614ee4a9ee96"
+    url "https://www.kernel.org/pub/software/scm/git/git-manpages-2.26.0.tar.xz"
+    sha256 "387e46a0b67c148be7ef80759b1930a3b64ac77782630c18afc784f35ed93426"
   end
 
   resource "Net::SMTP::SSL" do
@@ -63,8 +63,13 @@ class GitHead < Formula
       "#{p}/Library/Perl/#{perl_version}/darwin-thread-multi-2level"
     end.join(":")
 
-    unless quiet_system ENV["PERL_PATH"], "-e", "use ExtUtils::MakeMaker"
-      ENV["NO_PERL_MAKEMAKER"] = "1"
+    ENV["NO_PERL_MAKEMAKER"] = "1" unless quiet_system ENV["PERL_PATH"], "-e", "use ExtUtils::MakeMaker"
+
+    # Ensure we are using the correct system headers (for curl) to workaround
+    # mismatched Xcode/CLT versions:
+    # https://github.com/Homebrew/homebrew-core/issues/46466
+    if MacOS.version == :mojave && MacOS::CLT.installed? && MacOS::CLT.provides_sdk?
+      ENV["HOMEBREW_SDKROOT"] = MacOS::CLT.sdk_path(MacOS.version)
     end
 
     args = %W[
@@ -99,7 +104,7 @@ class GitHead < Formula
     cd "contrib/diff-highlight" do
       system "make"
       inreplace "diff-highlight", "/usr/bin/perl", "/usr/bin/env perl"
-      bin.install "diff-highlight"
+      git_core.install "diff-highlight"
     end
 
     # Install the netrc credential helper
@@ -135,9 +140,7 @@ class GitHead < Formula
     chmod 0755, Dir["#{share}/doc/git-doc/{RelNotes,howto,technical}"]
 
     # To avoid this feature hooking into the system OpenSSL, remove it
-    if MacOS.version >= :yosemite
-      rm "#{libexec}/git-core/git-imap-send"
-    end
+    rm "#{libexec}/git-core/git-imap-send" if MacOS.version >= :yosemite
 
     # git-send-email needs Net::SMTP::SSL
     resource("Net::SMTP::SSL").stage do
@@ -157,6 +160,12 @@ class GitHead < Formula
       \thelper = osxkeychain
     EOS
     etc.install "gitconfig"
+  end
+
+  def caveats
+    <<~EOS
+      The Tcl/Tk GUIs (e.g. gitk, git-gui) are now in the `git-gui` formula.
+    EOS
   end
 
   test do
