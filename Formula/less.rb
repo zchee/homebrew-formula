@@ -1,13 +1,13 @@
 class Less < Formula
   desc "Pager program similar to more"
   homepage "http://www.greenwoodsoftware.com/less/index.html"
-  url "http://www.greenwoodsoftware.com/less/less-551.tar.gz"
-  sha256 "ff165275859381a63f19135a8f1f6c5a194d53ec3187f94121ecd8ef0795fe3d"
+  url "http://www.greenwoodsoftware.com/less/less-557.tar.gz"
+  sha256 "510e1fe87de3579f7deb4bec38e6d0ad959663d54598729c4cc43a4d64d5b1f7"
 
   depends_on "pcre2"
 
   def install
-    system "./configure", "--prefix=#{prefix}", "--with-regex=pcre2", "--with-editor=nvim"
+    system "./configure", "--prefix=#{prefix}", "--with-regex=pcre2"
     system "make", "install"
   end
 
