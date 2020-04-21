@@ -9,6 +9,7 @@ class GroffHead < Formula
   depends_on "ghostscript" if build.head?
   depends_on "libtool" if build.head?
   depends_on "netpbm" if build.head?
+  depends_on "texinfo" if build.head?
 
   def install
     ENV.prepend_path "PATH", Formula["netpbm"].bin
