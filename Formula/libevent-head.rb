@@ -7,12 +7,13 @@ class LibeventHead < Formula
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
-  depends_on "openssl"
+  # depends_on "openssl@1.1" => :build
 
   def install
     system "./autogen.sh"
     system "./configure", "--disable-dependency-tracking",
                           "--disable-debug-mode",
+                          "--disable-openssl",
                           "--prefix=#{prefix}"
     system "make"
     system "make", "install"
