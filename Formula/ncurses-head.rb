@@ -1,7 +1,7 @@
 class NcursesHead < Formula
   desc "Text-based UI library"
   homepage "https://www.gnu.org/software/ncurses/"
-  head "https://github.com/mirror/ncurses.git"
+  head "https://github.com/ThomasDickey/ncurses-snapshots.git"
 
   depends_on "pkg-config" => :head
   depends_on "pcre" => :head
@@ -19,11 +19,11 @@ class NcursesHead < Formula
                           "--without-debug",
                           "--with-pcre2",
                           "--enable-db-install",
-                          "--enable-sp-funcs",
                           "--enable-ext-colors",
                           "--enable-ext-mouse",
-                          "--enable-ext-putwin",
-                          "--enable-colorfgbg"
+                          "--enable-colorfgbg",
+                          "--enable-sp-funcs",
+                          "--enable-ext-putwin"
 
     system "make", "install"
     make_libncurses_symlinks
@@ -33,13 +33,13 @@ class NcursesHead < Formula
   end
 
   def make_libncurses_symlinks
-    major = version.to_s.split(".")[0]
+    major = "6"
 
     %w[form menu ncurses panel].each do |name|
       lib.install_symlink "lib#{name}w.#{major}.dylib" => "lib#{name}.dylib"
       lib.install_symlink "lib#{name}w.#{major}.dylib" => "lib#{name}.#{major}.dylib"
       lib.install_symlink "lib#{name}w.a" => "lib#{name}.a"
-      lib.install_symlink "lib#{name}w_g.a" => "lib#{name}_g.a"
+      lib.install_symlink "lib#{name}w.a" => "lib#{name}_g.a"
     end
 
     lib.install_symlink "libncurses++w.a" => "libncurses++.a"
@@ -47,6 +47,9 @@ class NcursesHead < Formula
     lib.install_symlink "libncurses.dylib" => "libcurses.dylib"
 
     (lib/"pkgconfig").install_symlink "ncursesw.pc" => "ncurses.pc"
+    (lib/"pkgconfig").install_symlink "formw.pc" => "form.pc"
+    (lib/"pkgconfig").install_symlink "menuw.pc" => "menu.pc"
+    (lib/"pkgconfig").install_symlink "panelw.pc" => "panel.pc"
 
     bin.install_symlink "ncursesw#{major}-config" => "ncurses#{major}-config"
 
