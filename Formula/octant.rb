@@ -1,13 +1,15 @@
 require "language/node"
 
 class Octant < Formula
-  desc "Kubernetes introspection tool for developers"
-  homepage "https://github.com/vmware/octant"
+  desc "Visualize your Kubernetes workloads"
+  homepage "https://octant.dev"
   head "https://github.com/vmware-tanzu/octant.git"
 
   depends_on "go" => :build
   depends_on "node" => :build
   depends_on "protoc-gen-go" => :build
+
+  patch :DATA
 
   def install
     ENV["GOPATH"] = buildpath
@@ -18,26 +20,14 @@ class Octant < Formula
 
     cd "src/github.com/vmware-tanzu/octant" do
       system "go", "run", "build.go", "go-install"
+
       ENV.prepend_path "PATH", buildpath/"bin"
-
       ENV.prepend_path "PATH", "#{Formula["node"].opt_libexec}/bin"
+      ENV["NG_CLI_ANALYTICS"] = "false"
       cd "web" do
-        system "npm", "install", "fsevents@2.1.1", "--save-dev", *Language::Node.local_npm_install_args if build.head?
-        system "rm", "-rf", "node_modules"
+        system "npm", "install", *Language::Node.local_npm_install_args if build.head?
       end
-      system "go", "run", "build.go", "web-build"
-      system "go", "run", "build.go", "generate"
-
-      commit = Utils.popen_read("git rev-parse HEAD").chomp
-      build_time = Utils.popen_read("date -u +'%Y-%m-%dT%H:%M:%SZ' 2> /dev/null").chomp
-      ldflags = ["-X \"main.version=#{version}\"",
-                 "-X \"main.gitCommit=#{commit}\"",
-                 "-X \"main.buildTime=#{build_time}\""]
-
-      ENV["GO_LDFLAGS"] = ldflags.join(" ")
-      system "go", "run", "build.go", "build"
-      # system "go", "build", "-o", bin/"octant", "-ldflags", ldflags.join(" "),
-      #         "-v", "./cmd/octant"
+      system "go", "run", "build.go", "ci-quick"
       bin.install "build/octant"
     end
   end
@@ -50,3 +40,18 @@ class Octant < Formula
     assert_match version.to_s, shell_output("#{bin}/octant version")
   end
 end
+
+__END__
+diff --git a/web/package.json b/web/package.json
+index 119db778..6e14f449 100644
+--- a/web/package.json
++++ b/web/package.json
+@@ -102,5 +102,8 @@
+     "tslint-plugin-prettier": "^2.3.0",
+     "typescript": "^3.8.3",
+     "wait-on": "^4.0.1"
++  },
++  "resolutions": {
++    "**/**/fsevents": "^2.1.3"
+   }
+ }
