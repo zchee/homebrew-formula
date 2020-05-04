@@ -23,7 +23,11 @@ class NcursesHead < Formula
                           "--enable-ext-mouse",
                           "--enable-colorfgbg",
                           "--enable-sp-funcs",
-                          "--enable-ext-putwin"
+                          "--enable-ext-putwin",
+                          "--enable-termcap",
+                          "--without-tests",
+                          "--with-termlib",
+                          "--without-ada"
 
     system "make", "install"
     make_libncurses_symlinks
