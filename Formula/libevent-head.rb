@@ -12,6 +12,7 @@ class LibeventHead < Formula
   def install
     system "./autogen.sh"
     system "./configure", "--disable-dependency-tracking",
+                          "--disable-samples",
                           "--disable-debug-mode",
                           "--disable-openssl",
                           "--prefix=#{prefix}"
