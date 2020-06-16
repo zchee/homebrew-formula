@@ -1,37 +1,28 @@
 class Doxygen < Formula
   desc "Generate documentation for several programming languages"
   homepage "http://www.doxygen.org/"
-  url "https://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.14.src.tar.gz"
-  mirror "https://downloads.sourceforge.net/project/doxygen/rel-1.8.14/doxygen-1.8.14.src.tar.gz"
-  sha256 "d1757e02755ef6f56fd45f1f4398598b920381948d6fcfa58f5ca6aa56f59d4d"
+  url "https://doxygen.nl/files/doxygen-1.8.18.src.tar.gz"
+  mirror "https://downloads.sourceforge.net/project/doxygen/rel-1.8.18/doxygen-1.8.18.src.tar.gz"
+  sha256 "18173d9edc46d2d116c1f92a95d683ec76b6b4b45b817ac4f245bb1073d00656"
   head "https://github.com/doxygen/doxygen.git"
-
-  bottle do
-    cellar :any_skip_relocation
-    sha256 "df47755b88e08c978e06714ac8fb3422fc2bfb1c82c57aa66ae88680f65455b5" => :mojave
-    sha256 "a241e29223f4004e69c81be8e01476602866103e1467cbe631b3e4ef0aa3a4af" => :high_sierra
-    sha256 "c7bda918635189eee83c0716503d43f530b4366deb60639f842a7904debc09e3" => :sierra
-    sha256 "c5c177bb4a290f1e35327b03317dcf3034397db46ae544bebec9fadb9241c86f" => :el_capitan
-  end
 
   option "with-graphviz", "Build with dot command support from Graphviz."
   option "with-qt", "Build GUI frontend with Qt support."
   option "with-llvm", "Build with libclang support."
 
-  deprecated_option "with-dot" => "with-graphviz"
-  deprecated_option "with-doxywizard" => "with-qt"
-  deprecated_option "with-libclang" => "with-llvm"
-  deprecated_option "with-qt5" => "with-qt"
-
+  depends_on "bison" => :build
   depends_on "cmake" => :build
   depends_on "graphviz" => :optional
-  depends_on "llvm@6" => :optional
+  depends_on "llvm" => :optional
+  depends_on "ncursse-head" => :optional
+  depends_on "pcre" => :optional
   depends_on "qt" => :optional
 
   def install
     args = std_cmake_args << "-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=#{MacOS.version}"
     args << "-Dbuild_wizard=ON" if build.with? "qt"
-    args << "-Duse_libclang=ON -DLLVM_CONFIG=#{Formula["llvm@6"].opt_bin}/llvm-config" if build.with? "llvm@6"
+    args << "-Duse_libclang=ON -DLLVM_CONFIG=#{Formula["llvm"].opt_bin}/llvm-config" if build.with? "llvm"
+    args << "-DCMAKE_EXE_LINKER_FLAGS_RELEASE='-Wl,-rpath,#{Formula["llvm"].opt_lib} -Wl,-search_paths_first -ltinfow'"
 
     mkdir "build" do
       system "cmake", "..", *args
