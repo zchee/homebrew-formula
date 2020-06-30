@@ -10,7 +10,6 @@ class Ccache < Formula
     depends_on "asciidoc" => :build
     depends_on "cmake" => :build
     depends_on "git" => :build
-    depends_on "libb2" => :build
     depends_on "libtool" => :build
     depends_on "zstd" => :build
   end
@@ -23,8 +22,6 @@ class Ccache < Formula
     args << "-DA2X_EXE:FILEPATH=#{Formula["asciidoc"].opt_bin}/a2x"
     args << "-DASCIIDOC_EXE:FILEPATH=#{Formula["asciidoc"].opt_bin}/asciidoc"
     args << "-DGIT_EXECUTABLE:FILEPATH=#{Formula["git"].opt_bin}/git"
-    args << "-DLIBB2_INCLUDE_DIR:PATH=#{Formula["libb2"].opt_include}"
-    args << "-DLIBB2_LIBRARY:FILEPATH=#{Formula["libb2"].opt_lib}/libb2.dylib"
     args << "-DZSTD_INCLUDE_DIR:PATH=#{Formula["zstd"].opt_include}"
     args << "-DZSTD_LIBRARY:FILEPATH=#{Formula["zstd"].opt_lib}/libzstd.dylib"
 
