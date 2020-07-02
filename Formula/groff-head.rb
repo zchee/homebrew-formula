@@ -12,6 +12,10 @@ class GroffHead < Formula
   depends_on "texinfo" if build.head?
 
   def install
+    ENV.prepend_path "PATH", Formula["autoconf"].bin
+    ENV.prepend_path "PATH", Formula["automake"].bin
+    ENV.prepend_path "PATH", Formula["libtool"].bin
+    ENV.prepend_path "PATH", Formula["texinfo"].bin
     ENV.prepend_path "PATH", Formula["netpbm"].bin
 
     system "./bootstrap", "--skip-po"
