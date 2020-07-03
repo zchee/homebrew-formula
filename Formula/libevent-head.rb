@@ -7,7 +7,8 @@ class LibeventHead < Formula
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
-  # depends_on "openssl@1.1" => :build
+
+  keg_only "libevent-head is not linked to prevent conflicts with the libevent formula"
 
   def install
     system "./autogen.sh"
