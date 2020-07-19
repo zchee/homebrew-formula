@@ -22,11 +22,15 @@ class CurlQuic < Formula
   depends_on "openldap"
   depends_on "openssl-quic"
   depends_on "rtmpdump"
+  depends_on "zstd"
+
+  patch :DATA if not build.head?
 
   def install
     system "./buildconf" if build.head?
     
-    ENV.append "LDFLAGS", "-Wl,-rpath,#{Formula["openssl-quic"].lib}"
+    ENV.append "CFLAGS", "-march=native -Ofast -flto"
+    ENV.append "LDFLAGS", "-march=native -Ofast -flto"
     
     openssl_quic = Formula["openssl-quic"]
     args = %W[
@@ -42,20 +46,24 @@ class CurlQuic < Formula
       --with-libmetalink
       --with-librtmp
       --with-libssh2
-      --with-ssl=#{openssl_quic.opt_prefix}
+      --with-ssl=yes
       --with-nghttp3=#{Formula["nghttp3"].opt_prefix}
       --with-ngtcp2=#{Formula["ngtcp2"].opt_prefix}
       --without-quiche
       --enable-alt-svc
       --without-libpsl
-      PKG_CONFIG_LIBDIR=#{Formula["openssl-quic"].lib}/pkgconfig:#{ENV["PKG_CONFIG_LIBDIR"]}
-      PKG_CONFIG_PATH=#{Formula["openssl-quic"].lib}/pkgconfig:#{ENV["PKG_CONFIG_LIBDIR"]}
     ]
     
     system "./configure", *args
     system "make", "install"
 
     libexec.install "lib/mk-ca-bundle.pl"
+  end
+
+  def caveats
+    <<~EOS
+      curl-quic formula needs to --env=std flag
+    EOS
   end
 
   test do
@@ -70,3 +78,18 @@ class CurlQuic < Formula
     assert_predicate testpath/"certdata.txt", :exist?
   end
 end
+
+__END__
+diff --git a/configure.ac b/configure.ac
+index ed1b5fcec..e69dc561f 100755
+--- a/configure.ac
++++ b/configure.ac
+@@ -1751,7 +1751,7 @@ if test -z "$ssl_backends" -o "x$OPT_SSL" != xno &&
+       dnl only do pkg-config magic when not cross-compiling
+       PKGTEST="yes"
+     fi
+-    PREFIX_OPENSSL=/usr/local/ssl
++    PREFIX_OPENSSL=/usr/local/opt/openssl-quic
+     LIB_OPENSSL="$PREFIX_OPENSSL/lib$libsuff"
+     ;;
+   off)
