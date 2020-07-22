@@ -1,4 +1,4 @@
-class Ccache < Formula
+class CcacheHead < Formula
   desc "Object-file caching compiler wrapper"
   homepage "https://ccache.dev/"
 
@@ -19,6 +19,9 @@ class Ccache < Formula
 
     args = std_cmake_args << "-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=#{MacOS.version}"
     args << "-DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE"
+    args << "-DCMAKE_C_STANDARD=11"
+    args << "-DCMAKE_CXX_STANDARD=17"
+    args << "-DENABLE_TESTING:BOOL=OFF"
     args << "-DA2X_EXE:FILEPATH=#{Formula["asciidoc"].opt_bin}/a2x"
     args << "-DASCIIDOC_EXE:FILEPATH=#{Formula["asciidoc"].opt_bin}/asciidoc"
     args << "-DGIT_EXECUTABLE:FILEPATH=#{Formula["git"].opt_bin}/git"
