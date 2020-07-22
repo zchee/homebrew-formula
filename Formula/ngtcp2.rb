@@ -9,6 +9,7 @@ class Ngtcp2 < Formula
   end
 
   depends_on "pkg-config" => :build
+  depends_on "openssl-quic"
 
   def install
     args = std_cmake_args << "-Wno-dev"
@@ -16,7 +17,9 @@ class Ngtcp2 < Formula
     args << "-DCMAKE_C_STANDARD=11"
     args << "-DCMAKE_CXX_STANDARD=17"
     args << "-DENABLE_GNUTLS:BOOL=OFF"
-    args << "-DENABLE_OPENSSL:BOOL=OFF"
+    args << "-DENABLE_OPENSSL:BOOL=ON"
+    args << "-DOPENSSL_INCLUDE_DIRS:PATH=#{Formula["openssl-quic"].opt_include}"
+    args << "-DOPENSSL_LIBRARIES:PATH=#{Formula["openssl-quic"].opt_lib}"
     args << "-DLIBEV_INCLUDE_DIR:PATH="
     args << "-DLIBEV_LIBRARY:FILEPATH="
     args << "-DLIBNGHTTP3_INCLUDE_DIR:PATH="
