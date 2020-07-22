@@ -49,6 +49,7 @@ class NcursesHead < Formula
     lib.install_symlink "libncurses++w.a" => "libncurses++.a"
     lib.install_symlink "libncurses.a" => "libcurses.a"
     lib.install_symlink "libncurses.dylib" => "libcurses.dylib"
+    lib.install_symlink "libncursesw.dylib" => "libcursesw.dylib"
 
     (lib/"pkgconfig").install_symlink "ncursesw.pc" => "ncurses.pc"
     (lib/"pkgconfig").install_symlink "formw.pc" => "form.pc"
