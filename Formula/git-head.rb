@@ -3,32 +3,33 @@ class GitHead < Formula
   homepage "https://git-scm.com"
   head "https://github.com/git/git.git", :shallow => false
 
+  depends_on "asciidoc"
   depends_on "brotli"
-  depends_on "curl-head"
+  depends_on "c-ares"
+  depends_on "curl-quic"
   depends_on "gettext"
   depends_on "libidn2"
   depends_on "libmetalink"
   depends_on "libssh2"
   depends_on "nghttp2"
+  depends_on "nghttp3"
+  depends_on "ngtcp2"
+  depends_on "openldap"
+  depends_on "openssl-quic"
   depends_on "pcre2"
   depends_on "rtmpdump"
-  depends_on "zlib"
-  depends_on "asciidoc"
   depends_on "xmlto"
-
-  if MacOS.version < :yosemite
-    depends_on "openssl@1.1"
-    depends_on "curl"
-  end
+  depends_on "zlib"
+  depends_on "zstd"
 
   resource "html" do
-    url "https://www.kernel.org/pub/software/scm/git/git-htmldocs-2.26.0.tar.xz"
-    sha256 "5be14d0835177f8ada0310c98b0248c7caaea0a302b7b58f1ccc0c0f7ece2466"
+    url "https://www.kernel.org/pub/software/scm/git/git-htmldocs-2.27.0.tar.xz"
+    sha256 "ffa91681b6a8f558745924b1dbb76d604c9e52b27c525c6bd470c0123f7f4af3"
   end
 
   resource "man" do
-    url "https://www.kernel.org/pub/software/scm/git/git-manpages-2.26.0.tar.xz"
-    sha256 "387e46a0b67c148be7ef80759b1930a3b64ac77782630c18afc784f35ed93426"
+    url "https://www.kernel.org/pub/software/scm/git/git-manpages-2.27.0.tar.xz"
+    sha256 "e6cbab49b04c975886fdddf46eb24c5645c6799224208db8b01143091d9bd49c"
   end
 
   resource "Net::SMTP::SSL" do
@@ -37,23 +38,25 @@ class GitHead < Formula
   end
 
   def install
-    ENV["CFLAGS"] = "-std=c17 -march=native -Ofast -flto"
-    ENV["LDFLAGS"] = "-march=native -Ofast -flto -L#{Formula["zlib"].lib} -L#{Formula["brotli"].lib} -L#{Formula["libressl"].lib} -L#{Formula["libmetalink"].lib} -L#{Formula["libssh2"].lib} -L#{Formula["rtmpdump"].lib} -L#{Formula["libidn2"].lib} -L#{Formula["nghttp2"].lib}"
     # If these things are installed, tell Git build system not to use them
     ENV["NO_FINK"] = "1"
     ENV["NO_DARWIN_PORTS"] = "1"
-    ENV["NO_R_TO_GCC_LINKER"] = "1" # pass arguments to LD correctly
     ENV["PYTHON_PATH"] = which("python")
     ENV["PERL_PATH"] = which("perl")
     ENV["USE_LIBPCRE2"] = "1"
     ENV["INSTALL_SYMLINKS"] = "1"
     ENV["LIBPCREDIR"] = Formula["pcre2"].opt_prefix
-    ENV["CURLDIR"] = Formula["curl-head"].opt_prefix
     ENV["V"] = "1" # build verbosely
-    ENV["JAVA_HOME"] = "/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home"
+
+    ENV["CFLAGS"] = "-march=native -Ofast -flto -std=c17"
+    ENV["CXXFLAGS"] = "-march=native -Ofast -flto -std=c++17 -stdlib=libc++"
+    ENV["LDFLAGS"] = "-march=native -Ofast -flto"
+    ENV["LDFLAGS"] += " -L#{Formula["brotli"].lib} -L#{Formula["c-ares"].lib} -L#{Formula["curl-quic"].lib} -L#{Formula["libidn2"].lib} -L#{Formula["libmetalink"].lib}"
+    ENV["LDFLAGS"] += " -L#{Formula["libssh2"].lib} -L#{Formula["nghttp2"].lib} -L#{Formula["nghttp3"].lib} -L#{Formula["ngtcp2"].lib} -L#{Formula["openldap"].lib}"
+    ENV["LDFLAGS"] += " -L#{Formula["openssl-quic"].lib} -L#{Formula["pcre2"].lib} -L#{Formula["rtmpdump"].lib} -L#{Formula["zlib"].lib} -L#{Formula["zstd"].lib}"
     ENV["XML_CATALOG_FILES"] = "/usr/local/etc/xml/catalog"
 
-    perl_version = Utils.popen_read("perl --version")[/v(\d+\.\d+)(?:\.\d+)?/, 1]
+    perl_version = Utils.safe_popen_read("perl", "--version")[/v(\d+\.\d+)(?:\.\d+)?/, 1]
 
     ENV["PERLLIB_EXTRA"] = %W[
       #{MacOS.active_developer_dir}
@@ -63,8 +66,6 @@ class GitHead < Formula
       "#{p}/Library/Perl/#{perl_version}/darwin-thread-multi-2level"
     end.join(":")
 
-    ENV["NO_PERL_MAKEMAKER"] = "1" unless quiet_system ENV["PERL_PATH"], "-e", "use ExtUtils::MakeMaker"
-
     # Ensure we are using the correct system headers (for curl) to workaround
     # mismatched Xcode/CLT versions:
     # https://github.com/Homebrew/homebrew-core/issues/46466
@@ -72,22 +73,27 @@ class GitHead < Formula
       ENV["HOMEBREW_SDKROOT"] = MacOS::CLT.sdk_path(MacOS.version)
     end
 
+    # The git-gui and gitk tools are installed by a separate formula (git-gui)
+    # to avoid a dependency on tcl-tk and to avoid using the broken system
+    # tcl-tk (see https://github.com/Homebrew/homebrew-core/issues/36390)
+    # This is done by setting the NO_TCLTK make variable.
     args = %W[
       prefix=#{prefix}
       sysconfdir=#{etc}
       CC=#{ENV.cc}
       CFLAGS=#{ENV.cflags}
       LDFLAGS=#{ENV.ldflags}
+      NO_TCLTK=1
     ]
 
     if MacOS.version < :yosemite
-      openssl_prefix = Formula["openssl"].opt_prefix
+      openssl_prefix = Formula["openssl-quic"].opt_prefix
       args += %W[NO_APPLE_COMMON_CRYPTO=1 OPENSSLDIR=#{openssl_prefix}]
     else
       args += %w[NO_OPENSSL=1 APPLE_COMMON_CRYPTO=1]
     end
 
-    system "make", "install", "install-man", *args
+    system "make", "install", *args
 
     git_core = libexec/"git-core"
 
@@ -139,9 +145,6 @@ class GitHead < Formula
     chmod 0644, Dir["#{share}/doc/git-doc/**/*.{html,txt}"]
     chmod 0755, Dir["#{share}/doc/git-doc/{RelNotes,howto,technical}"]
 
-    # To avoid this feature hooking into the system OpenSSL, remove it
-    rm "#{libexec}/git-core/git-imap-send" if MacOS.version >= :yosemite
-
     # git-send-email needs Net::SMTP::SSL
     resource("Net::SMTP::SSL").stage do
       (share/"perl5").install "lib/Net"
@@ -172,6 +175,8 @@ class GitHead < Formula
     system bin/"git", "init"
     %w[haunted house].each { |f| touch testpath/f }
     system bin/"git", "add", "haunted", "house"
+    system bin/"git", "config", "user.name", "'A U Thor'"
+    system bin/"git", "config", "user.email", "author@example.com"
     system bin/"git", "commit", "-a", "-m", "Initial Commit"
     assert_equal "haunted\nhouse", shell_output("#{bin}/git ls-files").strip
 
@@ -179,9 +184,10 @@ class GitHead < Formula
     %w[foo bar].each { |f| touch testpath/f }
     system bin/"git", "add", "foo", "bar"
     system bin/"git", "commit", "-a", "-m", "Second Commit"
-    assert_match "Authentication Required", shell_output(
-      "#{bin}/git send-email --to=dev@null.com --smtp-server=smtp.gmail.com " \
-      "--smtp-encryption=tls --confirm=never HEAD^ 2>&1", 255
+    assert_match "Authentication Required", pipe_output(
+      "#{bin}/git send-email --from=test@example.com --to=dev@null.com " \
+      "--smtp-server=smtp.gmail.com --smtp-server-port=587 " \
+      "--smtp-encryption=tls --confirm=never HEAD^ 2>&1",
     )
   end
 end
