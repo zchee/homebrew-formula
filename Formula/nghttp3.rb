@@ -15,7 +15,6 @@ class Nghttp3 < Formula
 
     args = %W[
       --prefix=#{prefix}
-      --enable-lib-only
     ]
 
     system "autoreconf", "-i" if build.head?
