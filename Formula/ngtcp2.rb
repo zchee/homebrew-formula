@@ -5,36 +5,28 @@ class Ngtcp2 < Formula
   head do
     url "https://github.com/ngtcp2/ngtcp2.git"
 
-    depends_on "autoconf"
-    depends_on "automake"
-    depends_on "libtool"
+    depends_on "cmake"
   end
 
-  depends_on "cunit" => :build
   depends_on "pkg-config" => :build
-  depends_on "jemalloc"
-  depends_on "libev"
-  depends_on "nghttp3"
-  depends_on "openssl-quic"
-
-  uses_from_macos "zlib"
 
   def install
-    ENV.cxx11
+    args = std_cmake_args << "-Wno-dev"
+    args << "-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=#{MacOS.version}"
+    args << "-DCMAKE_C_STANDARD=11"
+    args << "-DCMAKE_CXX_STANDARD=17"
+    args << "-DENABLE_GNUTLS:BOOL=OFF"
+    args << "-DENABLE_OPENSSL:BOOL=OFF"
+    args << "-DLIBEV_INCLUDE_DIR:PATH="
+    args << "-DLIBEV_LIBRARY:FILEPATH="
+    args << "-DLIBNGHTTP3_INCLUDE_DIR:PATH="
+    args << "-DLIBNGHTTP3_LIBRARY:FILEPATH="
 
-    ENV.append "LDFLAGS", "-Wl,-rpath,#{Formula["openssl-quic"].lib}"
-
-    args = %W[
-      --prefix=#{prefix}
-      --disable-silent-rules
-      --with-jemalloc
-      --with-openssl
-    ]
-
-    system "autoreconf", "-i" if build.head?
-    system "./configure", *args
-    system "make"
-    system "make", "check"
-    system "make", "install"
+    mkdir "build" do
+      system "cmake", "..", *args
+      system "make"
+      system "make", "check"
+      system "make", "install"
+    end
   end
 end
