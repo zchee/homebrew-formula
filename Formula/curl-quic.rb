@@ -39,8 +39,8 @@ class CurlQuic < Formula
       --disable-silent-rules
       --prefix=#{prefix}
       --enable-ares=#{Formula["c-ares"].opt_prefix}
-      --with-ca-bundle=#{openssl_quic.pkgetc}/cert.pem
-      --with-ca-path=#{openssl_quic.pkgetc}/certs
+      --with-ca-bundle=#{etc}/openssl-quic/cert.pem
+      --with-ca-path=#{etc}/openssl-quic/certs
       --with-gssapi
       --with-libidn2
       --with-libmetalink
