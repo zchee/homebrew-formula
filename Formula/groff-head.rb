@@ -3,13 +3,13 @@ class GroffHead < Formula
   homepage "https://www.gnu.org/software/groff/"
   head "https://git.savannah.gnu.org/git/groff.git"
 
-  depends_on "autoconf" if build.head?
-  depends_on "automake" if build.head?
-  depends_on "gawk" if build.head?
-  depends_on "ghostscript" if build.head?
-  depends_on "libtool" if build.head?
-  depends_on "netpbm" if build.head?
-  depends_on "texinfo" if build.head?
+  depends_on "autoconf" if build
+  depends_on "automake" if build
+  depends_on "gawk" if build
+  depends_on "ghostscript" if build
+  depends_on "libtool" if build
+  depends_on "netpbm" if build
+  depends_on "texinfo" if build
 
   def install
     ENV.prepend_path "PATH", Formula["autoconf"].bin
