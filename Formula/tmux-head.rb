@@ -1,14 +1,11 @@
 class TmuxHead < Formula
   desc "Terminal multiplexer"
   homepage "https://tmux.github.io/"
+  head "https://github.com/tmux/tmux.git"
 
-  head do
-    url "https://github.com/tmux/tmux.git"
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
 
   depends_on "pkg-config" => :build
   depends_on "libevent-head"
@@ -24,7 +21,7 @@ class TmuxHead < Formula
   end
 
   def install
-    system "sh", "autogen.sh" if build.head?
+    system "sh", "autogen.sh"
 
     args = %W[
       --disable-dependency-tracking

@@ -1,23 +1,21 @@
 class CcacheHead < Formula
   desc "Object-file caching compiler wrapper"
   homepage "https://ccache.dev/"
+  head "https://github.com/ccache/ccache.git"
 
   uses_from_macos "zlib"
 
-  head do
-    url "https://github.com/ccache/ccache.git"
-
-    depends_on "asciidoc" => :build
-    depends_on "cmake" => :build
-    depends_on "git" => :build
-    depends_on "libtool" => :build
-    depends_on "zstd" => :build
-  end
+  depends_on "asciidoc" => :build
+  depends_on "cmake" => :build
+  depends_on "git" => :build
+  depends_on "libtool" => :build
+  depends_on "zstd" => :build
 
   def install
     ENV["XML_CATALOG_FILES"] = etc/"xml/catalog" if build.head?
 
-    args = std_cmake_args << "-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=#{MacOS.version}"
+    args = std_cmake_args
+    args << "-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=#{MacOS.version}"
     args << "-DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE"
     args << "-DCMAKE_C_STANDARD=11"
     args << "-DCMAKE_CXX_STANDARD=17"

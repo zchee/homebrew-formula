@@ -6,19 +6,22 @@ class JqHead < Formula
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "python" => :build
-  depends_on "pipenv" => :build
   depends_on "oniguruma" => :build
+  depends_on "pipenv" => :build
+  depends_on "python" => :build
 
   def install
-    system "autoreconf", "-iv" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--disable-maintainer-mode",
-                          "--disable-docs",
-                          "--prefix=#{prefix}",
-                          "--with-oniguruma=#{Formula["oniguruma"].opt_prefix}"
+    args = %W[
+      --disable-dependency-tracking
+      --disable-silent-rules
+      --disable-maintainer-mode
+      --disable-docs
+      --prefix=#{prefix}
+      --with-oniguruma=#{Formula["oniguruma"].opt_prefix}
+    ]
 
+    system "autoreconf", "-iv" if build.head?
+    system "./configure", *args
     system "make", "install"
   end
 

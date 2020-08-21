@@ -1,31 +1,27 @@
 class CurlQuic < Formula
   desc "Get a file from an HTTP, HTTPS or FTP server with QUIC"
   homepage "https://curl.haxx.se/"
+  head "https://github.com/curl/curl.git"
 
-  head do
-    url "https://github.com/curl/curl.git"
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
-
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "brotli" => :build
+  depends_on "c-ares" => :build
+  depends_on "libidn" => :build
+  depends_on "libmetalink" => :build
+  depends_on "libssh2" => :build
+  depends_on "libtool" => :build
+  depends_on "nghttp2" => :build
+  depends_on "nghttp3" => :build
+  depends_on "ngtcp2" => :build
+  depends_on "openldap" => :build
+  depends_on "openssl-quic" => :build
   depends_on "pkg-config" => :build
-  depends_on "brotli"
-  depends_on "c-ares"
-  depends_on "libidn"
-  depends_on "libmetalink"
-  depends_on "libssh2"
-  depends_on "nghttp2"
-  depends_on "nghttp3"
-  depends_on "ngtcp2"
-  depends_on "openldap"
-  depends_on "openssl-quic"
-  depends_on "rtmpdump"
-  depends_on "zstd"
+  depends_on "rtmpdump" => :build
+  depends_on "zstd" => :build
 
   def install
-    system "./buildconf" if build.head?
+    system "./buildconf"
     
     ENV.append "CFLAGS", "-march=native -Ofast -flto"
     ENV.append "LDFLAGS", "-march=native -Ofast -flto"
