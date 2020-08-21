@@ -25,7 +25,7 @@ class Octant < Formula
       ENV.prepend_path "PATH", "#{Formula["node"].opt_libexec}/bin"
       ENV["NG_CLI_ANALYTICS"] = "false"
       cd "web" do
-        system "npm", "install", *Language::Node.local_npm_install_args if build.head?
+        system "npm", "install", *Language::Node.local_npm_install_args
       end
       system "go", "run", "build.go", "ci-quick"
       bin.install "build/octant"
