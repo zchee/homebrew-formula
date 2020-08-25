@@ -39,10 +39,6 @@ class OpensslQuic < Formula
     system "make", "install_sw"
   end
 
-  def openssldir
-    etc/"openssl-quic"
-  end
-
   def post_install
     keychains = %w[
       /System/Library/Keychains/SystemRootCertificates.keychain
@@ -54,7 +50,7 @@ class OpensslQuic < Formula
     )
 
     valid_certs = certs.select do |cert|
-      IO.popen("#{bin}/openssl x509 -inform pem -checkend 0 -noout >/dev/null", "w") do |openssl_io|
+      IO.popen("#{bin}/openssl x509 -inform pem -checkend 0 -noout", "w") do |openssl_io|
         openssl_io.write(cert)
         openssl_io.close_write
       end
@@ -62,18 +58,19 @@ class OpensslQuic < Formula
       $CHILD_STATUS.success?
     end
 
-    openssldir.mkpath
-    (openssldir/"cert.pem").atomic_write(valid_certs.join("\n") << "\n")
+    (etc/"openssl-quic").mkpath
+    (etc/"openssl-quic/cert.pem").atomic_write(valid_certs.join("\n"))
   end
 
   def caveats
     <<~EOS
-      A CA file has been bootstrapped using certificates from the system
-      keychain. To add additional certificates, place .pem files in
-        #{openssldir}/certs
+      A CA file has been bootstrapped using certificates from the SystemRoots
+      keychain. To add additional certificates (e.g. the certificates added in
+      the System keychain), place .pem files in
+        #{etc}/openssl-quic/certs
 
       and run
-        #{opt_bin}/c_rehash
+        #{opt_bin}/openssl-quic certhash #{etc}/openssl-quic/certs
     EOS
   end
 
