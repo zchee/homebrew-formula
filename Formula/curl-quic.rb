@@ -21,7 +21,7 @@ class CurlQuic < Formula
   depends_on "zstd" => :build
 
   def install
-    system "./buildconf"
+    system "autoreconf", "-fi"
     
     ENV.append "CFLAGS", "-march=native -Ofast -flto"
     ENV.append "LDFLAGS", "-march=native -Ofast -flto"
