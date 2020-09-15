@@ -1,10 +1,13 @@
 class OpensslQuic < Formula
-  desc "Cryptography and SSL/TLS Toolkit with QUIC"
+  desc "Cryptography and SSL/TLS Toolkit with QUIC(http3)"
   homepage "https://github.com/tatsuhiro-t/openssl/tree/OpenSSL_1_1_1g-quic-draft-29"
   url "https://github.com/tatsuhiro-t/openssl/archive/OpenSSL_1_1_1g-quic-draft-29.tar.gz"
   sha256 "567facee74221471e04a6bbeb9ffbe646f2d655e2a011c98a30afc45a54132ef"
+  license "OpenSSL"
 
-  keg_only :provided_by_macos
+  bottle :unneeded
+
+  keg_only :shadowed_by_macos, "macOS provides LibreSSL"
 
   # SSLv2 died with 1.1.0, so no-ssl2 no longer required.
   # SSLv3 & zlib are off by default with 1.1.0 but this may not
@@ -13,7 +16,7 @@ class OpensslQuic < Formula
   def configure_args
     %W[
       --prefix=#{prefix}
-      --openssldir=#{etc}/openssl-quic
+      --openssldir=#{openssldir}
       enable-tls1_3
       no-ssl3
       no-ssl3-method
@@ -31,12 +34,19 @@ class OpensslQuic < Formula
     ENV["PERL"] = Formula["perl"].opt_bin/"perl" if which("perl") == Formula["perl"].opt_bin/"perl"
 
     arch_args = %w[darwin64-x86_64-cc enable-ec_nistp_64_gcc_128]
+    # Remove `no-asm` workaround when upstream releases a fix
+    # See also: https://github.com/openssl/openssl/issues/12254
+    arch_args << "no-asm" if Hardware::CPU.arm?
 
     ENV.deparallelize
     system "perl", "./Configure", *(configure_args + arch_args)
     system "make"
     system "make", "test"
-    system "make", "install_sw"
+    system "make", "install", "MANDIR=#{man}", "MANSUFFIX=ssl"
+  end
+
+  def openssldir
+    etc/"openssl-quic"
   end
 
   def post_install
@@ -50,7 +60,7 @@ class OpensslQuic < Formula
     )
 
     valid_certs = certs.select do |cert|
-      IO.popen("#{bin}/openssl x509 -inform pem -checkend 0 -noout", "w") do |openssl_io|
+      IO.popen("#{bin}/openssl x509 -inform pem -checkend 0 -noout >/dev/null", "w") do |openssl_io|
         openssl_io.write(cert)
         openssl_io.close_write
       end
@@ -58,19 +68,18 @@ class OpensslQuic < Formula
       $CHILD_STATUS.success?
     end
 
-    (etc/"openssl-quic").mkpath
-    (etc/"openssl-quic/cert.pem").atomic_write(valid_certs.join("\n"))
+    openssldir.mkpath
+    (openssldir/"cert.pem").atomic_write(valid_certs.join("\n") << "\n")
   end
 
   def caveats
     <<~EOS
-      A CA file has been bootstrapped using certificates from the SystemRoots
-      keychain. To add additional certificates (e.g. the certificates added in
-      the System keychain), place .pem files in
-        #{etc}/openssl-quic/certs
+      A CA file has been bootstrapped using certificates from the system
+      keychain. To add additional certificates, place .pem files in
+        #{openssldir}/certs
 
       and run
-        #{opt_bin}/openssl-quic certhash #{etc}/openssl-quic/certs
+        #{opt_bin}/c_rehash
     EOS
   end
 
