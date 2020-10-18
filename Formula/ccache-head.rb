@@ -29,9 +29,9 @@ class CcacheHead < Formula
     mkdir "build" do
       system "cmake", "..", *args
       system "make"
-      system "make", "manpage"
+      system "make", "doc-man-page"
       system "make", "install"
-      man1.install "ccache.1"
+      man1.install "doc/Ccache.1"
     end
 
     libexec.mkpath
