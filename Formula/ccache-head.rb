@@ -18,7 +18,7 @@ class CcacheHead < Formula
     args << "-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=#{MacOS.version}"
     args << "-DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE"
     args << "-DCMAKE_C_STANDARD=11"
-    args << "-DCMAKE_CXX_STANDARD=17"
+    args << "-DCMAKE_CXX_STANDARD=11"
     args << "-DENABLE_TESTING:BOOL=OFF"
     args << "-DA2X_EXE:FILEPATH=#{Formula["asciidoc"].opt_bin}/a2x"
     args << "-DASCIIDOC_EXE:FILEPATH=#{Formula["asciidoc"].opt_bin}/asciidoc"
