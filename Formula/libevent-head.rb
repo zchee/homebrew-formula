@@ -1,21 +1,27 @@
 class LibeventHead < Formula
   desc "Asynchronous event library"
   homepage "https://libevent.org/"
+  license "BSD-3-Clause"
   head "https://github.com/libevent/libevent.git"
+
+  livecheck do
+    url :homepage
+    regex(/libevent[._-]v?(\d+(?:\.\d+)+)-stable/i)
+  end
+
+  bottle :unneeded
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
-
-  keg_only "libevent-head is not linked to prevent conflicts with the libevent formula"
+  depends_on "openssl@1.1"
 
   def install
     system "./autogen.sh"
     system "./configure", "--disable-dependency-tracking",
                           "--disable-samples",
                           "--disable-debug-mode",
-                          "--disable-openssl",
                           "--prefix=#{prefix}"
     system "make"
     system "make", "install"
@@ -37,4 +43,3 @@ class LibeventHead < Formula
     system "./test"
   end
 end
-
