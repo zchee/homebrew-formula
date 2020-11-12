@@ -18,10 +18,10 @@ class BazelBuildtools < Formula
     # system "bazelisk", "build", "--config=release", "buildozer:buildozer"
     # system "bazelisk", "build", "--config=release", "generatetables:generatetables"
     # system "bazelisk", "build", "--config=release", "unused_deps:unused_deps"
-    bin.install "bazel-bin/buildifier/darwin_amd64_stripped/buildifier"
-    bin.install "bazel-bin/buildifier2/darwin_amd64_stripped/buildifier2"
-    bin.install "bazel-bin/buildozer/darwin_amd64_stripped/buildozer"
-    bin.install "bazel-bin/generatetables/darwin_amd64_stripped/generatetables"
-    bin.install "bazel-bin/unused_deps/darwin_amd64_stripped/unused_deps"
+    bin.install "bazel-bin/buildifier/buildifier_/buildifier"
+    bin.install "bazel-bin/buildifier2/buildifier2_/buildifier2"
+    bin.install "bazel-bin/buildozer/buildozer_/buildozer"
+    bin.install "bazel-bin/generatetables/generatetables_/generatetables"
+    bin.install "bazel-bin/unused_deps/unused_deps_/unused_deps"
   end
 end
