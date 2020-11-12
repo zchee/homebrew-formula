@@ -1,4 +1,4 @@
-class BashdbHead < Formula
+class Bashdb < Formula
   desc "Bash shell debugger"
   homepage "https://bashdb.sourceforge.io"
   license "GPL-2.0"
