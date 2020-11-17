@@ -1,22 +1,29 @@
 class TmuxHead < Formula
   desc "Terminal multiplexer"
   homepage "https://tmux.github.io/"
-  head "https://github.com/tmux/tmux.git"
+  license "ISC"
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
+  livecheck do
+    url "https://github.com/tmux/tmux/releases/latest"
+    regex(%r{href=.*?/tag/v?(\d+(?:\.\d+)+[a-z]?)["' >]}i)
+  end
+
+  bottle :unneeded
+
+  head do
+    url "https://github.com/tmux/tmux.git"
+
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "libtool" => :build
+  end
 
   depends_on "pkg-config" => :build
-  depends_on "libevent-head"
-  depends_on "ncurses-head"
-
-  # Old versions of macOS libc disagree with utf8proc character widths.
-  # https://github.com/tmux/tmux/issues/2223
-  depends_on "utf8proc" if MacOS.version >= :high_sierra
+  depends_on "libevent-head" => :build
+  depends_on "ncurses-head" => :build
 
   resource "completion" do
-    url "https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/f5d53239f765/completions/tmux"
+    url "https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/f5d53239f7658f8e8fbaf02535cc369009c436d6/completions/tmux"
     sha256 "b5f7bbd78f9790026bbff16fc6e3fe4070d067f58f943e156bd1a8c3c99f6a6f"
   end
 
@@ -25,12 +32,13 @@ class TmuxHead < Formula
 
     args = %W[
       --disable-dependency-tracking
+      --disable-utf8proc
       --prefix=#{prefix}
       --sysconfdir=#{etc}
     ]
 
-    args << "--enable-utf8proc" if MacOS.version >= :high_sierra
-
+    ENV.append "CFLAGS", "-march=native -Ofast -flto"
+    ENV.append "LDFLAGS", "-march=native -Ofast -flto"
     ENV.append "LDFLAGS", "-lresolv"
     system "./configure", *args
 
