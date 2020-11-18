@@ -14,6 +14,9 @@ class GitDelta < Formula
   def install
     ENV.append_to_cflags "-fno-stack-check" if DevelopmentTools.clang_build_version >= 1010
     system "cargo", "install", *std_cargo_args, "--all-features"
+
+    bash_completion.install "etc/completion/completion.bash"
+    zsh_completion.install "etc/completion/completion.zsh" => "_delta"
   end
 
   test do
