@@ -28,7 +28,6 @@ class Ngtcp2 < Formula
     mkdir "build" do
       system "cmake", "..", *args
       system "make"
-      system "make", "check"
       system "make", "install"
     end
   end
