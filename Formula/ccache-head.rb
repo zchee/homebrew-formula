@@ -7,7 +7,7 @@ class CcacheHead < Formula
 
   depends_on "asciidoc" => :build
   depends_on "cmake" => :build
-  depends_on "git" => :build
+  depends_on "git-head" => :build
   depends_on "libtool" => :build
   depends_on "zstd" => :build
 
