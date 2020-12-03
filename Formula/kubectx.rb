@@ -1,6 +1,7 @@
 class Kubectx < Formula
   desc "Tool that can switch between kubectl contexts easily and create aliases"
   homepage "https://github.com/ahmetb/kubectx"
+  license "Apache-2.0"
   head "https://github.com/ahmetb/kubectx.git"
 
   bottle :unneeded
