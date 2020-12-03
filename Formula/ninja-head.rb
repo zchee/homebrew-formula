@@ -11,16 +11,13 @@ class NinjaHead < Formula
 
   bottle :unneeded
 
-  depends_on "cmake" => :build
+  depends_on "python@3.9"
 
   def install
-    system "cmake", "-Bbuild-cmake", "-H.", *std_cmake_args
-    system "cmake", "--build", "build-cmake"
+    py = Formula["python@3.9"].opt_bin/"python3"
+    system py, "./configure.py", "--bootstrap", "--verbose", "--with-python=#{py}"
 
-    # Quickly test the build
-    system "./build-cmake/ninja_test"
-
-    bin.install "build-cmake/ninja"
+    bin.install "ninja"
     bash_completion.install "misc/bash-completion" => "ninja-completion.sh"
     zsh_completion.install "misc/zsh-completion" => "_ninja"
   end
