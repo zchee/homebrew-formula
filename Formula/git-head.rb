@@ -1,7 +1,12 @@
 class GitHead < Formula
   desc "Distributed revision control system"
   homepage "https://git-scm.com"
-  head "https://github.com/git/git.git", :shallow => false
+  head "https://github.com/git/git.git", shallow: false
+
+  livecheck do
+    url "https://www.kernel.org/pub/software/scm/git/"
+    regex(/href=.*?git[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   depends_on "asciidoc"
   depends_on "brotli"
@@ -86,12 +91,8 @@ class GitHead < Formula
       NO_TCLTK=1
     ]
 
-    if MacOS.version < :yosemite
-      openssl_prefix = Formula["openssl-quic"].opt_prefix
-      args += %W[NO_APPLE_COMMON_CRYPTO=1 OPENSSLDIR=#{openssl_prefix}]
-    else
-      args += %w[NO_OPENSSL=1 APPLE_COMMON_CRYPTO=1]
-    end
+    openssl_prefix = Formula["openssl-quic"].opt_prefix
+    args += %W[NO_APPLE_COMMON_CRYPTO=1 OPENSSLDIR=#{openssl_prefix}]
 
     system "make", "install", *args
 
