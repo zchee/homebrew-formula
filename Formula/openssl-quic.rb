@@ -1,8 +1,8 @@
 class OpensslQuic < Formula
-  desc "Cryptography and SSL/TLS Toolkit with QUIC(http3)"
-  homepage "https://github.com/tatsuhiro-t/openssl/tree/OpenSSL_1_1_1g-quic-draft-29"
-  url "https://github.com/tatsuhiro-t/openssl/archive/OpenSSL_1_1_1g-quic-draft-29.tar.gz"
-  sha256 "567facee74221471e04a6bbeb9ffbe646f2d655e2a011c98a30afc45a54132ef"
+  desc "Cryptography and SSL/TLS Toolkit with QUIC"
+  homepage "https://github.com/tatsuhiro-t/openssl/tree/OpenSSL_1_1_1g-quic-draft-33"
+  url "https://github.com/tatsuhiro-t/openssl/archive/OpenSSL_1_1_1g-quic-draft-33.tar.gz"
+  sha256 "a2a4159cbd9e58a345762b6f206d66b83f9b8ef64f911cc96a4e1de571280691"
   license "OpenSSL"
 
   bottle :unneeded
@@ -14,17 +14,33 @@ class OpensslQuic < Formula
   # be obvious to everyone, so explicitly state it for now to
   # help debug inevitable breakage.
   def configure_args
-    %W[
+    args = %W[
       --prefix=#{prefix}
       --openssldir=#{openssldir}
       enable-tls1_3
-      no-ssl3
-      no-ssl3-method
-      no-zlib
     ]
+    on_linux do
+      args += (ENV.cflags || "").split
+      args += (ENV.cppflags || "").split
+      args += (ENV.ldflags || "").split
+      args << "enable-md2"
+    end
+    args
   end
 
   def install
+    on_linux do
+      ENV.prepend_create_path "PERL5LIB", libexec/"lib/perl5"
+
+      %w[ExtUtils::MakeMaker Test::Harness Test::More].each do |r|
+        resource(r).stage do
+          system "perl", "Makefile.PL", "INSTALL_BASE=#{libexec}"
+          system "make", "PERL5LIB=#{ENV["PERL5LIB"]}", "CC=#{ENV.cc}"
+          system "make", "install"
+        end
+      end
+    end
+
     # This could interfere with how we expect OpenSSL to build.
     ENV.delete("OPENSSL_LOCAL_CONFIG_DIR")
 
@@ -33,16 +49,22 @@ class OpensslQuic < Formula
     # Whilst our env points to opt_bin, by default OpenSSL resolves the symlink.
     ENV["PERL"] = Formula["perl"].opt_bin/"perl" if which("perl") == Formula["perl"].opt_bin/"perl"
 
-    arch_args = %w[darwin64-x86_64-cc enable-ec_nistp_64_gcc_128]
-    # Remove `no-asm` workaround when upstream releases a fix
-    # See also: https://github.com/openssl/openssl/issues/12254
-    arch_args << "no-asm" if Hardware::CPU.arm?
+    arch_args = []
+    on_macos do
+      arch_args += %W[darwin64-#{Hardware::CPU.arch}-cc enable-ec_nistp_64_gcc_128]
+    end
+    on_linux do
+      if Hardware::CPU.intel?
+        arch_args << (Hardware::CPU.is_64_bit? ? "linux-x86_64" : "linux-elf")
+      elsif Hardware::CPU.arm?
+        arch_args << (Hardware::CPU.is_64_bit? ? "linux-aarch64" : "linux-armv4")
+      end
+    end
 
     ENV.deparallelize
     system "perl", "./Configure", *(configure_args + arch_args)
     system "make"
-    system "make", "test"
-    system "make", "install", "MANDIR=#{man}", "MANSUFFIX=ssl"
+    system "make", "install", "MANDIR=#{man}", "MANSUFFIX=ssl-quic"
   end
 
   def openssldir
@@ -50,6 +72,11 @@ class OpensslQuic < Formula
   end
 
   def post_install
+    on_macos(&method(:macos_post_install))
+    on_linux(&method(:linux_post_install))
+  end
+
+  def macos_post_install
     keychains = %w[
       /System/Library/Keychains/SystemRootCertificates.keychain
     ]
@@ -70,6 +97,41 @@ class OpensslQuic < Formula
 
     openssldir.mkpath
     (openssldir/"cert.pem").atomic_write(valid_certs.join("\n") << "\n")
+  end
+
+  def linux_post_install
+    # Download and install cacert.pem from curl.haxx.se
+    cacert = resource("cacert")
+    cacert.fetch
+    rm_f openssldir/"cert.pem"
+    filename = Pathname.new(cacert.url).basename
+    openssldir.install cacert.files(filename => "cert.pem")
+  end
+
+  def caveats
+    <<~EOS
+      A CA file has been bootstrapped using certificates from the system
+      keychain. To add additional certificates, place .pem files in
+        #{openssldir}/certs
+
+      and run
+        #{opt_bin}/c_rehash
+    EOS
+  end
+
+  test do
+    # Make sure the necessary .cnf file exists, otherwise OpenSSL gets moody.
+    assert_predicate pkgetc/"openssl.cnf", :exist?,
+            "OpenSSL requires the .cnf file for some functionality"
+
+    # Check OpenSSL itself functions as expected.
+    (testpath/"testfile.txt").write("This is a test file")
+    expected_checksum = "e2d0fe1585a63ec6009c8016ff8dda8b17719a637405a4e23c0ff81339148249"
+    system bin/"openssl", "dgst", "-sha256", "-out", "checksum.txt", "testfile.txt"
+    open("checksum.txt") do |f|
+      checksum = f.read(100).split("=").last.strip
+      assert_equal checksum, expected_checksum
+    end
   end
 
   def caveats
