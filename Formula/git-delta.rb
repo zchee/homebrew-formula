@@ -12,7 +12,6 @@ class GitDelta < Formula
   conflicts_with "delta", because: "both install a `delta` binary"
 
   def install
-    ENV.append_to_cflags "-fno-stack-check" if DevelopmentTools.clang_build_version >= 1010
     system "cargo", "update", "--aggressive"
     system "cargo", "install", *std_cargo_args, "--all-features"
 
