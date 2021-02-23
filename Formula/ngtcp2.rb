@@ -22,7 +22,7 @@ class Ngtcp2 < Formula
     ENV.append "LDFLAGS", "-march=native -Ofast -flto=thin"
 
     system "autoreconf", "-iv"
-    system "./configure", "--prefix=#{prefix}"
+    system "./configure", "--prefix=#{prefix}", "--with-jemalloc", "--with-libnghttp3", "--with-libev", "--with-openssl"
     system "make", "check"
     system "make", "install"
   end
