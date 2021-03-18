@@ -1,7 +1,7 @@
 class Nghttp3 < Formula
   desc "HTTP/3 library written in C"
   homepage "https://github.com/ngtcp2/nghttp3"
-  head "https://github.com/ngtcp2/nghttp3.git"
+  head "https://github.com/ngtcp2/nghttp3.git", :branch => "main"
   license "MIT"
 
   bottle :unneeded

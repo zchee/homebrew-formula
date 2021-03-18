@@ -3,7 +3,7 @@ class Ngtcp2 < Formula
   homepage "https://github.com/ngtcp2/ngtcp2"
 
   head do
-    url "https://github.com/ngtcp2/ngtcp2.git"
+    url "https://github.com/ngtcp2/ngtcp2.git", :branch => "main"
 
     depends_on "pkg-config"
     depends_on "autoconf"
