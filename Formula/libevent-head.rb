@@ -11,7 +11,6 @@ class LibeventHead < Formula
 
   bottle :unneeded
 
-  conflicts_with "libevent", because: "unstable"
   keg_only "unstable"
 
   depends_on "autoconf" => :build
