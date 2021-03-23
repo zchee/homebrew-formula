@@ -3,8 +3,10 @@ class NcursesHead < Formula
   homepage "https://www.gnu.org/software/ncurses/"
   head "https://github.com/ThomasDickey/ncurses-snapshots.git"
 
-  depends_on "pkg-config" => :head
-  depends_on "pcre" => :head
+  bottle :unneeded
+
+  depends_on "pkg-config" => :build
+  depends_on "pcre2" => :build
 
   def install
     ENV["TERMINFO"] = ""
@@ -16,18 +18,11 @@ class NcursesHead < Formula
                           "--enable-widec",
                           "--with-shared",
                           "--with-gpm=no",
-                          "--without-debug",
                           "--with-pcre2",
-                          "--enable-db-install",
-                          "--enable-ext-colors",
-                          "--enable-ext-mouse",
-                          "--enable-colorfgbg",
                           "--enable-sp-funcs",
-                          "--enable-ext-putwin",
-                          "--enable-termcap",
                           "--without-tests",
-                          "--with-termlib",
-                          "--without-ada"
+                          "--without-develop",
+                          "--enable-colorfgbg"
 
     system "make", "install"
     make_libncurses_symlinks
@@ -43,13 +38,12 @@ class NcursesHead < Formula
       lib.install_symlink "lib#{name}w.#{major}.dylib" => "lib#{name}.dylib"
       lib.install_symlink "lib#{name}w.#{major}.dylib" => "lib#{name}.#{major}.dylib"
       lib.install_symlink "lib#{name}w.a" => "lib#{name}.a"
-      lib.install_symlink "lib#{name}w.a" => "lib#{name}_g.a"
+      lib.install_symlink "lib#{name}w_g.a" => "lib#{name}_g.a"
     end
 
     lib.install_symlink "libncurses++w.a" => "libncurses++.a"
     lib.install_symlink "libncurses.a" => "libcurses.a"
-    lib.install_symlink "libncurses.dylib" => "libcurses.dylib"
-    lib.install_symlink "libncursesw.dylib" => "libcursesw.dylib"
+    lib.install_symlink shared_library("libncurses") => shared_library("libcurses")
 
     (lib/"pkgconfig").install_symlink "ncursesw.pc" => "ncurses.pc"
     (lib/"pkgconfig").install_symlink "formw.pc" => "form.pc"
@@ -57,7 +51,7 @@ class NcursesHead < Formula
     (lib/"pkgconfig").install_symlink "panelw.pc" => "panel.pc"
 
     bin.install_symlink "ncursesw#{major}-config" => "ncurses#{major}-config"
-
+ 
     include.install_symlink [
       "ncursesw/curses.h", "ncursesw/form.h", "ncursesw/ncurses.h",
       "ncursesw/panel.h", "ncursesw/term.h", "ncursesw/termcap.h"
