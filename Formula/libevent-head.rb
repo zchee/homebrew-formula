@@ -10,6 +10,7 @@ class LibeventHead < Formula
   end
 
   bottle :unneeded
+
   conflicts_with "libevent", because: "unstable"
   keg_only "unstable"
 
@@ -17,7 +18,7 @@ class LibeventHead < Formula
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
-  depends_on "openssl@1.1"
+  depends_on "openssl@1.1" => :build
 
   def install
     system "./autogen.sh"
