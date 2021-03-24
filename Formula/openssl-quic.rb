@@ -1,9 +1,9 @@
 class OpensslQuic < Formula
   desc "Cryptography and SSL/TLS Toolkit with QUIC"
-  homepage "https://github.com/tatsuhiro-t/openssl/tree/OpenSSL_1_1_1g-quic-draft-33"
-  url "https://github.com/tatsuhiro-t/openssl/archive/OpenSSL_1_1_1g-quic-draft-33.tar.gz"
-  sha256 "a2a4159cbd9e58a345762b6f206d66b83f9b8ef64f911cc96a4e1de571280691"
+  homepage "https://github.com/tatsuhiro-t/openssl/tree/post-handshake-data-3.0.0"
+  url "https://github.com/tatsuhiro-t/openssl/archive/post-handshake-data-3.0.0.tar.gz"
   license "OpenSSL"
+  version "post-handshake-data-3.0.0"
 
   bottle :unneeded
 
