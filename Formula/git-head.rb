@@ -28,13 +28,13 @@ class GitHead < Formula
   depends_on "zstd"
 
   resource "html" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.30.1.tar.xz"
-    sha256 "e826d9dd63bef455f80cd785c69c9ee74ab4f8793e25477470474ef96db66315"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.31.0.tar.xz"
+    sha256 "2ff3c0403870c3f02cdd46af1cd749b0c5d7826bfe00bee09ba1d0c2f19f554b"
   end
 
   resource "man" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.30.1.tar.xz"
-    sha256 "30fc7ecbd964bb19a2ca1a695fe7af430740e09bd1c134cd3730783abec5b904"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.31.0.tar.xz"
+    sha256 "185ddcbc31ae6b8d33c3ab78f6022ee6cc79dd867c1b2e5c3767821124e780ec"
   end
 
   resource "Net::SMTP::SSL" do
