@@ -44,21 +44,24 @@ class CurlQuic < Formula
       --enable-ares=#{Formula["c-ares"].opt_prefix}
       --with-ca-bundle=#{openssl_quic.pkgetc}/cert.pem
       --with-ca-path=#{openssl_quic.pkgetc}/certs
-      --with-gssapi
-      --with-libidn2
-      --with-libmetalink
-      --with-librtmp
-      --with-libssh2
+      --with-secure-transport
+      --with-default-ssl-backend=openssl
       --with-ssl=#{openssl_quic.opt_prefix}
       --with-nghttp3=#{Formula["nghttp3"].opt_prefix}
       --with-ngtcp2=#{Formula["ngtcp2"].opt_prefix}
       --without-quiche
       --enable-alt-svc
+      --with-gssapi
+      --with-libidn2
+      --with-libmetalink
+      --with-librtmp
+      --with-libssh2
       --without-libpsl
     ]
     
     system "./configure", *args
     system "make", "install"
+    system "make", "install", "-C", "scripts"
     libexec.install "lib/mk-ca-bundle.pl"
   end
 
