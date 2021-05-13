@@ -8,7 +8,7 @@ class Jq < Formula
   depends_on "libtool" => :build
   depends_on "oniguruma" => :build
   depends_on "pipenv" => :build
-  depends_on "python" => :build
+  depends_on "python@3.9" => :build
 
   def install
     args = %W[
