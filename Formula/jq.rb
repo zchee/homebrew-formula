@@ -1,4 +1,4 @@
-class JqHead < Formula
+class Jq < Formula
   desc "Lightweight and flexible command-line JSON processor"
   homepage "https://stedolan.github.io/jq/"
   head "https://github.com/stedolan/jq.git"
