@@ -94,7 +94,7 @@ class ZshHead < Formula
               "$(libdir)/$(tzsh)/$(VERSION)", "$(libdir)"
 
     system "make", "install"
-    system "make", "install.info"
+    system "make", "install.bin", "install.modules", "install.fns"
   end
 
   test do
