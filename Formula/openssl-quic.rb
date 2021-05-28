@@ -1,7 +1,7 @@
 class OpensslQuic < Formula
   desc "Cryptography and SSL/TLS Toolkit with QUIC"
   homepage "https://github.com/quictls/openssl"
-  head "https://github.com/quictls/openssl.git", :branch => "openssl-3.0.0-alpha16+quic"
+  head "https://github.com/quictls/openssl.git", :branch => "openssl-3.0.0-alpha17+quic"
   license "OpenSSL"
 
   bottle :unneeded
