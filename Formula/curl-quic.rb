@@ -15,7 +15,6 @@ class CurlQuic < Formula
     depends_on "brotli" => :build
     depends_on "c-ares" => :build
     depends_on "libidn2" => :build
-    depends_on "libmetalink" => :build
     depends_on "libssh2" => :build
     depends_on "nghttp2" => :build
     depends_on "nghttp3" => :build
@@ -51,9 +50,7 @@ class CurlQuic < Formula
       --with-ngtcp2=#{Formula["ngtcp2"].opt_prefix}
       --without-quiche
       --enable-alt-svc
-      --with-gssapi
       --with-libidn2
-      --with-libmetalink
       --with-librtmp
       --with-libssh2
       --without-libpsl
