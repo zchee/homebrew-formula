@@ -8,22 +8,22 @@ class CurlQuic < Formula
   head do
     url "https://github.com/curl/curl.git"
 
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
+    depends_on "autoconf" => :head
+    depends_on "automake" => :head
+    depends_on "libtool" => :head
 
-    depends_on "brotli" => :build
-    depends_on "c-ares" => :build
-    depends_on "libidn2" => :build
-    depends_on "libssh2" => :build
-    depends_on "nghttp2" => :build
-    depends_on "nghttp3" => :build
-    depends_on "ngtcp2" => :build
-    depends_on "openldap" => :build
-    depends_on "openssl-quic" => :build
-    depends_on "pkg-config" => :build
-    depends_on "rtmpdump" => :build
-    depends_on "zstd" => :build
+    depends_on "brotli" => :head
+    depends_on "c-ares" => :head
+    depends_on "libidn2" => :head
+    depends_on "libssh2" => :head
+    depends_on "nghttp2" => :head
+    depends_on "nghttp3" => :head
+    depends_on "ngtcp2" => :head
+    depends_on "openldap" => :head
+    depends_on "openssl-quic" => :head
+    depends_on "pkg-config" => :head
+    depends_on "rtmpdump" => :head
+    depends_on "zstd" => :head
   end
 
   def install
@@ -31,8 +31,8 @@ class CurlQuic < Formula
 
     ENV.append "CFLAGS", "-march=native -Ofast -flto=thin"
     ENV.append "LDFLAGS", "-march=native -Ofast -flto=thin"
-    ENV.prepend "CPPFLAGS", "-isystem #{Formula["openssl-quic"].include}"
-    ENV.prepend "LDFLAGS", "-L#{Formula["openssl-quic"].lib}"
+    ENV.prepend "CPPFLAGS", "-isystem #{Formula["openssl-quic"].opt_prefix}/include"
+    ENV.prepend "LDFLAGS", "-L#{Formula["openssl-quic"].opt_prefix}/lib"
     
     openssl_quic = Formula["openssl-quic"]
     args = %W[
