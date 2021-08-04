@@ -12,12 +12,7 @@ class Utf8procHead < Formula
   bottle :unneeded
 
   def install
-    args = std_cmake_args
-
-    mkdir "build" do
-      system "cmake", "..", *args
-      system "make", "install"
-    end
+    system "make", "install", "prefix=#{prefix}"
   end
 
   test do
