@@ -22,7 +22,7 @@ class TmuxHead < Formula
   depends_on "pkg-config" => :build
   depends_on "libevent-head" => :build
   depends_on "ncurses-head" => :build
-  depends_on "utf8proc" => :build
+  depends_on "utf8proc-head" => :build
 
   resource "completion" do
     url "https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/master/completions/tmux"
