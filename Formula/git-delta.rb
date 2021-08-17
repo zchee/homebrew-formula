@@ -15,7 +15,6 @@ class GitDelta < Formula
     system "cargo", "update", "--aggressive"
     system "cargo", "install", *std_cargo_args, "--all-features"
 
-    bash_completion.install "etc/completion/completion.bash"
     zsh_completion.install "etc/completion/completion.zsh" => "_delta"
   end
 
