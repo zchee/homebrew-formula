@@ -13,20 +13,24 @@ class LibeventHead < Formula
 
   keg_only "unstable"
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "cmake" => :build
   depends_on "openssl@1.1" => :build
+  depends_on "pkg-config" => :build
 
   def install
-    system "./autogen.sh"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-samples",
-                          "--disable-debug-mode",
-                          "--prefix=#{prefix}"
-    system "make"
-    system "make", "install"
+    args = std_cmake_args
+    args << "-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=#{MacOS.version}"
+    args << "-DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE"
+    args << "-DCMAKE_C_STANDARD=11"
+    args << "-DCMAKE_CXX_STANDARD=11"
+    args << "-DEVENT__DISABLE_MBEDTLS=TRUE"
+    args << "-DEVENT__DISABLE_TESTS=TRUE"
+
+    mkdir "build" do
+      system "cmake", "..", *args
+      system "make"
+      system "make", "install"
+    end
   end
 
   test do
