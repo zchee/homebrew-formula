@@ -24,7 +24,7 @@ class Radare2 < Formula
     ]
 
     system "./configure", *args
-    system "make"
+    system "make", "-j", ENV.make_jobs
     system "make", "install"
   end
 
