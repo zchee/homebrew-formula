@@ -1,7 +1,6 @@
 class ChartRereaser < Formula
   desc "Hosting Helm Charts via GitHub Pages and Releases"
   homepage "https://github.com/helm/chart-releaser/"
-  bottle :unneeded
   head "https://github.com/helm/chart-releaser.git", branch: "main"
 
   depends_on "go" => :build

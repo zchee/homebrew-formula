@@ -4,8 +4,6 @@ class OpensslQuic < Formula
   head "https://github.com/quictls/openssl.git", :branch => "openssl-3.0.0+quic"
   license "OpenSSL"
 
-  bottle :unneeded
-
   keg_only :shadowed_by_macos, "macOS provides LibreSSL"
 
   on_linux do

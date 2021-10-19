@@ -5,8 +5,6 @@ class QemuVirtio9p < Formula
   sha256 "eebc089db3414bbeedf1e464beda0a7515aad30f73261abc246c9b27503a3c96"
   license "GPL-2.0-only"
 
-  bottle :unneeded
-
   depends_on "libtool" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build

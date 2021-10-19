@@ -4,8 +4,6 @@ class Tccutil < Formula
   license "GPL-2.0-or-later"
   head "https://github.com/jacobsalmela/tccutil.git"
 
-  bottle :unneeded
-
   def install
     bin.install "tccutil.py" => "tccutil.py"
   end

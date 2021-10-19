@@ -4,8 +4,6 @@ class Act < Formula
   head "https://github.com/nektos/act.git"
   license "MIT"
 
-  bottle :unneeded
-
   depends_on "go" => :build
 
   def install

@@ -6,8 +6,6 @@ class LuarocksLuajit < Formula
   license "MIT"
   head "https://github.com/luarocks/luarocks.git"
 
-  bottle :unneeded
-
   depends_on "openresty/brew/openresty"
 
   uses_from_macos "unzip"

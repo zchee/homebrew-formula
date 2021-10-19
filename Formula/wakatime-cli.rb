@@ -4,8 +4,6 @@ class WakatimeCli < Formula
   license "BSD-3-Clause"
   head "https://github.com/wakatime/wakatime-cli.git", branch: "develop"
 
-  bottle :unneeded
-
   depends_on "go" => :build
 
   def install

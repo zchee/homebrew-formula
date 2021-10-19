@@ -8,8 +8,6 @@ class TmuxHead < Formula
     regex(%r{href=.*?/tag/v?(\d+(?:\.\d+)+[a-z]?)["' >]}i)
   end
 
-  bottle :unneeded
-
   head do
     url "https://github.com/tmux/tmux.git"
 

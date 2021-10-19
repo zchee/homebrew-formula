@@ -8,8 +8,6 @@ class Wakatime < Formula
     url :stable
   end
 
-  bottle :unneeded
-
   depends_on "python@3.9"
 
   def install

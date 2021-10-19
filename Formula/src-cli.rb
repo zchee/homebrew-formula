@@ -9,8 +9,6 @@ class SrcCli < Formula
     strategy :github_latest
   end
 
-  bottle :unneeded
-
   depends_on "go" => :build
 
   def install

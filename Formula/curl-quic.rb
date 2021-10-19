@@ -3,8 +3,6 @@ class CurlQuic < Formula
   homepage "https://curl.haxx.se/"
   license "curl"
 
-  bottle :unneeded
-
   head do
     url "https://github.com/curl/curl.git"
 

@@ -6,8 +6,6 @@ class YoutubeDlHead < Formula
   head "https://github.com/ytdl-org/youtube-dl.git", branch "master"
   license "Unlicense"
 
-  bottle :unneeded
-
   depends_on "python@3.9"
 
   def install

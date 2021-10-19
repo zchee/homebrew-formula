@@ -4,8 +4,6 @@ class Kubectx < Formula
   license "Apache-2.0"
   head "https://github.com/ahmetb/kubectx.git"
 
-  bottle :unneeded
-
   def install
     bin.install "kubectx", "kubens"
 

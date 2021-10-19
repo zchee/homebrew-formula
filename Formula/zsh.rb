@@ -13,8 +13,6 @@ class Zsh < Formula
     depends_on "yodl"
   end
 
-  bottle :unneeded
-
   def install
     # Work around configure issues with Xcode 12
     # https://www.zsh.org/mla/workers/2020/index.html

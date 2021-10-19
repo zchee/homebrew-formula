@@ -4,8 +4,6 @@ class GitDelta < Formula
   license "MIT"
   head "https://github.com/dandavison/delta.git"
 
-  bottle :unneeded
-
   depends_on "rust" => :build
   uses_from_macos "llvm"
 

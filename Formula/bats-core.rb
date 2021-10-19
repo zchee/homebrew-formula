@@ -4,8 +4,6 @@ class BatsCore < Formula
   head "https://github.com/bats-core/bats-core.git"
   license "MIT"
 
-  bottle :unneeded
-
   depends_on "coreutils"
 
   conflicts_with "bats", because: "both install `bats` executables"

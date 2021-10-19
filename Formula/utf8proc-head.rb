@@ -9,8 +9,6 @@ class Utf8procHead < Formula
     depends_on "cmake"
   end
 
-  bottle :unneeded
-
   def install
     system "make", "install", "prefix=#{prefix}"
   end

@@ -3,8 +3,6 @@ class NcursesHead < Formula
   homepage "https://www.gnu.org/software/ncurses/"
   head "https://github.com/ThomasDickey/ncurses-snapshots.git"
 
-  bottle :unneeded
-
   depends_on "pkg-config" => :build
   depends_on "pcre2" => :build
 

@@ -18,8 +18,6 @@ class BindHead < Formula
     regex(/href=.*?bind[._-]v?(\d+\.\d*[02468](?:\.\d+)*)\.t/i)
   end
 
-  bottle :unneeded
-
   uses_from_macos "zlib"
 
   depends_on "autoconf" => :build

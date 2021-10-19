@@ -4,8 +4,6 @@ class GoGdu < Formula
   head "https://github.com/dundee/gdu.git"
   license "MIT"
 
-  bottle :unneeded
-
   depends_on "go" => :build
 
   def install

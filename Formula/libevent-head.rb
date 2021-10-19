@@ -9,8 +9,6 @@ class LibeventHead < Formula
     regex(/libevent[._-]v?(\d+(?:\.\d+)+)-stable/i)
   end
 
-  bottle :unneeded
-
   keg_only "unstable"
 
   depends_on "cmake" => :build

@@ -4,8 +4,6 @@ class Gojq < Formula
   license "MIT"
   head "https://github.com/itchyny/gojq.git", :branch => "main"
 
-  bottle :unneeded
-
   depends_on "go" => :build
 
   def install
