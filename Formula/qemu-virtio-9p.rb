@@ -36,6 +36,23 @@ class QemuVirtio9p < Formula
     sha256 "81237c7b42dc0ffc8b32a2f5734e3480a3f9a470c50c14a9c4576a2561a35807"
   end
 
+  if Hardware::CPU.arm?
+    patch do
+      url "https://patchwork.kernel.org/series/548227/mbox/"
+      sha256 "5b9c9779374839ce6ade1b60d1377c3fc118bc43e8482d0d3efa64383e11b6d3"
+    end
+    # allwinner-h3: Switch to SMC as PSCI conduit
+    patch do
+      url "https://patchwork.kernel.org/series/550031/mbox/"
+      sha256 "793b6676902c5c64501730bce8a839ef26b9d6b8cf9b4fa8032bdcc1d26de565"
+    end
+  end
+  # hvf: Determine slot count from struct layout
+  patch do
+    url "https://patchwork.kernel.org/series/559687/mbox/"
+    sha256 "d9d732ec009325dfb23a0160984a385fdbf77e34ca66d04c855f21362a4cfbd2"
+  end
+
   patch :DATA
 
   def install
@@ -48,6 +65,8 @@ class QemuVirtio9p < Formula
       --prefix=#{prefix}
       --cc=#{ENV.cc}
       --host-cc=#{ENV.cc}
+      --enable-hvf
+      --enable-virtfs
       --disable-bsd-user
       --disable-guest-agent
       --enable-curses
