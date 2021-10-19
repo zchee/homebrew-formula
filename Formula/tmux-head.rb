@@ -39,6 +39,11 @@ class TmuxHead < Formula
       s.gsub!(/AC_INIT\(\[tmux\],[^)]*\)/, "AC_INIT([tmux], master)")
     end
 
+    inreplace "osdep-darwin.c" do |s|
+      s.gsub!(/\tsetenv\("EVENT_NOPOLL", "1", 1\);\n/, "")
+      s.gsub!(/\tunsetenv\("EVENT_NOPOLL"\);\n/, "")
+    end
+
     system "sh", "autogen.sh"
 
     args = %W[
