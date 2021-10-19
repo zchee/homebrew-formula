@@ -1,4 +1,4 @@
-class Lima < Formula
+class LimaHead < Formula
   desc "Linux virtual machines"
   homepage "https://github.com/lima-vm/lima"
   head "https://github.com/lima-vm/lima.git", branch: "master"
