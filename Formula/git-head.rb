@@ -56,9 +56,9 @@ class GitHead < Formula
     ENV["CFLAGS"] = "-march=native -Ofast -flto -std=c17"
     ENV["CXXFLAGS"] = "-march=native -Ofast -flto -std=c++17 -stdlib=libc++"
     ENV["LDFLAGS"] = "-march=native -Ofast -flto"
-    ENV["LDFLAGS"] += " -L#{Formula["brotli"].lib} -L#{Formula["c-ares"].lib} -L#{Formula["curl-quic"].lib} -L#{Formula["libidn2"].lib} -L#{Formula["libmetalink"].lib}"
-    ENV["LDFLAGS"] += " -L#{Formula["libssh2"].lib} -L#{Formula["nghttp2"].lib} -L#{Formula["nghttp3"].lib} -L#{Formula["ngtcp2"].lib} -L#{Formula["openldap"].lib}"
-    ENV["LDFLAGS"] += " -L#{Formula["openssl-quic"].lib} -L#{Formula["pcre2"].lib} -L#{Formula["rtmpdump"].lib} -L#{Formula["zlib"].lib} -L#{Formula["zstd"].lib}"
+    ENV["LDFLAGS"] += " -L#{Formula['brotli'].lib} -L#{Formula['c-ares'].lib} -L#{Formula['curl-quic'].lib} -L#{Formula['libidn2'].lib} -L#{Formula['libmetalink'].lib}"
+    ENV["LDFLAGS"] += " -L#{Formula['libssh2'].lib} -L#{Formula['nghttp2'].lib} -L#{Formula['nghttp3'].lib} -L#{Formula['ngtcp2'].lib} -L#{Formula['openldap'].lib}"
+    ENV["LDFLAGS"] += " -L#{Formula['openssl-quic'].lib} -L#{Formula['pcre2'].lib} -L#{Formula['rtmpdump'].lib} -L#{Formula['zlib'].lib} -L#{Formula['zstd'].lib}"
     ENV["XML_CATALOG_FILES"] = "/usr/local/etc/xml/catalog"
 
     perl_version = Utils.safe_popen_read("perl", "--version")[/v(\d+\.\d+)(?:\.\d+)?/, 1]
@@ -143,8 +143,8 @@ class GitHead < Formula
     (share/"doc/git-doc").install resource("html")
 
     # Make html docs world-readable
-    chmod 0644, Dir["#{share}/doc/git-doc/**/*.{html,txt}"]
-    chmod 0755, Dir["#{share}/doc/git-doc/{RelNotes,howto,technical}"]
+    chmod 0o644, Dir["#{share}/doc/git-doc/**/*.{html,txt}"]
+    chmod 0o755, Dir["#{share}/doc/git-doc/{RelNotes,howto,technical}"]
 
     # git-send-email needs Net::SMTP::SSL
     resource("Net::SMTP::SSL").stage do
@@ -188,7 +188,7 @@ class GitHead < Formula
     assert_match "Authentication Required", pipe_output(
       "#{bin}/git send-email --from=test@example.com --to=dev@null.com " \
       "--smtp-server=smtp.gmail.com --smtp-server-port=587 " \
-      "--smtp-encryption=tls --confirm=never HEAD^ 2>&1",
+      "--smtp-encryption=tls --confirm=never HEAD^ 2>&1"
     )
   end
 end

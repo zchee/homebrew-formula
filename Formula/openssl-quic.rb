@@ -1,7 +1,7 @@
 class OpensslQuic < Formula
   desc "Cryptography and SSL/TLS Toolkit with QUIC"
   homepage "https://github.com/quictls/openssl"
-  head "https://github.com/quictls/openssl.git", :branch => "openssl-3.0.0+quic"
+  head "https://github.com/quictls/openssl.git", branch: "openssl-3.0.0+quic"
   license "OpenSSL"
 
   keg_only :shadowed_by_macos, "macOS provides LibreSSL"
@@ -59,7 +59,7 @@ class OpensslQuic < Formula
       %w[ExtUtils::MakeMaker Test::Harness Test::More].each do |r|
         resource(r).stage do
           system "perl", "Makefile.PL", "INSTALL_BASE=#{libexec}"
-          system "make", "PERL5LIB=#{ENV["PERL5LIB"]}", "CC=#{ENV.cc}"
+          system "make", "PERL5LIB=#{ENV['PERL5LIB']}", "CC=#{ENV.cc}"
           system "make", "install"
         end
       end
@@ -110,7 +110,7 @@ class OpensslQuic < Formula
 
     certs_list = `security find-certificate -a -p #{keychains.join(" ")}`
     certs = certs_list.scan(
-      /-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----/m,
+      /-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----/m
     )
 
     # Check that the certificate has not expired
