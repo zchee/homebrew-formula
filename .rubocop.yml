@@ -1,0 +1,61 @@
+Metrics/LineLength:
+  Max: 180
+MethodLength:
+  CountComments: false
+  Max: 100
+StringLiterals:
+  EnforcedStyle: double_quotes
+Layout/SpaceAroundOperators:
+  Enabled: false
+# Avoid false positives on modifiers used on symbols of methods
+# See https://github.com/rubocop-hq/rubocop/issues/5953
+Style/AccessModifierDeclarations:
+  Enabled: false
+# Enabled now LineLength is lowish.
+Style/IfUnlessModifier:
+  Enabled: true
+# `system` is a special case and aligns on second argument, so allow this for formulae.
+Layout/ArgumentAlignment:
+  Exclude:
+    - "Taps/*/*/*.rb"
+    - "/**/Formula/*.rb"
+    - "**/Formula/*.rb"
+Lint/DuplicateBranch:
+  Exclude:
+    - "Taps/*/*/*.rb"
+    - "/**/{Formula,Casks}/*.rb"
+    - "**/{Formula,Casks}/*.rb"
+# `unless ... ||` and `unless ... &&` are hard to mentally parse
+Style/UnlessLogicalOperators:
+  Enabled: true
+  EnforcedStyle: forbid_logical_operators
+# Not used for casks and formulae.
+Style/FrozenStringLiteralComment:
+  EnforcedStyle: always
+  Exclude:
+    - "Taps/*/*/*.rb"
+    - "/**/{Formula,Casks}/*.rb"
+    - "**/{Formula,Casks}/*.rb"
+    - "Homebrew/test/**/Casks/**/*.rb"
+    - "**/*.rbi"
+    - "**/Brewfile"
+# Don't enforce documentation in casks or formulae.
+Style/Documentation:
+  Exclude:
+    - "Taps/**/*"
+    - "/**/{Formula,Casks}/*.rb"
+    - "**/{Formula,Casks}/*.rb"
+    - "**/*.rbi"
+Naming/FileName:
+  Enabled: false
+Metrics/ClassLength:
+  Enabled: false
+Style/IfUnlessModifier:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
+Naming/HeredocDelimiterNaming:
+  Enabled: false
+# avoid hash rockets where possible
+Style/HashSyntax:
+  EnforcedStyle: ruby19
