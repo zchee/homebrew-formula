@@ -38,6 +38,7 @@ class Zsh < Formula
            "--enable-pcre",
            "--enable-zsh-secure-free",
            "--enable-unicode9",
+           "--disable-etcdir",
            "--with-tcsetpgrp",
            "--disable-dynamic"
 
