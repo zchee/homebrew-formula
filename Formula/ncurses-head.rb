@@ -22,6 +22,7 @@ class NcursesHead < Formula
       "--without-tests",
       "--without-develop",
       "--without-debug",
+      "--enable-ext-funcs",
       "--enable-colorfgbg",
       "--enable-ext-colors",
       "--enable-ext-mouse",
@@ -82,9 +83,15 @@ class NcursesHead < Formula
     bin.install_symlink "ncursestw#{major}-config" => "ncurses#{major}-config"
     bin.install_symlink "ncursestw#{major}-config" => "ncursesw#{major}-config"
 
+    # (include/"ncursesw").install_symlink (bin/versioned_name).realpath => unversioned_name
     include.install_symlink [
       "ncursestw/curses.h", "ncursestw/form.h", "ncursestw/ncurses.h",
       "ncursestw/panel.h", "ncursestw/term.h", "ncursestw/termcap.h"
+    ]
+    mkdir "#{include}/ncursesw"
+    (include/"ncursesw").install_symlink [
+      "../ncursestw/curses.h", "../ncursestw/form.h", "../ncursestw/ncurses.h",
+      "../ncursestw/panel.h", "../ncursestw/term.h", "../ncursestw/termcap.h"
     ]
   end
 
