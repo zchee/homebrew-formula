@@ -30,7 +30,7 @@ class TmuxHead < Formula
   def install
     ENV.append "CFLAGS", "-march=native -Ofast -flto"
     ENV.append "CPPFLAGS", "-I#{Formula["ncurses-head"].include}/ncursesw"
-    ENV.append "LDFLAGS", "-march=native -Ofast -flto -L#{Formula["ncurses-head"].lib} -lncursesw"
+    ENV.append "LDFLAGS", "-march=native -Ofast -flto -L#{Formula["ncurses-head"].lib} -lncursestw"
     ENV.append "LDFLAGS", "-lresolv"
 
     inreplace "configure.ac" do |s|
