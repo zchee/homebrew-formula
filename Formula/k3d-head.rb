@@ -25,9 +25,7 @@ class K3dHead < Formula
       -X github.com/rancher/k3d/v#{version.major}/version.K3sVersion=#{k3s_version}
     ]
 
-    system "go", "build",
-           "-mod", "vendor",
-           *std_go_args(ldflags: ldflags.join(" "))
+    system "go", "build", "-mod", "vendor", "-trimpath", "-o=#{prefix}/bin/k3d", "-ldflags=#{ldflags.join(" ")}"
 
     # Install bash completion
     output = Utils.safe_popen_read(bin/"k3d", "completion", "bash")
