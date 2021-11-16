@@ -1,4 +1,4 @@
-class K3d < Formula
+class K3dHead < Formula
   desc "Little helper to run Rancher Lab's k3s in Docker"
   homepage "https://k3d.io"
   head "https://github.com/rancher/k3d.git", branch: "main"
