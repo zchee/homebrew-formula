@@ -4,8 +4,6 @@ class GroffHead < Formula
   head "https://git.savannah.gnu.org/git/groff.git"
   license "GPL-3.0-or-later"
 
-  bottle :unneeded
-
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "gawk" => :build
@@ -18,14 +16,13 @@ class GroffHead < Formula
   depends_on "uchardet" => :build
 
   uses_from_macos "bison" => :build
+  uses_from_macos "texinfo" => :build
   uses_from_macos "perl"
 
   on_linux do
     depends_on "glib"
   end
 
-  # See https://savannah.gnu.org/bugs/index.php?59276
-  # Fixed in 1.23.0
   patch :DATA
 
   def install
