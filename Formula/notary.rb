@@ -7,6 +7,6 @@ class Notary < Formula
   depends_on "go" => :build
 
   def install
-    system "go", "build", "-o", "#{bin}/notary", "-tags=pkcs11", "./cmd/notary"
+    system "go", "build", "-o", bin/"notary", "-tags=pkcs11", "-trimpath", "./cmd/notary"
   end
 end
