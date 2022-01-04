@@ -10,7 +10,6 @@ class GitDelta < Formula
   conflicts_with "delta", because: "both install a `delta` binary"
 
   def install
-    system "cargo", "update", "--aggressive"
     system "cargo", "install", *std_cargo_args, "--all-features"
 
     zsh_completion.install "etc/completion/completion.zsh" => "_delta"
