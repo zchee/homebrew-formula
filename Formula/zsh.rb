@@ -13,6 +13,8 @@ class Zsh < Formula
     depends_on "yodl"
   end
 
+  uses_from_macos "texinfo"
+
   def install
     # Work around configure issues with Xcode 12
     # https://www.zsh.org/mla/workers/2020/index.html
@@ -33,7 +35,6 @@ class Zsh < Formula
            "--enable-runhelpdir=#{pkgshare}/help",
            "--enable-cap",
            "--enable-gdbm",
-           "--enable-maildir-support",
            "--enable-multibyte",
            "--enable-pcre",
            "--enable-zsh-secure-free",
