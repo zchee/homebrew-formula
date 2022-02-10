@@ -17,9 +17,21 @@ class Ngtcp2 < Formula
   depends_on "openssl-quic"
 
   def install
-    ENV.append "CFLAGS", "-march=native -Ofast -flto=thin -std=c11"
-    ENV.append "CXXFLAGS", "-march=native -Ofast -flto=thin -std=c++17 -stdlib=libc++"
-    ENV.append "LDFLAGS", "-march=native -Ofast -flto=thin"
+    cflags = "-std=c11 -flto"
+    cxxflags = "-std=c++17 -stdlib=libc++"
+    ldflags = "-flto"
+    if Hardware::CPU.intel?
+      cflags += " -march=native -Ofast"
+      cxxflags = " -march=native -Ofast"
+      ldflags += " -march=native -Ofast"
+    else
+      cflags += " -mcpu=apple-a14"
+      cxxflags = " -mcpu=apple-a14"
+      ldflags += " -mcpu=apple-a14"
+    end
+
+    ENV.append "CFLAGS", *cflags
+    ENV.append "CXXFLAGS", *cxxflags
 
     system "autoreconf", "-iv"
     system "./configure", "--prefix=#{prefix}", "--with-jemalloc", "--with-libnghttp3", "--with-libev", "--with-openssl"
