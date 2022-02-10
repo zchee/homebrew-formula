@@ -19,9 +19,18 @@ class Zsh < Formula
     # Work around configure issues with Xcode 12
     # https://www.zsh.org/mla/workers/2020/index.html
     # https://github.com/Homebrew/homebrew-core/issues/64921
-    ENV.append "CFLAGS", "-Wno-implicit-function-declaration"
-    ENV.append "CFLAGS", "-std=c11 -march=native -Ofast -flto"
-    ENV.append "LDFLAGS", "-march=native -Ofast -flto"
+
+    cflags = "-Wno-implicit-function-declaration -std=c11 -flto"
+    ldflags = "-flto"
+    if not Hardware::CPU.arm?
+      cflags += "-march=native -Ofast"
+      ldflags += "-march=native -Ofast"
+    else
+      cflags += " -mcpu=apple-a14"
+      ldflags += " -mcpu=apple-a14"
+    end
+    ENV.append "CFLAGS", *cflags
+    ENV.append "LDFLAGS", *ldflags
     ENV.append "CPPFLAGS", "-D_DARWIN_C_SOURCE -I#{Formula["ncurses-head"].include}/ncursesw"
     ENV.append "LDFLAGS", "-L#{Formula["ncurses-head"].lib} -lncursesw"
 
