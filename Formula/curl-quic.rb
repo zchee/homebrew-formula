@@ -29,12 +29,21 @@ class CurlQuic < Formula
 
     openssl_quic = Formula["openssl-quic"]
 
-    ENV.append "CFLAGS", "-march=native -Ofast -flto"
-    ENV.append "LDFLAGS", "-march=native -Ofast -flto"
+    cflags = "-std=c11 -flto"
+    ldflags = "-flto"
+    if Hardware::CPU.intel?
+      cflags += " -march=native -Ofast"
+      ldflags += " -march=native -Ofast"
+    else
+      cflags += " -mcpu=apple-a14"
+      ldflags += " -mcpu=apple-a14"
+    end
+    ENV.append "CFLAGS", *cflags
+    ENV.append "LDFLAGS", *ldflags
     ENV.prepend "CPPFLAGS", "-isystem #{openssl_quic.opt_prefix}/include"
     ENV.prepend "LDFLAGS", "-L#{openssl_quic.opt_prefix}/lib"
     ENV.prepend "LIBS", "-lngtcp2_crypto_openssl"
-    
+
     args = %W[
       --disable-debug
       --disable-dependency-tracking
@@ -55,7 +64,7 @@ class CurlQuic < Formula
       --with-libssh2
       --without-libpsl
     ]
-    
+
     system "./configure", *args
     system "make", "install"
     system "make", "install", "-C", "scripts"
