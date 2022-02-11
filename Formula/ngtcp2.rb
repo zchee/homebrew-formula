@@ -32,6 +32,7 @@ class Ngtcp2 < Formula
 
     ENV.append "CFLAGS", *cflags
     ENV.append "CXXFLAGS", *cxxflags
+    ENV.append "LDFLAGS", *ldflags
 
     system "autoreconf", "-iv"
     system "./configure", "--prefix=#{prefix}", "--with-jemalloc", "--with-libnghttp3", "--with-libev", "--with-openssl"
