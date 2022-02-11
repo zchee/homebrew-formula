@@ -22,9 +22,9 @@ class Zsh < Formula
 
     cflags = "-Wno-implicit-function-declaration -std=c11 -flto"
     ldflags = "-flto"
-    if not Hardware::CPU.arm?
-      cflags += "-march=native -Ofast"
-      ldflags += "-march=native -Ofast"
+    if Hardware::CPU.intel?
+      cflags += " -march=native -Ofast"
+      ldflags += " -march=native -Ofast"
     else
       cflags += " -mcpu=apple-a14"
       ldflags += " -mcpu=apple-a14"
