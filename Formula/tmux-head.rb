@@ -28,10 +28,19 @@ class TmuxHead < Formula
   end
 
   def install
-    ENV.append "CFLAGS", "-march=native -Ofast -flto"
+    cflags = "-std=c11 -flto"
+    ldflags = "-flto"
+    if Hardware::CPU.intel?
+      cflags += " -march=native -Ofast"
+      ldflags += " -march=native -Ofast"
+    else
+      cflags += " -mcpu=apple-a14"
+      ldflags += " -mcpu=apple-a14"
+    end
+    ldflags += " -L#{Formula["ncurses-head"].lib} -lncursestw -lresolv"
+    ENV.append "CFLAGS", *cflags
+    ENV.append "LDFLAGS", *ldflags
     ENV.append "CPPFLAGS", "-I#{Formula["ncurses-head"].include}/ncursesw"
-    ENV.append "LDFLAGS", "-march=native -Ofast -flto -L#{Formula["ncurses-head"].lib} -lncursestw"
-    ENV.append "LDFLAGS", "-lresolv"
 
     inreplace "configure.ac" do |s|
       s.gsub!(/AC_INIT\(\[tmux\],[^)]*\)/, "AC_INIT([tmux], master)")
