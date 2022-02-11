@@ -51,6 +51,8 @@ class QemuVirtio9p < Formula
     ENV.append "CXXFLAGS", "-arch x86_64 -m64 -march=native -mavx -mavx2 -mavx512ifma -mavx512bw -mavx512cd -mavx512dq -mavx512f -mavx512vl"
     ENV.append "LDFLAGS", "-arch x86_64 -m64"
 
+    inreplace "os-posix.c", "ENOTSUPP", "524"
+
     args = %W[
       --prefix=#{prefix}
       --cc=#{ENV.cc}
