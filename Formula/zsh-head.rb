@@ -1,4 +1,4 @@
-class Zsh < Formula
+class ZshHead < Formula
   desc "UNIX shell (command interpreter)"
   homepage "https://www.zsh.org/"
 
@@ -31,17 +31,17 @@ class Zsh < Formula
     end
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
-    ENV.append "CPPFLAGS", "-D_DARWIN_C_SOURCE -I#{Formula["ncurses-head"].include}/ncursesw"
-    ENV.append "LDFLAGS", "-L#{Formula["ncurses-head"].lib} -lncursesw"
+    ENV.append "CPPFLAGS", "-D_DARWIN_C_SOURCE -I#{Formula["ncurses-head"].opt_include}/ncursesw"
+    ENV.append "LDFLAGS", "-L#{Formula["ncurses-head"].opt_lib} -lncursesw"
 
     system "Util/preconfig" if build.head?
 
     system "./configure", "--prefix=#{prefix}",
-           "--enable-fndir=#{pkgshare}/functions",
-           "--enable-scriptdir=#{pkgshare}/scripts",
+           "--enable-fndir=#{prefix}/share/zsh/functions",
+           "--enable-scriptdir=#{prefix}/share/zsh/scripts",
            "--enable-site-fndir=#{HOMEBREW_PREFIX}/share/zsh/site-functions",
            "--enable-site-scriptdir=#{HOMEBREW_PREFIX}/share/zsh/site-scripts",
-           "--enable-runhelpdir=#{pkgshare}/help",
+           "--enable-runhelpdir=#{prefix}/share/zsh/help",
            "--enable-cap",
            "--enable-gdbm",
            "--enable-multibyte",
