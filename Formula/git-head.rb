@@ -1,7 +1,7 @@
 class GitHead < Formula
   desc "Distributed revision control system"
   homepage "https://git-scm.com"
-  head "https://github.com/git/git.git", shallow: false
+  head "https://github.com/git/git.git", :branch => "master"
 
   livecheck do
     url "https://www.kernel.org/pub/software/scm/git/"
@@ -28,13 +28,13 @@ class GitHead < Formula
   depends_on "zstd"
 
   resource "html" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.33.0.tar.xz"
-    sha256 "309c5d3cdd9a115f693c0e035298cc867a3b8ba8ce235fa1ac950a48cb4b0447"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.35.1.tar.xz"
+    sha256 "ca2f0bd4a9d24d9b6b3a021f11b8eacee863948c67a4cc0ff6d7adef8137ea18"
   end
 
   resource "man" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.33.0.tar.xz"
-    sha256 "d6d38abe3fe45b74359e65d53e51db3aa92d7f551240b7f7a779746f24c4bc31"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.35.1.tar.xz"
+    sha256 "e4e3a751f2c05959222c3ea2f0f09481700eca8f915d1398bb270eb6846c3803"
   end
 
   resource "Net::SMTP::SSL" do
@@ -53,12 +53,25 @@ class GitHead < Formula
     ENV["LIBPCREDIR"] = Formula["pcre2"].opt_prefix
     ENV["V"] = "1" # build verbosely
 
-    ENV["CFLAGS"] = "-march=native -Ofast -flto -std=c17"
-    ENV["CXXFLAGS"] = "-march=native -Ofast -flto -std=c++17 -stdlib=libc++"
-    ENV["LDFLAGS"] = "-march=native -Ofast -flto"
-    ENV["LDFLAGS"] += " -L#{Formula['brotli'].lib} -L#{Formula['c-ares'].lib} -L#{Formula['curl-quic'].lib} -L#{Formula['libidn2'].lib} -L#{Formula['libmetalink'].lib}"
-    ENV["LDFLAGS"] += " -L#{Formula['libssh2'].lib} -L#{Formula['nghttp2'].lib} -L#{Formula['nghttp3'].lib} -L#{Formula['ngtcp2'].lib} -L#{Formula['openldap'].lib}"
-    ENV["LDFLAGS"] += " -L#{Formula['openssl-quic'].lib} -L#{Formula['pcre2'].lib} -L#{Formula['rtmpdump'].lib} -L#{Formula['zlib'].lib} -L#{Formula['zstd'].lib}"
+    cflags = "-std=c11 -flto"
+    cxxflags = "-std=c++17 -stdlib=libc++ -flto"
+    ldflags = "-flto"
+    if Hardware::CPU.intel?
+      cflags += " -march=native -Ofast"
+      cxxflags += " -march=native -Ofast"
+      ldflags += " -march=native -Ofast"
+    else
+      cflags += " -mcpu=apple-a14"
+      cxxflags += " -mcpu=apple-a14"
+      ldflags += " -mcpu=apple-a14"
+    end
+    ldflags += " -L#{Formula["brotli"].opt_lib} -L#{Formula["c-ares"].opt_lib} -L#{Formula["curl-quic"].opt_lib} -L#{Formula["libidn2"].opt_lib}"
+    ldflags += " -L#{Formula["libmetalink"].opt_lib} -L#{Formula["libssh2"].opt_lib} -L#{Formula["nghttp2"].opt_lib} -L#{Formula["nghttp3"].opt_lib} -L#{Formula["ngtcp2"].opt_lib}"
+    ldflags += " -L#{Formula["openldap"].opt_lib} -L#{Formula["openssl-quic"].opt_lib} -L#{Formula["pcre2"].opt_lib} -L#{Formula["rtmpdump"].opt_lib}"
+    ldflags += " -L#{Formula["zlib"].opt_lib} -L#{Formula["zstd"].opt_lib}"
+    ENV.append "CFLAGS", *cflags
+    ENV.append "CXXFLAGS", *cxxflags
+    ENV.append "LDFLAGS", *ldflags
     ENV["XML_CATALOG_FILES"] = "/usr/local/etc/xml/catalog"
 
     perl_version = Utils.safe_popen_read("perl", "--version")[/v(\d+\.\d+)(?:\.\d+)?/, 1]
