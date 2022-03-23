@@ -1,7 +1,7 @@
 class OpensslQuic < Formula
   desc "Cryptography and SSL/TLS Toolkit with QUIC"
   homepage "https://github.com/quictls/openssl"
-  head "https://github.com/quictls/openssl.git", branch: "openssl-3.0.1+quic"
+  head "https://github.com/quictls/openssl.git", branch: "openssl-3.0.2+quic"
   license "OpenSSL"
 
   keg_only :shadowed_by_macos, "macOS provides LibreSSL"
