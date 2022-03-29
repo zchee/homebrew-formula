@@ -57,6 +57,7 @@ class CurlQuic < Formula
       --with-ssl=#{openssl_quic.opt_prefix}
       --with-nghttp3=#{Formula["nghttp3"].opt_prefix}
       --with-ngtcp2=#{Formula["ngtcp2"].opt_prefix}
+      --enable-headers-api
       --without-quiche
       --enable-alt-svc
       --with-libidn2
@@ -68,7 +69,6 @@ class CurlQuic < Formula
     system "./configure", *args
     system "make", "install"
     system "make", "install", "-C", "scripts"
-    libexec.install "lib/mk-ca-bundle.pl"
   end
 
   test do
