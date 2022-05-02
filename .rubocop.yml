@@ -2,8 +2,10 @@ Metrics/LineLength:
   Max: 180
 MethodLength:
   CountComments: false
-  Max: 100
+  Max: 500
 StringLiterals:
+  EnforcedStyle: double_quotes
+Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
 Layout/SpaceAroundOperators:
   Enabled: false
@@ -13,7 +15,7 @@ Style/AccessModifierDeclarations:
   Enabled: false
 # Enabled now LineLength is lowish.
 Style/IfUnlessModifier:
-  Enabled: true
+  Enabled: false
 # `system` is a special case and aligns on second argument, so allow this for formulae.
 Layout/ArgumentAlignment:
   Exclude:
@@ -50,12 +52,16 @@ Naming/FileName:
   Enabled: false
 Metrics/ClassLength:
   Enabled: false
-Style/IfUnlessModifier:
-  Enabled: false
 Metrics/AbcSize:
   Enabled: false
 Naming/HeredocDelimiterNaming:
   Enabled: false
 # avoid hash rockets where possible
-Style/HashSyntax:
+HashSyntax:
   EnforcedStyle: ruby19
+Metrics/BlockLength:
+  Max: 500
+Metrics/PerceivedComplexity:
+  Max: 50
+Metrics/CyclomaticComplexity:
+  Max: 50
