@@ -6,7 +6,6 @@ class GroffHead < Formula
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
-  depends_on "gawk" => :build
   depends_on "ghostscript" => :build
   depends_on "libtool" => :build
   depends_on "netpbm" => :build
@@ -17,17 +16,16 @@ class GroffHead < Formula
 
   uses_from_macos "bison" => :build
   uses_from_macos "texinfo" => :build
-  uses_from_macos "perl"
+  uses_from_macos "perl" => :build
 
   on_linux do
     depends_on "glib"
   end
 
-  patch :DATA
-
   def install
+    ENV.prepend_path "PATH", "/usr/local/texlive/2022basic/bin/universal-darwin"
     system "./bootstrap", "--skip-po"
-    system "./configure", "--prefix=#{prefix}", "--without-x", "--with-doc=info", "--with-uchardet", "--with-gs=#{Formula["ghostscript"].bin}/gs", "--with-awk=#{Formula["gawk"].bin}/gawk"
+    system "./configure", "--prefix=#{prefix}", "--without-x", "--with-uchardet"
     system "make" # Separate steps required
     system "make", "install"
   end
@@ -37,132 +35,3 @@ class GroffHead < Formula
       pipe_output("#{bin}/groff -a", "homebrew\n")
   end
 end
-
-__END__
---- a/src/libs/libgroff/assert.cpp
-+++ b/src/libs/libgroff/assert.cpp
-@@ -16,6 +16,10 @@ for more details.
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-+#ifdef HAVE_CONFIG_H
-+#include "config.h"
-+#endif
-+
- #include <stdio.h>
- #include <stdlib.h>
- #include "assert.h"
---- a/src/libs/libgroff/errarg.cpp
-+++ b/src/libs/libgroff/errarg.cpp
-@@ -17,6 +17,10 @@ for more details.
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-+#ifdef HAVE_CONFIG_H
-+#include "config.h"
-+#endif
-+
- #include <stdio.h>
- #include "assert.h"
- #include "errarg.h"
---- a/src/libs/libgroff/error.cpp
-+++ b/src/libs/libgroff/error.cpp
-@@ -17,6 +17,10 @@ for more details.
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-+#ifdef HAVE_CONFIG_H
-+#include "config.h"
-+#endif
-+
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
---- a/src/libs/libgroff/curtime.cpp
-+++ b/src/libs/libgroff/curtime.cpp
-@@ -15,6 +15,10 @@
- The GNU General Public License version 2 (GPL2) is available in the
- internet at <http://www.gnu.org/licenses/gpl-2.0.txt>. */
-
-+#ifdef HAVE_CONFIG_H
-+#include "config.h"
-+#endif
-+
- #include <errno.h>
- #include <limits.h>
- #include <stdlib.h>
---- a/src/libs/libgroff/device.cpp
-+++ b/src/libs/libgroff/device.cpp
-@@ -17,6 +17,7 @@ for more details.
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-+#include "config.h"
- #include <stdlib.h>
- #include "device.h"
- #include "defs.h"
---- a/src/libs/libgroff/fatal.cpp
-+++ b/src/libs/libgroff/fatal.cpp
-@@ -16,6 +16,7 @@ for more details.
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-+#include "config.h"
- #include <stdlib.h>
-
- #define FATAL_ERROR_EXIT_CODE 3
---- a/src/libs/libgroff/string.cpp
-+++ b/src/libs/libgroff/string.cpp
-@@ -17,6 +17,10 @@ for more details.
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-+#ifdef HAVE_CONFIG_H
-+#include "config.h"
-+#endif
-+
- #include <stdlib.h>
-
- #include "lib.h"
---- a/src/libs/libgroff/strsave.cpp
-+++ b/src/libs/libgroff/strsave.cpp
-@@ -17,6 +17,7 @@ for more details.
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-+#include "config.h"
- #include <string.h>
- #include <stdlib.h>
-
---- a/src/preproc/eqn/text.cpp
-+++ b/src/preproc/eqn/text.cpp
-@@ -17,6 +17,7 @@ for more details.
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-+#include "config.h"
- #include <ctype.h>
- #include <stdlib.h>
- #include "eqn.h"
---- a/src/preproc/eqn/other.cpp
-+++ b/src/preproc/eqn/other.cpp
-@@ -17,6 +17,7 @@ for more details.
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-+#include "config.h"
- #include <stdlib.h>
-
- #include "eqn.h"
---- a/src/preproc/pic/object.cpp
-+++ b/src/preproc/pic/object.cpp
-@@ -17,6 +17,8 @@ for more details.
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-+#include "config.h"
-+
- #include <stdlib.h>
-
- #include "pic.h"
-{"mode":"full","isActive":false}
