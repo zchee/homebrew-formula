@@ -1,32 +1,26 @@
-class ManDb < Formula
+class ManDbHead < Formula
   desc "Unix documentation system"
   homepage "https://www.nongnu.org/man-db/"
-  url "https://download.savannah.gnu.org/releases/man-db/man-db-2.9.4.tar.xz"
-  mirror "https://download-mirror.savannah.gnu.org/releases/man-db/man-db-2.9.4.tar.xz"
-  sha256 "b66c99edfad16ad928c889f87cf76380263c1609323c280b3a9e6963fdb16756"
-  license "GPL-2.0-or-later"
-
-  head do
-    url "https://git.savannah.nongnu.org/git/man-db.git", branch: "master"
-
-    depends_on "autoconf"
-    depends_on "automake"
-    depends_on "libtool"
-  end
+  head "https://gitlab.com/cjwatson/man-db.git", branch: "main"
+  license "GPL-3.0"
 
   livecheck do
     url "https://download.savannah.gnu.org/releases/man-db/"
     regex(/href=.*?man-db[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
   depends_on "pkg-config" => :build
-  depends_on "bzip2"
-  depends_on "gettext"
-  depends_on "groff"
-  depends_on "gzip"
-  depends_on "libpipeline"
-  depends_on "xz"
-  depends_on "zstd"
+  depends_on "bzip2" => :build
+  depends_on "gettext" => :build
+  depends_on "groff-head" => :build
+  depends_on "gzip" => :build
+  depends_on "libpipeline" => :build
+  depends_on "lzip" => :build
+  depends_on "xz" => :build
+  depends_on "zstd" => :build
 
   uses_from_macos "zlib"
 
@@ -45,6 +39,12 @@ class ManDb < Formula
       --program-prefix=g
       --enable-shared
       --enable-static
+      --enable-mb-groff
+      --with-bzip2=#{Formula["bzip2"].opt_prefix}
+      --with-xz=#{Formula["xz"].opt_prefix}
+      --with-lzma=#{Formula["xz"].opt_prefix}
+      --with-lzip=#{Formula["lzip"].opt_prefix}
+      --with-zstd=#{Formula["zstd"].opt_prefix}
       --with-config-file=#{etc}/man_db.conf
       --with-systemdtmpfilesdir=#{etc}/tmpfiles.d
       --with-systemdsystemunitdir=#{etc}/systemd/system
