@@ -2,24 +2,22 @@ class TmuxHead < Formula
   desc "Terminal multiplexer"
   homepage "https://tmux.github.io/"
   license "ISC"
+  head "https://github.com/tmux/tmux.git"
 
   livecheck do
     url "https://github.com/tmux/tmux/releases/latest"
     regex(%r{href=.*?/tag/v?(\d+(?:\.\d+)+[a-z]?)["' >]}i)
   end
 
-  head do
-    url "https://github.com/tmux/tmux.git"
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-    depends_on "bison" => :build
-  end
-
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
   depends_on "pkg-config" => :build
+
+  depends_on "bison" => :build
   depends_on "libevent-head" => :build
   depends_on "ncurses-head" => :build
+  depends_on "pcre" => :build
   depends_on "utf8proc-head" => :build
 
   resource "completion" do
@@ -28,19 +26,27 @@ class TmuxHead < Formula
   end
 
   def install
-    cflags = "-std=c11 -flto"
-    ldflags = "-flto"
+    cflags = "-std=c2x -Wno-pointer-sign"
+    ldflags = "-lresolv"
     if Hardware::CPU.intel?
-      cflags += " -march=native -Ofast"
-      ldflags += " -march=native -Ofast"
+      cflags += " -march=native -Ofast -flto"
+      ldflags += " -march=native -Ofast -flto"
     else
-      cflags += " -mcpu=apple-a14"
-      ldflags += " -mcpu=apple-a14"
+      cflags += " -mcpu=apple-a14 -flto"
+      ldflags += " -mcpu=apple-a14 -flto"
     end
-    ldflags += " -L#{Formula["ncurses-head"].lib} -lncursestw -lresolv"
+    ldflags += " -L#{Formula["ncurses-head"].lib} -lresolv"
+
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
-    ENV.append "CPPFLAGS", "-I#{Formula["ncurses-head"].include}/ncursesw"
+    ENV.append "CFLAGS", "-I#{Formula["pcre"].opt_include} -I#{Formula["utf8proc-head"].opt_include}"
+    ENV.append "LDFLAGS", "#{Formula["utf8proc-head"].opt_lib}/libutf8proc.a"
+
+    ENV.append "LIBEVENT_CFLAGS", "-I#{Formula["libevent-head"].opt_include}"
+    ENV.append "LIBEVENT_LIBS", "#{Formula["libevent-head"].opt_lib}/libevent.a"
+    ENV.append "LIBEVENT_CORE_LIBS", "#{Formula["libevent-head"].opt_lib}/libevent_core.a"
+    ENV.append "LIBNCURSES_CFLAGS", "-I#{Formula["ncurses-head"].opt_include}/ncursesw -I#{Formula["ncurses-head"].opt_include} -D_DARWIN_C_SOURCE -DNCURSES_WIDECHAR"
+    ENV.append "LIBNCURSES_LIBS", "#{Formula["ncurses-head"].opt_lib}/libncursesw.a"
 
     inreplace "configure.ac" do |s|
       s.gsub!(/AC_INIT\(\[tmux\],[^)]*\)/, "AC_INIT([tmux], master)")
