@@ -1,7 +1,7 @@
 class Jq < Formula
   desc "Lightweight and flexible command-line JSON processor"
   homepage "https://stedolan.github.io/jq/"
-  head "https://github.com/stedolan/jq.git"
+  head "https://github.com/stedolan/jq.git", branch: "master"
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build

@@ -1,7 +1,7 @@
 class SimavrHead < Formula
   desc "Lean, mean and hackable AVR simulator for Linux & macOS"
   homepage "https://github.com/buserror/simavr"
-  head "https://github.com/buserror/simavr.git"
+  head "https://github.com/buserror/simavr.git", branch: "master"
 
   depends_on "avr-gcc"
   depends_on "libelf"

@@ -1,7 +1,7 @@
 class GoGdu < Formula
   desc "Disk usage analyzer with console interface written in Go"
   homepage "https://github.com/dundee/gdu"
-  head "https://github.com/dundee/gdu.git"
+  head "https://github.com/dundee/gdu.git", branch: "master"
   license "MIT"
 
   depends_on "go" => :build

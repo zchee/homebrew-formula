@@ -1,7 +1,7 @@
 class Gn < Formula
   desc "GN is a meta-build system that generates build files for Ninja."
   homepage "https://gn.googlesource.com/gn"
-  head "https://gn.googlesource.com/gn.git"
+  head "https://gn.googlesource.com/gn.git", branch: "master"
 
   depends_on "ninja" => :build
   depends_on "python" => :build

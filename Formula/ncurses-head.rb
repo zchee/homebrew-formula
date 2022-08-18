@@ -1,7 +1,7 @@
 class NcursesHead < Formula
   desc "Text-based UI library"
   homepage "https://www.gnu.org/software/ncurses/"
-  head "https://github.com/ThomasDickey/ncurses-snapshots.git"
+  head "https://github.com/ThomasDickey/ncurses-snapshots.git", branch: "master"
   license "MIT"
 
   depends_on "pkg-config" => :build

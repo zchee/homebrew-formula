@@ -3,7 +3,7 @@ class YamllintHead < Formula
 
   desc "Linter for YAML files"
   homepage "https://github.com/adrienverge/yamllint"
-  head "https://github.com/adrienverge/yamllint.git"
+  head "https://github.com/adrienverge/yamllint.git", branch: "master"
 
   depends_on "libyaml"
   depends_on "python@3.8"

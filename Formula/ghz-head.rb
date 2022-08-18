@@ -1,7 +1,7 @@
 class GhzHead < Formula
   desc "Simple gRPC benchmarking and load testing tool"
   homepage "https://ghz.sh"
-  head "https://github.com/bojand/ghz.git"
+  head "https://github.com/bojand/ghz.git", branch: "master"
   license "Apache-2.0"
 
   livecheck do

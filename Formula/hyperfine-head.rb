@@ -1,7 +1,7 @@
 class HyperfineHead < Formula
   desc "Command-line benchmarking tool"
   homepage "https://github.com/sharkdp/hyperfine"
-  head "https://github.com/sharkdp/hyperfine.git"
+  head "https://github.com/sharkdp/hyperfine.git", branch: "master"
   license any_of: ["Apache-2.0", "MIT"]
 
   depends_on "rust" => :build

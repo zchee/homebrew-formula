@@ -1,7 +1,7 @@
 class Act < Formula
   desc "Run your GitHub Actions locally 🚀"
   homepage "https://github.com/nektos/act"
-  head "https://github.com/nektos/act.git"
+  head "https://github.com/nektos/act.git", branch: "master"
   license "MIT"
 
   depends_on "go" => :build

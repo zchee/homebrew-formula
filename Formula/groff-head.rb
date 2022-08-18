@@ -1,7 +1,7 @@
 class GroffHead < Formula
   desc "GNU troff text-formatting system"
   homepage "https://www.gnu.org/software/groff/"
-  head "https://git.savannah.gnu.org/git/groff.git"
+  head "https://git.savannah.gnu.org/git/groff.git", branch: "master"
   license "GPL-3.0-or-later"
 
   depends_on "autoconf" => :build

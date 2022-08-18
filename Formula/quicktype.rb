@@ -3,7 +3,7 @@ require "language/node"
 class Quicktype < Formula
   desc "Generate types and converters from JSON, Schema, and GraphQL"
   homepage "https://github.com/quicktype/quicktype"
-  head "https://github.com/quicktype/quicktype.git"
+  head "https://github.com/quicktype/quicktype.git", branch: "master"
 
   depends_on "node@10"
 

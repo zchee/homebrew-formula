@@ -3,7 +3,7 @@ class Glances < Formula
   homepage "https://nicolargo.github.io/glances/"
   url "https://github.com/nicolargo/glances/archive/v3.0.2.tar.gz"
   sha256 "76a793a8e0fbdce11ad7fb35000695fdb70750f937db41f820881692d5b0a29c"
-  head "https://github.com/nicolargo/glances.git"
+  head "https://github.com/nicolargo/glances.git", branch: "master"
 
   depends_on "python"
   depends_on "pandoc"

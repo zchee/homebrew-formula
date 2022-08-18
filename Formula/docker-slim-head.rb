@@ -1,7 +1,7 @@
 class DockerSlimHead < Formula
   desc "Minify and secure Docker images"
   homepage "https://dockersl.im"
-  head "https://github.com/docker-slim/docker-slim.git"
+  head "https://github.com/docker-slim/docker-slim.git", branch: "master"
 
   depends_on "go" => :build
 

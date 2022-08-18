@@ -1,7 +1,7 @@
 class CcacheHead < Formula
   desc "Object-file caching compiler wrapper"
   homepage "https://ccache.dev/"
-  head "https://github.com/ccache/ccache.git"
+  head "https://github.com/ccache/ccache.git", branch: "master"
 
   uses_from_macos "zlib"
 

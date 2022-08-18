@@ -2,7 +2,7 @@ class TmuxHead < Formula
   desc "Terminal multiplexer"
   homepage "https://tmux.github.io/"
   license "ISC"
-  head "https://github.com/tmux/tmux.git"
+  head "https://github.com/tmux/tmux.git", branch: "master"
 
   livecheck do
     url "https://github.com/tmux/tmux/releases/latest"

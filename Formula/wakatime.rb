@@ -2,7 +2,7 @@ class Wakatime < Formula
   desc "Command-line interface to the WakaTime api"
   homepage "https://wakatime.com/"
   license "BSD-3-Clause"
-  head "https://github.com/wakatime/wakatime.git"
+  head "https://github.com/wakatime/wakatime.git", branch: "master"
 
   livecheck do
     url :stable

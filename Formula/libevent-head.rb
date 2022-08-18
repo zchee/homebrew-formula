@@ -2,7 +2,7 @@ class LibeventHead < Formula
   desc "Asynchronous event library"
   homepage "https://libevent.org/"
   license "BSD-3-Clause"
-  head "https://github.com/libevent/libevent.git"
+  head "https://github.com/libevent/libevent.git", branch: "master"
 
   livecheck do
     url :homepage

@@ -2,7 +2,7 @@ class SrcCli < Formula
   desc "Sourcegraph CLI"
   homepage "https://sourcegraph.com/"
   license "Apache-2.0"
-  head "https://github.com/sourcegraph/src-cli.git"
+  head "https://github.com/sourcegraph/src-cli.git", branch: "master"
 
   livecheck do
     url :stable

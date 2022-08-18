@@ -1,7 +1,7 @@
 class ShellcheckHead < Formula
   desc "Static analysis and lint tool, for (ba)sh scripts"
   homepage "https://www.shellcheck.net/"
-  head "https://github.com/koalaman/shellcheck.git"
+  head "https://github.com/koalaman/shellcheck.git", branch: "master"
 
   depends_on "cabal-install" => :build
   depends_on "ghc" => :build

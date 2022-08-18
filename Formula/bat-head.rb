@@ -1,7 +1,7 @@
 class BatHead < Formula
   desc "Clone of cat(1) with syntax highlighting and Git integration"
   homepage "https://github.com/sharkdp/bat"
-  head "https://github.com/sharkdp/bat.git"
+  head "https://github.com/sharkdp/bat.git", branch: "master"
   license any_of: ["Apache-2.0", "MIT"]
 
   depends_on "rust" => :build

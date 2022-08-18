@@ -1,7 +1,7 @@
 class BatsCore < Formula
   desc "Bash Automated Testing System"
   homepage "https://github.com/bats-core/bats-core"
-  head "https://github.com/bats-core/bats-core.git"
+  head "https://github.com/bats-core/bats-core.git", branch: "master"
   license "MIT"
 
   depends_on "coreutils"

@@ -1,7 +1,7 @@
 class ZshFastSyntaxHighlighting < Formula
   desc "Fast Zsh Syntax Highlighting"
   homepage "https://github.com/zdharma/fast-syntax-highlighting"
-  head "https://github.com/zdharma/fast-syntax-highlighting.git"
+  head "https://github.com/zdharma/fast-syntax-highlighting.git", branch: "master"
 
   def install
     pkgshare.install Dir["*"]
