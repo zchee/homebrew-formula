@@ -4,7 +4,7 @@ class TigHead < Formula
   license "GPL-2.0-or-later"
 
   head do
-    url "https://github.com/jonas/tig.git"
+    url "https://github.com/jonas/tig.git", branch: "master"
 
     depends_on "asciidoc" => :build
     depends_on "autoconf" => :build
@@ -38,9 +38,11 @@ class TigHead < Formula
     # installing in a separate step.
     system "make", "install", "sysconfdir=#{pkgshare}/examples"
     system "make", "install-doc-man"
-    bash_completion.install "contrib/tig-completion.bash"
-    zsh_completion.install "contrib/tig-completion.zsh" => "_tig"
-    cp "#{bash_completion}/tig-completion.bash", zsh_completion
+
+    # comment out since git bash completion better than tig bash completion
+    # bash_completion.install "contrib/tig-completion.bash"
+    # zsh_completion.install "contrib/tig-completion.zsh" => "_tig"
+    # cp "#{bash_completion}/tig-completion.bash", zsh_completion
   end
 
   def caveats
