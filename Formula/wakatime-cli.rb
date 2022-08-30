@@ -21,10 +21,20 @@ class WakatimeCli < Formula
       -X "github.com/wakatime/wakatime-cli/pkg/version.Version=<Homebrew-build>"
       -X "github.com/wakatime/wakatime-cli/pkg/version.OS=#{os}"
       -X "github.com/wakatime/wakatime-cli/pkg/version.Arch=#{arch}"
+      -linkmode=external
+      -buildmode=pie
+      -buildid=
+      "-extldflags=-static-pie -all_load -dead_strip -Wl,-no_deduplicate"
     ].join(" ")
 
+    tags = %W[
+      osusergo
+      netgo
+      static
+    ].join(",")
+
     ENV["CGO_ENABLED"] = "0"
-    system "go", "build", *std_go_args(ldflags: ldflags)
+    system "go", "build", *std_go_args(ldflags: ldflags), "-tags=#{tags}"
     bin.install_symlink "#{bin}/wakatime-cli" => "#{bin}/wakatime"
   end
 
