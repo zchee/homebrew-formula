@@ -8,7 +8,24 @@ class DirenvHead < Formula
   depends_on "go-md2man" => :build
 
   def install
-    system "make", "install", "PREFIX=#{prefix}"
+    ldflags = %W[
+      -s -w
+      -linkmode=external
+      -buildmode=pie
+      -buildid=
+      "-extldflags=-static-pie -all_load -dead_strip -Wl,-no_deduplicate"
+    ].join(" ")
+
+    tags = %W[
+      osusergo
+      netgo
+      static
+    ].join(",")
+
+    ENV["CGO_ENABLED"] = "0"
+    system "go", "build", *std_go_args(ldflags: ldflags), "-tags=#{tags}", "-o=#{bin}/direnv"
+    system "make", "man"
+    man1.install Dir["man/*.1"]
   end
 
   test do
