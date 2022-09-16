@@ -12,9 +12,8 @@ class BatHead < Formula
     ENV["SHELL_COMPLETIONS_DIR"] = buildpath
 
     ENV["RUSTC_WRAPPER"] = Formula["sccache"].opt_bin/"sccache"
-    ENV["RUSTFLAGS"] = "-C target-cpu=native -C target-feature=+aes,avx,avx2,avx512f,avx512dq,avx512cd,avx512bw,avx512vl -C opt-level=3 -C force-frame-pointers=on -C debug-assertions=off -C incremental=on -C overflow-checks=off"
-    system "cargo", "update", "--aggressive"
-    system "cargo", "install", "-v", "--all-features", *std_cargo_args
+    ENV["RUSTFLAGS"] = "-C target-cpu=x86-64-v4 -C target-feature=+aes,+avx,+avx2,+avx512f,+avx512dq,+avx512cd,+avx512bw,+avx512vl -C opt-level=3 -C force-frame-pointers=on -C debug-assertions=off -C incremental=on -C overflow-checks=off"
+    system "cargo", "install", "-v", *std_cargo_args, "--all-features"
 
     assets_dir = Dir["target/release/build/bat-*/out/assets"].first
     man1.install "#{assets_dir}/manual/bat.1"
