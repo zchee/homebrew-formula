@@ -3,6 +3,11 @@ class CurlQuic < Formula
   homepage "https://curl.haxx.se/"
   license "curl"
 
+  livecheck do
+    url "https://curl.se/download/"
+    regex(/href=.*?curl[._-]v?(.*?)\.t/i)
+  end
+
   head do
     url "https://github.com/curl/curl.git", :branch => "master"
 
@@ -14,7 +19,7 @@ class CurlQuic < Formula
     depends_on "c-ares" => :build
     depends_on "libidn2" => :build
     depends_on "libssh2" => :build
-    depends_on "nghttp2" => :build
+    depends_on "libnghttp2" => :build
     depends_on "nghttp3" => :build
     depends_on "ngtcp2" => :build
     depends_on "openldap" => :build
@@ -22,12 +27,13 @@ class CurlQuic < Formula
     depends_on "pkg-config" => :build
     depends_on "rtmpdump" => :build
     depends_on "zstd" => :build
+
+    uses_from_macos "krb5"
+    uses_from_macos "zlib"
   end
 
   def install
     system "autoreconf", "-fiv"
-
-    openssl_quic = Formula["openssl-quic"]
 
     cflags = "-std=c11 -flto"
     ldflags = "-flto"
@@ -40,35 +46,44 @@ class CurlQuic < Formula
     end
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
-    ENV.prepend "CPPFLAGS", "-isystem #{openssl_quic.opt_prefix}/include"
-    ENV.prepend "LDFLAGS", "-L#{openssl_quic.opt_prefix}/lib"
-    ENV.prepend "LIBS", "-lngtcp2_crypto_openssl"
+    # ENV.prepend "CPPFLAGS", "-isystem #{openssl_quic.opt_prefix}/include"
+    # ENV.prepend "LDFLAGS", "-L#{openssl_quic.opt_prefix}/lib"
+    # ENV.prepend "LIBS", "-lngtcp2_crypto_openssl"
 
     args = %W[
       --disable-debug
       --disable-dependency-tracking
       --disable-silent-rules
       --prefix=#{prefix}
+      --with-ssl=#{Formula["openssl-quic"].opt_prefix}
       --enable-ares=#{Formula["c-ares"].opt_prefix}
-      --with-ca-bundle=#{openssl_quic.pkgetc}/cert.pem
-      --with-ca-path=#{openssl_quic.pkgetc}/certs
+      --without-ca-bundle
+      --without-ca-path
+      --with-ca-fallback
       --with-secure-transport
       --with-default-ssl-backend=openssl
-      --with-ssl=#{openssl_quic.opt_prefix}
       --with-nghttp3=#{Formula["nghttp3"].opt_prefix}
       --with-ngtcp2=#{Formula["ngtcp2"].opt_prefix}
       --enable-headers-api
       --without-quiche
       --enable-alt-svc
+      --enable-websockets
       --with-libidn2
       --with-librtmp
       --with-libssh2
       --without-libpsl
     ]
 
+    args << if OS.mac?
+      "--with-gssapi"
+    else
+      "--with-gssapi=#{Formula["krb5"].opt_prefix}"
+    end
+
     system "./configure", *args
     system "make", "install"
     system "make", "install", "-C", "scripts"
+    libexec.install "scripts/mk-ca-bundle.pl"
   end
 
   test do
