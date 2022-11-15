@@ -14,23 +14,43 @@ class TigHead < Formula
 
   depends_on "libiconv"
   depends_on "ncurses-head"
-  depends_on "pcre"
   depends_on "pcre2"
   depends_on "readline"
 
   def install
-    ENV.append "CFLAGS", "-I#{Formula["libiconv"].opt_include} -I#{Formula["pcre"].opt_include} -I#{Formula["pcre2"].opt_include}"
     system "./autogen.sh" if build.head?
     system "./configure", "--prefix=#{prefix}", "--sysconfdir=#{etc}"
 
+    c_ld_flags = %W[
+      -Ofast
+    ]
+    if Hardware::CPU.intel?
+      c_ld_flags << "-march=native"
+    elsif Hardware::CPU.arm?
+      c_ld_flags << "-mcpu=apple-m1"
+    end
+    cppflags = "-DHAVE_CONFIG_H -DHAVE_NCURSESW_CURSES_H -DHAVE_READLINE -DHAVE_PCRE2 -DPCRE2_CODE_UNIT_WIDTH=8"
+
     inreplace "config.make" do |s|
-      s.gsub!(/CFLAGS =.*/, "CFLAGS= -march=native -Ofast -I#{include}")
-      s.gsub!(/LDFLAGS =.*/, "LDFLAGS= -L#{lib} -march=native -Ofast #{Formula["libiconv"].opt_lib}/libiconv.a \
+      s.gsub!(/CFLAGS =.*/, "CFLAGS= #{c_ld_flags.join(" ")} -I#{include} -DHAVE_EXECINFO_H")
+      s.gsub!(/CPPFLAGS =.*/, "CPPFLAGS= #{cppflags}")
+      s.gsub!(/LDFLAGS =.*/, "LDFLAGS= -L#{lib} \
+        #{c_ld_flags.join(" ")} \
+        #{Formula["libiconv"].opt_lib}/libiconv.a \
         #{Formula["readline"].opt_lib}/libreadline.a \
-        #{Formula["pcre"].opt_lib}/libpcre.a \
-        #{Formula["pcre"].opt_lib}/libpcreposix.a #{Formula["pcre2"].opt_lib}/libpcre2-posix.a #{Formula["pcre2"].opt_lib}/libpcre2-8.a \
+        #{Formula["pcre2"].opt_lib}/libpcre2-posix.a \
+        #{Formula["pcre2"].opt_lib}/libpcre2-8.a \
         #{Formula["ncurses-head"].opt_lib}/libncursesw.a")
       s.gsub!(/LDLIBS =.*/, "LDLIBS=")
+    end
+
+    if Hardware::CPU.arm?
+      inreplace "contrib/config.make-Darwin" do |s|
+        s.gsub!(/(XML_CATALOG_FILES)=.*/, "\\1=#{etc}/xml/catalog")
+        s.gsub!(/\/usr\/local\/opt\/ncurses/, "#{Formula["ncurses-head"].opt_prefix}")
+        s.gsub!(/\/usr\/local\/opt\/readline/, "#{Formula["readline"].opt_prefix}")
+        s.gsub!(/\/usr\/local\/opt\/pcre2/, "#{Formula["pcre2"].opt_prefix}")
+      end
     end
 
     system "make"
