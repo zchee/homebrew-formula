@@ -2,7 +2,7 @@ class WatchHead < Formula
   desc "Executes a program periodically, showing output fullscreen"
   homepage "https://gitlab.com/procps-ng/procps"
   license all_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"]
-  head "https://gitlab.com/procps-ng/procps.git", branch: "newlib"
+  head "https://gitlab.com/procps-ng/procps.git", branch: "master"
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
