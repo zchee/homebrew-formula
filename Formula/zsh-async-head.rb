@@ -1,7 +1,7 @@
 class ZshAsyncHead < Formula
   desc "Perform tasks asynchronously without external tools"
   homepage "https://github.com/mafredri/zsh-async"
-  head "https://github.com/mafredri/zsh-async.git", branch: "master"
+  head "https://github.com/mafredri/zsh-async.git", branch: "main"
   license "MIT"
 
   uses_from_macos "zsh"
