@@ -1,6 +1,11 @@
 class ZshHead < Formula
   desc "UNIX shell (command interpreter)"
   homepage "https://www.zsh.org/"
+  license "MIT-Modern-Variant"
+
+  livecheck do
+    url "https://sourceforge.net/projects/zsh/rss?path=/zsh"
+  end
 
   head do
     url "https://github.com/zsh-users/zsh.git"
@@ -12,17 +17,18 @@ class ZshHead < Formula
     depends_on "yodl"
   end
 
-  uses_from_macos "texinfo"
+  on_system :linux, macos: :ventura_or_newer do
+    depends_on "texinfo" => :build
+  end
 
   def install
     # Work around configure issues with Xcode 12
     # https://www.zsh.org/mla/workers/2020/index.html
     # https://github.com/Homebrew/homebrew-core/issues/64921
-
-    cflags = "-Wno-implicit-function-declaration -std=c11 -flto"
+    cflags = "-Wno-implicit-function-declaration"
     ldflags = "-flto"
     if Hardware::CPU.intel?
-      cflags += " -march=native -Ofast"
+      cflags += " -std=c11 -march=native -Ofast -flto"
       ldflags += " -march=native -Ofast"
     else
       cflags += " -mcpu=apple-a14"
@@ -50,7 +56,6 @@ class ZshHead < Formula
            "--enable-multibyte",
            "--enable-pcre",
            "--enable-zsh-secure-free",
-           "--enable-stack-allocation",
            "--enable-unicode9",
            "--disable-etcdir",
            "--with-tcsetpgrp",
@@ -105,7 +110,7 @@ class ZshHead < Formula
     inreplace ["Makefile", "Src/Makefile"],
               "$(libdir)/$(tzsh)/$(VERSION)", "$(libdir)"
 
-    system "make", "install"
+    system "make", "install.bin", "install.modules", "install.fns", "install.man"
   end
 
   test do
