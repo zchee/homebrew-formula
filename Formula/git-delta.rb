@@ -5,12 +5,13 @@ class GitDelta < Formula
   head "https://github.com/dandavison/delta.git", :branch => "master"
 
   depends_on "rust" => :build
-  uses_from_macos "llvm"
+  depends_on "llvm" => :build
 
   conflicts_with "delta", because: "both install a `delta` binary"
 
   def install
     system "cargo", "install", *std_cargo_args, "--all-features"
+    bin.install_symlink "delta" => "git-delta"
 
     zsh_completion.install "etc/completion/completion.zsh" => "_delta"
   end
