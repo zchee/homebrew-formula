@@ -7,9 +7,9 @@ class WakatimeCliHead < Formula
   depends_on "go" => :build
 
   def install
-    arch = Hardware::CPU.intel? ? "amd64" : Hardware::CPU.arch.to_s
-
     ENV["CGO_ENABLED"] = "0"
+
+    arch = Hardware::CPU.intel? ? "amd64" : Hardware::CPU.arch.to_s
     ldflags = %W[
       -s -w
       -X github.com/wakatime/wakatime-cli/pkg/version.Arch=#{arch}
@@ -27,7 +27,7 @@ class WakatimeCliHead < Formula
       static
     ].join(",")
 
-    system "go", "build", "-buildmode=pie", "-tags=#{tags}", *std_go_args(ldflags: ldflags)
+    system "go", "build", "-buildmode=pie", "-tags=#{tags}", *std_go_args(ldflags: ldflags), "-o=#{bin}/wakatime-cli"
     bin.install_symlink "#{bin}/wakatime-cli" => "#{bin}/wakatime"
   end
 
