@@ -12,7 +12,7 @@ class Yodl < Formula
 
   def install
     inreplace "INSTALL.im", %r{"/usr"}, "\"#{prefix}\""
-    inreplace "build", %r{/usr/bin/icmake}, "/usr\/local\/bin\/icmake"
+    inreplace "build", %r{/usr/bin/icmake}, "#{Formula["icmake"].opt_bin}\/icmake"
 
     if `/usr/bin/which gsed`
       opoo "Using gnu-sed"
