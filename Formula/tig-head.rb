@@ -47,9 +47,16 @@ class TigHead < Formula
     if Hardware::CPU.arm?
       inreplace "contrib/config.make-Darwin" do |s|
         s.gsub!(/(XML_CATALOG_FILES)=.*/, "\\1=#{etc}/xml/catalog")
-        s.gsub!(/\/usr\/local\/opt\/ncurses/, "#{Formula["ncurses-head"].opt_prefix}")
-        s.gsub!(/\/usr\/local\/opt\/readline/, "#{Formula["readline"].opt_prefix}")
-        s.gsub!(/\/usr\/local\/opt\/pcre2/, "#{Formula["pcre2"].opt_prefix}")
+        s.gsub!(/(\$\(HOMEBREW_PREFIX\)\/opt)\/ncurses/, "\\1/ncurses-head")
+        # NCURSES_DIR ?= $(wildcard $(HOMEBREW_PREFIX)/opt/ncurses)
+        s.gsub!(/(TIG_NCURSES) = -lncursesw/, "\\1 =")
+	s.gsub!(/(TIG_LDFLAGS) \+= -L(\$\(NCURSES_DIR\)\/lib)/, "\\1 \+= \\2/libncursesw.a")
+        s.gsub!(/(TIG_LDLIBS) \+= -lreadline/, "\\1 =")
+        # s.gsub!(/(TIG_LDLIBS) \+= -lreadline/, "\\1 = #{Formula["readline"].opt_lib}/libreadline.a")
+	s.gsub!(/(TIG_LDFLAGS) \+= -L(\$\(READLINE_DIR\)\/lib)/, "\\1 \+= \\2/libreadline.a")
+        s.gsub!(/(TIG_LDLIBS) \+= -lpcre2-posix -lpcre2-8/, "\\1 =")
+        # s.gsub!(/(TIG_LDLIBS) \+= -lpcre2-posix -lpcre2-8/, "\\1 = #{Formula["pcre2"].opt_lib}/libpcre2-posix.a #{Formula["pcre2"].opt_lib}/libpcre2-8.a")
+	s.gsub!(/(TIG_LDFLAGS) \+= -L(\$\(PCRE2_DIR\)\/lib)/, "\\1 \+= \\2/libpcre2-posix.a \\2/libpcre2-8.a")
       end
     end
 
