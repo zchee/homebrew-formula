@@ -1,8 +1,7 @@
-# "File" is a reserved class name
-class FileFormulaHead < Formula
+class FileHead < Formula
   desc "Utility to determine file types"
   homepage "https://darwinsys.com/file/"
-  # file-formula has a BSD-2-Clause-like license
+  # file has a BSD-2-Clause-like license
   license :cannot_represent
   head do
     url "https://github.com/file/file.git", branch: "master"
@@ -24,20 +23,25 @@ class FileFormulaHead < Formula
   depends_on "bzip2"
   depends_on "xz"
   depends_on "zstd"
-  depends_on "lzip"
+  depends_on "lzlib"
 
   def install
     ENV.prepend "LDFLAGS", "-L#{Formula["libmagic"].opt_lib} -lmagic"
-    ENV.prepend "LDFLAGS", "-L#{Formula["lzip"].opt_lib} -llzip"
+    ENV.prepend "LDFLAGS", "#{Formula["lzlib"].opt_lib}/liblz.a"
 
-    system "autoreconf", "-fiv" if head?
+    system "autoreconf", "-fiv"
     inreplace "src/Makefile.in" do |s|
-      s.gsub! "file_DEPENDENCIES = libmagic.la", ""
+      s.gsub! /^file_DEPENDENCIES = libmagic.la$/, ""
       s.gsub! "file_LDADD = libmagic.la -lm", "file_LDADD = $(LDADD) -lm"
     end
 
     system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+                          "--prefix=#{prefix}",
+                          "--enable-lzlib",
+                          "--enable-zlib",
+                          "--enable-bzlib",
+                          "--enable-xzlib",
+                          "--enable-zstdlib",
                           "--enable-lzlib"
     system "make", "install-exec"
     system "make", "-C", "doc", "install-man1"
