@@ -1,19 +1,25 @@
 class BatHead < Formula
   desc "Clone of cat(1) with syntax highlighting and Git integration"
   homepage "https://github.com/sharkdp/bat"
-  head "https://github.com/sharkdp/bat.git", branch: "master"
   license any_of: ["Apache-2.0", "MIT"]
-
-  depends_on "rust" => :build
+  head "https://github.com/sharkdp/bat.git", branch: "master"
 
   uses_from_macos "zlib"
 
+  env :std
+
   def install
+    # setup nightly cargo with rustup
+    ENV.append_path "PATH", "/usr/local/rust/rustup/bin"
+    ENV["RUSTUP_HOME"] = "/usr/local/rust/rustup"
+    ENV["RUSTFLAGS"] = "-C target-cpu=native -C target-cpu=x86-64-v4 -C target-feature=+aes,+avx,+avx2,+avx512f,+avx512dq,+avx512cd,+avx512bw,+avx512vl"
+
+    # avoid invalid data in index - calculated checksum does not match expected
+    system "git", "config", "--local", "index.skipHash", "false"
+
     ENV["SHELL_COMPLETIONS_DIR"] = buildpath
 
-    ENV["RUSTC_WRAPPER"] = Formula["sccache"].opt_bin/"sccache"
-    ENV["RUSTFLAGS"] = "-C target-cpu=x86-64-v4 -C target-feature=+aes,+avx,+avx2,+avx512f,+avx512dq,+avx512cd,+avx512bw,+avx512vl -C opt-level=3 -C force-frame-pointers=on -C debug-assertions=off -C incremental=on -C overflow-checks=off"
-    system "cargo", "install", "-v", *std_cargo_args, "--all-features"
+    system "rustup", "run", "nightly", "cargo", "install", "--all-features", "--root", prefix, "--path", "."
 
     assets_dir = Dir["target/release/build/bat-*/out/assets"].first
     man1.install "#{assets_dir}/manual/bat.1"
