@@ -6,6 +6,8 @@ class Kubectx < Formula
 
   def install
     bin.install "kubectx", "kubens"
+    bin.install_symlink "kubectx" => "kctx"
+    bin.install_symlink "kubens" => "kns"
 
     bash_completion.install "completion/kubectx.bash" => "kubectx"
     bash_completion.install "completion/kubens.bash" => "kubens"
