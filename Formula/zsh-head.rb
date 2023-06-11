@@ -13,7 +13,7 @@ class ZshHead < Formula
     depends_on "autoconf"
     depends_on "gdbm"
     depends_on "ncurses-head"
-    depends_on "pcre"
+    depends_on "pcre2"
     depends_on "yodl"
   end
 
