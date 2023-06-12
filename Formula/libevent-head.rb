@@ -9,6 +9,8 @@ class LibeventHead < Formula
     regex(/libevent[._-]v?(\d+(?:\.\d+)+)-stable/i)
   end
 
+  keg_only "unstable"
+
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
