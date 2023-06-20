@@ -14,7 +14,7 @@ class HelmfileHead < Formula
       -X go.szostok.io/version.commit=#{revision}
       -X go.szostok.io/version.dirtyBuild=false
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags)
+    system "go", "build", *std_go_args(ldflags: ldflags), "-o=#{bin}/helmfile"
 
     # Install shell completions
     generate_completions_from_executable(bin/"helmfile", "completion", base_name: "helmfile")
