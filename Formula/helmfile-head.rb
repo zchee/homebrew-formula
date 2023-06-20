@@ -1,4 +1,4 @@
-class Helmfile < Formula
+class HelmfileHead < Formula
   desc "Declaratively deploy your Kubernetes manifests, Kustomize configs, and Charts as Helm releases."
   homepage "https://github.com/helmfile/helmfile"
   license "MIT"
