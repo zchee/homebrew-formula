@@ -11,7 +11,7 @@ class ChromeCliHead < Formula
     inreplace "chrome-cli.xcodeproj/project.pbxproj", "MACOSX_DEPLOYMENT_TARGET = 10.9", "MACOSX_DEPLOYMENT_TARGET = 13.3"
 
     # Release builds
-    xcodebuild "-arch", Hardware::CPU.arch, "SYMROOT=build"
+    xcodebuild "-arch", Hardware::CPU.arch.to_s, "SYMROOT=build"
     bin.install "build/Release/chrome-cli"
 
     # Install wrapper scripts for chrome compatible browsers
