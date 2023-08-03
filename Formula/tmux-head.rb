@@ -26,15 +26,8 @@ class TmuxHead < Formula
   end
 
   def install
-    cflags = "-std=c2x -Wno-pointer-sign"
-    ldflags = "-lresolv"
-    if Hardware::CPU.intel?
-      cflags += " -march=native -Ofast -flto"
-      ldflags += " -march=native -Ofast -flto"
-    else
-      cflags += " -mcpu=apple-a14 -flto"
-      ldflags += " -mcpu=apple-a14 -flto"
-    end
+    cflags = "-march=native -Ofast -flto -std=c2x -Wno-pointer-sign"
+    ldflags = "-march=native -Ofast -flto"
     ldflags += " -L#{Formula["ncurses-head"].lib} -lresolv"
 
     ENV.append "CFLAGS", *cflags
@@ -48,9 +41,7 @@ class TmuxHead < Formula
     ENV.append "LIBNCURSES_CFLAGS", "-I#{Formula["ncurses-head"].opt_include}/ncursesw -I#{Formula["ncurses-head"].opt_include} -D_DARWIN_C_SOURCE -DNCURSES_WIDECHAR"
     ENV.append "LIBNCURSES_LIBS", "#{Formula["ncurses-head"].opt_lib}/libncursesw.a"
 
-    inreplace "configure.ac" do |s|
-      s.gsub!(/AC_INIT\(\[tmux\],[^)]*\)/, "AC_INIT([tmux], master)")
-    end
+    inreplace "configure.ac", /AC_INIT\(\[tmux\],[^)]*\)/, "AC_INIT([tmux], master)"
 
     system "sh", "autogen.sh"
 

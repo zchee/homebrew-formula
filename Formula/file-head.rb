@@ -26,14 +26,13 @@ class FileHead < Formula
   depends_on "lzlib"
 
   def install
-    ENV.prepend "LDFLAGS", "-L#{Formula["libmagic"].opt_lib} -lmagic"
+    ENV.prepend "LDFLAGS", "#{Formula["libmagic"].opt_lib}/libmagic.a"
     ENV.prepend "LDFLAGS", "#{Formula["lzlib"].opt_lib}/liblz.a"
 
     system "autoreconf", "-fiv"
-    inreplace "src/Makefile.in" do |s|
-      s.gsub! /^file_DEPENDENCIES = libmagic.la$/, ""
-      s.gsub! "file_LDADD = libmagic.la -lm", "file_LDADD = $(LDADD) -lm"
-    end
+
+    inreplace "./src/Makefile.in", "file_DEPENDENCIES = libmagic.la", ""
+    inreplace "./src/Makefile.in", "libmagic.la -lm", "$(LDADD) -lm"
 
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
