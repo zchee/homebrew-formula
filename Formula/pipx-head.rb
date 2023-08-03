@@ -6,7 +6,7 @@ class PipxHead < Formula
   license "MIT"
   head "https://github.com/pypa/pipx.git", branch: "main"
 
-  depends_on "python@3.12"
+  depends_on "python@3.11"
 
   resource "argcomplete" do
     url "https://files.pythonhosted.org/packages/85/b9/e2bef848f79fce1e70d048b4de873424fde918c54ac2e6b8638cca887243/argcomplete-2.1.2.tar.gz"
