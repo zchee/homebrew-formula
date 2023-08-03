@@ -27,19 +27,21 @@ class TmuxHead < Formula
 
   def install
     cflags = "-march=native -Ofast -flto -std=c2x -Wno-pointer-sign"
-    ldflags = "-march=native -Ofast -flto"
-    ldflags += " -L#{Formula["ncurses-head"].lib} -lresolv"
+    ldflags = "-march=native -Ofast -flto -lresolv"
 
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
-    ENV.append "CFLAGS", "-I#{Formula["pcre"].opt_include} -I#{Formula["utf8proc-head"].opt_include}"
-    ENV.append "LDFLAGS", "#{Formula["utf8proc-head"].opt_lib}/libutf8proc.a"
 
-    ENV.append "LIBEVENT_CFLAGS", "-I#{Formula["libevent-head"].opt_include}"
-    ENV.append "LIBEVENT_LIBS", "#{Formula["libevent-head"].opt_lib}/libevent.a"
-    ENV.append "LIBEVENT_CORE_LIBS", "#{Formula["libevent-head"].opt_lib}/libevent_core.a"
-    ENV.append "LIBNCURSES_CFLAGS", "-I#{Formula["ncurses-head"].opt_include}/ncursesw -I#{Formula["ncurses-head"].opt_include} -D_DARWIN_C_SOURCE -DNCURSES_WIDECHAR"
-    ENV.append "LIBNCURSES_LIBS", "#{Formula["ncurses-head"].opt_lib}/libncursesw.a"
+    ENV["LIBEVENT_CORE_CFLAGS"] = "-I#{Formula["libevent-head"].opt_include}"
+    ENV["LIBEVENT_CORE_LIBS"] = "#{Formula["libevent-head"].opt_lib}/libevent_core.a"
+    ENV["LIBEVENT_CFLAGS"] = "-I#{Formula["libevent-head"].opt_include}"
+    ENV["LIBEVENT_LIBS"] = "#{Formula["libevent-head"].opt_lib}/libevent_core.a"
+    ENV["LIBNCURSES_CFLAGS"] = "-I#{Formula["ncurses-head"].opt_include}"
+    ENV["LIBNCURSES_LIBS"] = "#{Formula["ncurses-head"].opt_lib}/libncursesw.a"
+    ENV["LIBNCURSESW_CFLAGS"] = "-I#{Formula["ncurses-head"].opt_include}/ncursesw"
+    ENV["LIBNCURSESW_LIBS"] = "#{Formula["ncurses-head"].opt_lib}/libncursesw.a"
+    ENV["LIBUTF8PROC_CFLAGS"] = "-I#{Formula["utf8proc-head"].opt_include}"
+    ENV["LIBUTF8PROC_LIBS"] = "#{Formula["utf8proc-head"].opt_lib}/libutf8proc.a"
 
     inreplace "configure.ac", /AC_INIT\(\[tmux\],[^)]*\)/, "AC_INIT([tmux], master)"
 
