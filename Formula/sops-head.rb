@@ -7,7 +7,6 @@ class SopsHead < Formula
   depends_on "go" => :build
 
   def install
-    ENV["CGO_ENABLED"] = "0"
     system "go", "build", *std_go_args, "-o", bin/"sops", "./cmd/sops"
     pkgshare.install "example.yaml"
   end
