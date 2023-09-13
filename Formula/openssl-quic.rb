@@ -1,7 +1,7 @@
 class OpensslQuic < Formula
   desc "Cryptography and SSL/TLS Toolkit with QUIC"
   homepage "https://github.com/quictls/openssl"
-  head "https://github.com/quictls/openssl.git", branch: "openssl-3.0.9+quic"
+  head "https://github.com/quictls/openssl.git", branch: "openssl-3.0.10+quic"
   license "Apache-2.0"
 
   livecheck do
@@ -18,19 +18,27 @@ class OpensslQuic < Formula
 
     resource "Test::Harness" do
       url "https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-3.44.tar.gz"
+      mirror "http://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-3.44.tar.gz"
       sha256 "7eb591ea6b499ece6745ff3e80e60cee669f0037f9ccbc4e4511425f593e5297"
     end
 
     resource "Test::More" do
       url "https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Test-Simple-1.302195.tar.gz"
+      mirror "http://cpan.metacpan.org/authors/id/E/EX/EXODIST/Test-Simple-1.302195.tar.gz"
       sha256 "b390bb23592e0b946c95adbb3c30b11bc634a286b2847be611ad929c57e39a6c"
     end
 
     resource "ExtUtils::MakeMaker" do
       url "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/ExtUtils-MakeMaker-7.70.tar.gz"
+      mirror "http://cpan.metacpan.org/authors/id/B/BI/BINGOS/ExtUtils-MakeMaker-7.70.tar.gz"
       sha256 "f108bd46420d2f00d242825f865b0f68851084924924f92261d684c49e3e7a74"
     end
   end
+
+  link_overwrite "bin/c_rehash", "bin/openssl", "include/openssl/*"
+  link_overwrite "lib/libcrypto*", "lib/libssl*"
+  link_overwrite "lib/pkgconfig/libcrypto.pc", "lib/pkgconfig/libssl.pc", "lib/pkgconfig/openssl.pc"
+  link_overwrite "share/doc/openssl/*", "share/man/man*/*ssl"
 
   # SSLv2 died with 1.1.0, so no-ssl2 no longer required.
   # SSLv3 & zlib are off by default with 1.1.0 but this may not
@@ -56,11 +64,12 @@ class OpensslQuic < Formula
 
   def install
     if OS.linux?
-      ENV.prepend_create_path "PERL5LIB", libexec/"lib/perl5"
+      ENV.prepend_create_path "PERL5LIB", buildpath/"lib/perl5"
+      ENV.prepend_path "PATH", buildpath/"bin"
 
       %w[ExtUtils::MakeMaker Test::Harness Test::More].each do |r|
         resource(r).stage do
-          system "perl", "Makefile.PL", "INSTALL_BASE=#{libexec}"
+          system "perl", "Makefile.PL", "INSTALL_BASE=#{buildpath}"
           system "make", "PERL5LIB=#{ENV["PERL5LIB"]}", "CC=#{ENV.cc}"
           system "make", "install"
         end
@@ -88,7 +97,6 @@ class OpensslQuic < Formula
     system "perl", "./Configure", *(configure_args + arch_args)
     system "make"
     system "make", "install", "MANDIR=#{man}", "MANSUFFIX=ssl-quic"
-    # system "make", "test"
   end
 
   def openssldir
