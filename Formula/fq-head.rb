@@ -1,4 +1,4 @@
-class Fq < Formula
+class FqHead < Formula
   desc "jq for binary formats"
   homepage "https://github.com/wader/fq"
   license "MIT"
