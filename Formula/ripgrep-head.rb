@@ -18,13 +18,17 @@ class RipgrepHead < Formula
   def install
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
     target_cpu = Hardware::CPU.intel? ? "x86-64-v4" : "apple-latest"
+    features = %w(pcre2)
+    if Hardware::CPU::intel?
+      features += %w(simd-accel)
+    end
 
     ENV.append_path "PATH", "/opt/local/rust/rustup/bin"
     ENV["RUSTUP_HOME"] = "/opt/local/rust/rustup"
     ENV["RUSTFLAGS"] = "-C target-cpu=native"
     ENV["PCRE2_SYS_STATIC"] = "1"
 
-    system "rustup", "run", "nightly", "cargo", "install", "--features", %q[pcre2], "--root", prefix, "--path", "."
+    system "rustup", "run", "nightly", "cargo", "install", "--features", "#{features.join(" ")}", "--root", prefix, "--path", "."
 
     # Completion scripts and manpage are generated in the crate's build
     # directory, which includes a fingerprint hash. Try to locate it first
