@@ -1,5 +1,5 @@
-class TfenvOpentofu < Formula
-  desc "Terraform version manager inspired by rbenv"
+class TfenvTofu < Formula
+  desc "Terraform and OpenTofu version manager"
   homepage "https://github.com/opentofu/tfenv"
   license "MIT"
   head "https://github.com/opentofu/tfenv.git", branch: "add-opentofu-support"
