@@ -9,12 +9,15 @@ class BatHead < Formula
   env :std
 
   def install
+    root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
+    target_cpu = Hardware::CPU.intel? ? "x86-64-v4" : "apple-latest"
     # setup nightly cargo with rustup
-    ENV.append_path "PATH", "/usr/local/rust/rustup/bin"
-    ENV["RUSTUP_HOME"] = "/usr/local/rust/rustup"
-    ENV["RUSTFLAGS"] = "-C target-cpu=native -C target-cpu=x86-64-v4 -C target-feature=+aes,+avx,+avx2,+avx512f,+avx512dq,+avx512cd,+avx512bw,+avx512vl"
+    ENV.append_path "PATH", "#{root_dir}/local/rust/rustup/bin"
+    ENV["RUSTUP_HOME"] = "#{root_dir}/local/rust/rustup"
+    ENV["RUSTFLAGS"] = "-C target-cpu=native -C target-cpu=#{target_cpu}"
 
     # avoid invalid data in index - calculated checksum does not match expected
+    File.open("#{buildpath}/.git/info/exclude", "w") { |f| f.write ".brew_home/\n.DS_Store\n" }
     system "git", "config", "--local", "index.skipHash", "false"
 
     ENV["SHELL_COMPLETIONS_DIR"] = buildpath
