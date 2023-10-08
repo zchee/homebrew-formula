@@ -26,7 +26,7 @@ class ManDbHead < Formula
     depends_on "bzip2" => :build
     depends_on "gdbm" => :build
     depends_on "gettext" => :build
-    depends_on "groff-head" => :build
+    depends_on "groff" => :build
     depends_on "gzip" => :build
     depends_on "libtool" => :build
     depends_on "lzip" => :build
