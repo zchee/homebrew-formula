@@ -1,12 +1,12 @@
 class ArgocdHead < Formula
   desc "GitOps Continuous Delivery for Kubernetes"
   homepage "https://argoproj.github.io/cd"
-  head "https://github.com/argoproj/argo-cd.git" , branch: "master"
+  head "https://github.com/argoproj/argo-cd.git", branch: "master"
   license "Apache-2.0"
 
   depends_on "go" => :build
   depends_on "node" => :build
-  depends_on "yarn" => :build
+  depends_on "corepack" => :build
 
   def install
     system "make", "dep-ui-local"
