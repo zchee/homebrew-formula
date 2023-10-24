@@ -15,6 +15,8 @@ class WatchHead < Formula
 
   conflicts_with "visionmedia-watch"
 
+  patch :DATA
+
   def install
     system "autoreconf", "-fiv"
     system "./configure", "--disable-dependency-tracking",
@@ -30,3 +32,20 @@ class WatchHead < Formula
     system bin/"watch", "--errexit", "--chgexit", "--interval", "1", "date"
   end
 end
+
+__END__
+diff --git a/local/signals.c b/local/signals.c
+index 6d68c07d..1c878328 100644
+--- a/local/signals.c
++++ b/local/signals.c
+@@ -83,6 +83,10 @@ typedef struct mapstruct {
+   int num;
+ } mapstruct;
+ 
++#ifdef __APPLE__
++#define SIGPOLL 0
++#endif
++
+ // Rank the more common names higher up the list to prioritize them in number-
+ // -to-name lookups.
+ static const mapstruct sigtable[] = {
