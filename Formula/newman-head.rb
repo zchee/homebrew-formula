@@ -5,7 +5,7 @@ class NewmanHead < Formula
   homepage "https://www.getpostman.com"
   license "Apache-2.0"
 
-  head "https://github.com/postmanlabs/newman.git"
+  head "https://github.com/postmanlabs/newman.git", branch: "develop"
 
   depends_on "node"
 
