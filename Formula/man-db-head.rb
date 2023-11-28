@@ -28,6 +28,7 @@ class ManDbHead < Formula
     depends_on "gettext" => :build
     depends_on "groff" => :build
     depends_on "gzip" => :build
+    depends_on "libiconv" => :build
     depends_on "libtool" => :build
     depends_on "lzip" => :build
     depends_on "xz" => :build
@@ -38,59 +39,27 @@ class ManDbHead < Formula
     man_db_conf = etc/"man_db.conf"
     args = %W[
       --disable-silent-rules
-      --disable-cache-owner
+      --enable-cache-owner=man
       --disable-setuid
+      --enable-threads=isoc+posix
       --disable-nls
+      --enable-mb-groff
       --program-prefix=g
       --localstatedir=#{var}
       --with-config-file=#{man_db_conf}
       --with-systemdtmpfilesdir=#{etc}/tmpfiles.d
       --with-systemdsystemunitdir=#{etc}/systemd/system
-
       --with-db=gdbm
+      --with-compress=zstd
       --with-gzip=#{Formula["gzip"].opt_prefix}
       --with-bzip2=#{Formula["bzip2"].opt_prefix}
       --with-xz=#{Formula["xz"].opt_prefix}
       --with-lzma=#{Formula["xz"].opt_prefix}
       --with-lzip=#{Formula["lzip"].opt_prefix}
       --with-zstd=#{Formula["zstd"].opt_prefix}
+      --with-libiconv-prefix=#{Formula["libiconv"].opt_prefix}
+      --with-libintl-prefix=#{Formula["gettext"].opt_prefix}
     ]
-
-    # man_db_conf = etc/"man_db.conf"
-    # args = %W[
-    #   --disable-silent-rules
-    #   --disable-cache-owner
-    #   --disable-setuid
-    #   --disable-nls
-    #   --program-prefix=g
-    #   --localstatedir=#{var}
-    #   --with-config-file=#{man_db_conf}
-    #   --with-systemdtmpfilesdir=#{etc}/tmpfiles.d
-    #   --with-systemdsystemunitdir=#{etc}/systemd/system
-    # ]
-
-    # man_db_conf = etc/"man_db.conf"
-    # args = %W[
-    #   --disable-dependency-tracking
-    #   --prefix=#{prefix}
-    #
-    #   --disable-silent-rules
-    #   --disable-cache-owner
-    #   --disable-setuid
-    #   --disable-nls
-    #   --program-prefix=g
-    #   --enable-shared
-    #   --enable-static
-    #   --enable-mb-groff
-    #   --with-bzip2=#{Formula["bzip2"].opt_prefix}
-    #   --with-xz=#{Formula["xz"].opt_prefix}
-    #   --with-lzma=#{Formula["xz"].opt_prefix}
-    #   --with-lzip=#{Formula["lzip"].opt_prefix}
-    #   --with-zstd=#{Formula["zstd"].opt_prefix}
-    #   --with-config-file=#{man_db_conf}
-    #   --with-systemdtmpfilesdir=#{etc}/tmpfiles.d
-    #   --with-systemdsystemunitdir=#{etc}/systemd/system
-    # ]
 
     system "./bootstrap", "--skip-po" if build.head?
     system "./configure", *args, *std_configure_args
@@ -136,14 +105,13 @@ class ManDbHead < Formula
 
   test do
     ENV["PAGER"] = "cat"
-    output = shell_output("#{bin}/gman true")
-    on_macos do
-      assert_match "BSD General Commands Manual", output
-      assert_match "The true utility always returns with exit code zero", output
-    end
-    on_linux do
-      assert_match "true - do nothing, successfully", output
-      assert_match "GNU coreutils online help: <http://www.gnu.org/software/coreutils/", output
+    if OS.mac?
+      output = shell_output("#{bin}/gman true")
+      assert_match "General Commands Manual", output
+      assert_match(/The true utility always returns with (an )?exit code (of )?zero/, output)
+    else
+      output = shell_output("#{bin}/gman gman")
+      assert_match "gman - an interface to the system reference manuals", output
     end
   end
 end
