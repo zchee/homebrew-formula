@@ -2,7 +2,7 @@ class GitDelta < Formula
   desc "Syntax-highlighting pager for git and diff output"
   homepage "https://github.com/dandavison/delta"
   license "MIT"
-  head "https://github.com/dandavison/delta.git", :branch => "master"
+  head "https://github.com/dandavison/delta.git", :branch => "main"
 
   depends_on "rust" => :build
   depends_on "llvm" => :build
