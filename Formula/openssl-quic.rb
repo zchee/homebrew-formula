@@ -1,7 +1,7 @@
 class OpensslQuic < Formula
   desc "Cryptography and SSL/TLS Toolkit with QUIC"
   homepage "https://github.com/quictls/openssl"
-  head "https://github.com/quictls/openssl.git", branch: "openssl-3.0.10+quic"
+  head "https://github.com/quictls/openssl.git", branch: "openssl-3.1.4+quic"
   license "Apache-2.0"
 
   livecheck do
