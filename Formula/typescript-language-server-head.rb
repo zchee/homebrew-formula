@@ -8,16 +8,13 @@ class TypescriptLanguageServerHead < Formula
 
   depends_on "corepack"
   depends_on "node"
-  depends_on "typescript"
 
   def install
+    system "#{Formula["corepack"].bin}/yarn", "add", "typescript@next"
+    system "cat", "package.json"
     system "#{Formula["corepack"].bin}/yarn"
-    system "#{Formula["corepack"].bin}/yarn", "run", "compile"
+    system "#{Formula["corepack"].bin}/yarn", "run", "build"
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
-
-    node_modules = libexec/"lib/node_modules"
-    typescript = Formula["typescript"].opt_libexec/"lib/node_modules/typescript"
-    ln_sf typescript.relative_path_from(node_modules), node_modules
 
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
