@@ -1,4 +1,4 @@
-class GitDelta < Formula
+class GitDeltaHead < Formula
   desc "Syntax-highlighting pager for git and diff output"
   homepage "https://github.com/dandavison/delta"
   license "MIT"
