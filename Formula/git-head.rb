@@ -35,13 +35,13 @@ class GitHead < Formula
   end
 
   resource "html" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.41.0.tar.xz"
-    sha256 "0cb2d4a09270eede7c1b686e2dfeac9bffef9e42c117a7e120f3cbb3e665d286"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.43.0.tar.xz"
+    sha256 "8b02e46a5fb41971be8cd2347dbc14d53802a08b0822adc1f822831da8f31f60"
   end
 
   resource "man" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.41.0.tar.xz"
-    sha256 "bc7a4c944492c76fc3cd766ce22e826d0241e43792c611d4fdc068e0df545877"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.43.0.tar.xz"
+    sha256 "ef18df09444a60c70be996a481fde093928996055f61a585e9ea07b5bdc6d4d8"
   end
 
   resource "Net::SMTP::SSL" do
@@ -103,6 +103,10 @@ class GitHead < Formula
 
       %W[NO_APPLE_COMMON_CRYPTO=1 OPENSSLDIR=#{openssl_prefix}]
     end
+
+    # Make sure `git` looks in `opt_prefix` instead of the Cellar.
+    # Otherwise, Cellar references propagate to generated plists from `git maintenance`.
+    inreplace "Makefile", /(-DFALLBACK_RUNTIME_PREFIX=")[^"]+/, "\\1#{opt_prefix}"
 
     system "make", "install", *args
 
