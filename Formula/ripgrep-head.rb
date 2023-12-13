@@ -23,8 +23,8 @@ class RipgrepHead < Formula
       features += %w(simd-accel)
     end
 
-    ENV.append_path "PATH", "/opt/local/rust/rustup/bin"
-    ENV["RUSTUP_HOME"] = "/opt/local/rust/rustup"
+    ENV.append_path "PATH", "#{ENV["HOMEBREW_PREFIX"]}/rust/rustup/bin"
+    ENV["RUSTUP_HOME"] = "#{ENV["HOMEBREW_PREFIX"]}/rust/rustup"
     ENV["RUSTFLAGS"] = "-C target-cpu=native"
     ENV["PCRE2_SYS_STATIC"] = "1"
 
@@ -32,11 +32,11 @@ class RipgrepHead < Formula
 
     # Completion scripts and manpage are generated in the crate's build
     # directory, which includes a fingerprint hash. Try to locate it first
-    out_dir = Dir["target/release/build/ripgrep-*/out"].first
-    man1.install "#{out_dir}/rg.1"
-    bash_completion.install "#{out_dir}/rg.bash"
-    fish_completion.install "#{out_dir}/rg.fish"
-    zsh_completion.install "complete/_rg"
+    # out_dir = Dir["target/release/build/ripgrep-*/out"].first
+    # man1.install "#{out_dir}/rg.1"
+    # bash_completion.install "#{out_dir}/rg.bash"
+    # fish_completion.install "#{out_dir}/rg.fish"
+    # zsh_completion.install "complete/_rg"
   end
 
   test do
