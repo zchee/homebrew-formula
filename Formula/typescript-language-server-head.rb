@@ -11,10 +11,12 @@ class TypescriptLanguageServerHead < Formula
 
   def install
     system "#{Formula["corepack"].bin}/yarn", "add", "typescript@next"
-    system "cat", "package.json"
     system "#{Formula["corepack"].bin}/yarn"
     system "#{Formula["corepack"].bin}/yarn", "run", "build"
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+
+    node_modules = libexec/"lib/node_modules"
+    node_modules.install "node_modules/typescript"
 
     bin.install_symlink Dir["#{libexec}/bin/*"]
   end
