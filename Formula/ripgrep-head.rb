@@ -30,13 +30,8 @@ class RipgrepHead < Formula
 
     system "rustup", "run", "nightly", "cargo", "install", "--features", "#{features.join(" ")}", "--root", prefix, "--path", "."
 
-    # Completion scripts and manpage are generated in the crate's build
-    # directory, which includes a fingerprint hash. Try to locate it first
-    # out_dir = Dir["target/release/build/ripgrep-*/out"].first
-    # man1.install "#{out_dir}/rg.1"
-    # bash_completion.install "#{out_dir}/rg.bash"
-    # fish_completion.install "#{out_dir}/rg.fish"
-    # zsh_completion.install "complete/_rg"
+    generate_completions_from_executable(bin/"rg", "--generate", base_name: "rg", shell_parameter_format: "complete-")
+    (man1/"rg.1").write Utils.safe_popen_read(bin/"rg", "--generate", "man")
   end
 
   test do
