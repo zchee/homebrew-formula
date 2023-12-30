@@ -1,4 +1,4 @@
-class Kubectx < Formula
+class KubectxHead < Formula
   desc "Tool that can switch between kubectl contexts easily and create aliases"
   homepage "https://github.com/ahmetb/kubectx"
   license "Apache-2.0"
@@ -9,12 +9,14 @@ class Kubectx < Formula
     bin.install_symlink "kubectx" => "kctx"
     bin.install_symlink "kubens" => "kns"
 
-    bash_completion.install "completion/kubectx.bash" => "kubectx"
-    bash_completion.install "completion/kubens.bash" => "kubens"
-    zsh_completion.install "completion/_kubectx.zsh" => "_kubectx"
-    zsh_completion.install "completion/_kubens.zsh" => "_kubens"
-    fish_completion.install "completion/kubectx.fish"
-    fish_completion.install "completion/kubens.fish"
+    ln_s bin/"kubectx", bin/"kubectl-ctx"
+    ln_s bin/"kubens", bin/"kubectl-ns"
+
+    %w[kubectx kubens].each do |cmd|
+      bash_completion.install "completion/#{cmd}.bash" => cmd.to_s
+      zsh_completion.install "completion/_#{cmd}.zsh" => "_#{cmd}"
+      fish_completion.install "completion/#{cmd}.fish"
+    end
   end
 
   test do
