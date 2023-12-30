@@ -15,7 +15,7 @@ class TerraformLsHead < Formula
     revision = Utils.git_short_head
     ldflags = %W[
       -s -w
-      -X main.rawVersion=#{revision}
+      -X main.rawVersion=0.0.0
     ]
     system "go", "build", *std_go_args(ldflags: ldflags.join(" ")), "-o=#{bin}/terraform-ls"
   end
