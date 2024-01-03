@@ -8,7 +8,7 @@ class KwokHead < Formula
   depends_on "docker" => :test
 
   def install
-    system "make", "build", "VERSION=v#{version}"
+    system "make", "build", "VERSION=v0.4.0"
 
     arch = Hardware::CPU.arm? ? "arm64" : "amd64"
     bin.install "bin/#{OS.kernel_name.downcase}/#{arch}/kwok"
