@@ -21,7 +21,6 @@ class StarlarkRs < Formula
     ENV["RUSTFLAGS"] = "-C target-cpu=native"
 
     system "cargo", "build", "--release", "--all-features", "--bin", "starlark"
-    bin.install "target/release/starlark"
-    bin.install_symlink "starlark" => "starlark-rs"
+    bin.install "target/release/starlark" => "starlark-rs"
   end
 end
