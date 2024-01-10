@@ -11,9 +11,9 @@ class KubeLinterHead < Formula
     system "go", "mod", "tidy", "-v"
     ENV["CGO_ENABLED"] = "0"
     ldflags = "-s -w -X golang.stackrox.io/kube-linter/internal/version.version=#{version}"
-    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/kube-linter"
+    system "go", "build", *std_go_args(output: bin/"kube-linter", ldflags: ldflags), "./cmd/kube-linter"
 
-    generate_completions_from_executable(bin/"kube-linter", "completion")
+    generate_completions_from_executable(bin/"kube-linter", "completion", base_name: "kube-linter")
   end
 
   test do
