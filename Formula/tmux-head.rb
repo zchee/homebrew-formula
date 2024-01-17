@@ -25,6 +25,8 @@ class TmuxHead < Formula
     sha256 "b5f7bbd78f9790026bbff16fc6e3fe4070d067f58f943e156bd1a8c3c99f6a6f"
   end
 
+  patch :DATA
+
   def install
     cflags = "-march=native -Ofast -flto -std=c2x -Wno-pointer-sign"
     ldflags = "-march=native -Ofast -flto -lresolv"
@@ -73,3 +75,64 @@ class TmuxHead < Formula
     system "#{bin}/tmux", "-V"
   end
 end
+
+__END__
+diff --git a/src/Makefile.in b/src/Makefile.in
+diff --git a/compat/imsg.c b/compat/imsg.c
+index 54ac7e566..674c89e2b 100644
+--- a/compat/imsg.c
++++ b/compat/imsg.c
+@@ -30,7 +30,7 @@
+ 
+ int	 imsg_fd_overhead = 0;
+ 
+-static int	 imsg_get_fd(struct imsgbuf *);
++int	 imsg_get_fd(struct imsgbuf *);
+ 
+ void
+ imsg_init(struct imsgbuf *ibuf, int fd)
+@@ -266,7 +266,7 @@ imsg_free(struct imsg *imsg)
+ 	freezero(imsg->data, imsg->hdr.len - IMSG_HEADER_SIZE);
+ }
+ 
+-static int
++int
+ imsg_get_fd(struct imsgbuf *ibuf)
+ {
+ 	int		 fd;
+diff --git a/compat/imsg.h b/compat/imsg.h
+index 5b092cfcf..6d58d8ecd 100644
+--- a/compat/imsg.h
++++ b/compat/imsg.h
+@@ -107,6 +107,7 @@ struct ibuf *imsg_create(struct imsgbuf *, uint32_t, uint32_t, pid_t, uint16_t);
+ int	 imsg_add(struct ibuf *, const void *, uint16_t);
+ void	 imsg_close(struct imsgbuf *, struct ibuf *);
+ void	 imsg_free(struct imsg *);
++int	 imsg_get_fd(struct imsgbuf *ibuf);
+ int	 imsg_flush(struct imsgbuf *);
+ void	 imsg_clear(struct imsgbuf *);
+ 
+diff --git a/proc.c b/proc.c
+index 68ab9604e..2914c2d36 100644
+--- a/proc.c
++++ b/proc.c
+@@ -32,6 +32,7 @@
+ #endif
+ 
+ #include "tmux.h"
++#include "compat/imsg.h"
+ 
+ struct tmuxproc {
+ 	const char	 *name;
+diff --git a/server-client.c b/server-client.c
+index a74945032..301856a85 100644
+--- a/server-client.c
++++ b/server-client.c
+@@ -28,6 +28,7 @@
+ #include <unistd.h>
+ 
+ #include "tmux.h"
++#include "compat/imsg.h"
+ 
+ static void	server_client_free(int, short, void *);
+ static void	server_client_check_pane_resize(struct window_pane *);
