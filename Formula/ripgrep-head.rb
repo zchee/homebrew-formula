@@ -19,16 +19,14 @@ class RipgrepHead < Formula
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
     target_cpu = Hardware::CPU.intel? ? "x86-64-v4" : "apple-latest"
     features = %w(pcre2)
-    if Hardware::CPU::intel?
-      features += %w(simd-accel)
-    end
 
     ENV.append_path "PATH", "#{ENV["HOMEBREW_PREFIX"]}/rust/rustup/bin"
     ENV["RUSTUP_HOME"] = "#{ENV["HOMEBREW_PREFIX"]}/rust/rustup"
     ENV["RUSTFLAGS"] = "-C target-cpu=native"
     ENV["PCRE2_SYS_STATIC"] = "1"
 
-    system "rustup", "run", "nightly", "cargo", "install", "--features", "#{features.join(" ")}", "--root", prefix, "--path", "."
+    system "rustup", "run", "nightly", "cargo", "build", "--release", "--features", "#{features.join(" ")}"
+    bin.install "target/release/rg"
 
     generate_completions_from_executable(bin/"rg", "--generate", base_name: "rg", shell_parameter_format: "complete-")
     (man1/"rg.1").write Utils.safe_popen_read(bin/"rg", "--generate", "man")
