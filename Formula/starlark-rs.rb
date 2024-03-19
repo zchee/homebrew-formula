@@ -14,7 +14,6 @@ class StarlarkRs < Formula
   def install
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
     target_cpu = Hardware::CPU.intel? ? "x86-64-v4" : "apple-latest"
-    features = %w(pcre2)
 
     ENV.append_path "PATH", "#{ENV["HOMEBREW_PREFIX"]}/rust/rustup/bin"
     ENV["RUSTUP_HOME"] = "#{ENV["HOMEBREW_PREFIX"]}/rust/rustup"
