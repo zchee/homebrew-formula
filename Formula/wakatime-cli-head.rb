@@ -17,9 +17,6 @@ class WakatimeCliHead < Formula
       -X github.com/wakatime/wakatime-cli/pkg/version.Commit=#{Utils.git_head(length: 7)}
       -X github.com/wakatime/wakatime-cli/pkg/version.OS=#{OS.kernel_name.downcase}
       -X github.com/wakatime/wakatime-cli/pkg/version.Version=v#{version}
-      -linkmode=external
-      -buildid=
-      "-extldflags=-static-pie -all_load -Wl,-no_deduplicate"
     ].join(" ")
     tags = %W[
       osusergo
