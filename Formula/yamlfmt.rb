@@ -9,10 +9,6 @@ class Yamlfmt < Formula
   def install
     ldflags = %W[
       -s -w
-      -linkmode=external
-      -buildmode=pie
-      -buildid=
-      "-extldflags=-static-pie -all_load -dead_strip -Wl,-no_deduplicate"
     ].join(" ")
 
     tags = %W[
