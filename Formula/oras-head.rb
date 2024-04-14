@@ -10,11 +10,10 @@ class OrasHead < Formula
     ENV["CGO_ENABLED"] = "0"
     ldflags = %W[
       -s -w
-      -linkmode=external
+      -linkmode=internal
       -buildid=
       -X oras.land/oras/internal/version.Version=#{version}
       -X oras.land/oras/internal/version.BuildMetadata=Homebrew
-      "-extldflags=-static-pie -all_load -Wl,-no_deduplicate"
     ].join(" ")
     tags = %W[
       osusergo
