@@ -23,6 +23,8 @@ class GroffHead < Formula
   end
 
   def install
+    ENV.cxx11
+
     ENV.prepend_path "PATH", "/usr/local/texlive/2022basic/bin/universal-darwin"
     system "./bootstrap", "--skip-po"
     system "./configure", "--prefix=#{prefix}", "--without-x", "--with-uchardet"
