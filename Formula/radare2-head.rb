@@ -1,4 +1,4 @@
-class Radare2 < Formula
+class Radare2Head < Formula
   desc "Reverse engineering framework"
   homepage "https://radare.org"
   license "LGPL-3.0-only"
