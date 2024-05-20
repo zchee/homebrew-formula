@@ -6,13 +6,14 @@ class TypescriptLanguageServerHead < Formula
   license all_of: ["MIT", "Apache-2.0"]
   head "https://github.com/typescript-language-server/typescript-language-server.git", branch: "master"
 
-  depends_on "corepack"
+  depends_on "yarn"
   depends_on "node"
 
   def install
-    system "#{Formula["corepack"].bin}/yarn", "add", "typescript@next"
-    system "#{Formula["corepack"].bin}/yarn"
-    system "#{Formula["corepack"].bin}/yarn", "run", "build"
+    system "#{Formula["yarn"].bin}/yarn", "add", "typescript@next"
+    system "#{Formula["yarn"].bin}/yarn"
+    ENV["NODE_ENV"] = "production"
+    system "#{Formula["yarn"].bin}/yarn", "run", "build"
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
 
     node_modules = libexec/"lib/node_modules"
