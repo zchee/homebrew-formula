@@ -10,11 +10,11 @@ class NinjaHead < Formula
   end
 
   # Ninja only needs Python for some non-core functionality.
-  depends_on "python@3.11" => :build
+  depends_on "python@3.12" => :build
   uses_from_macos "python" => :test, since: :catalina
 
   def install
-    system "python3.11", "configure.py", "--bootstrap", "--verbose", "--with-python=python3"
+    system "python3.12", "configure.py", "--bootstrap", "--verbose", "--with-python=python3"
 
     bin.install "ninja"
     bash_completion.install "misc/bash-completion" => "ninja-completion.sh"
