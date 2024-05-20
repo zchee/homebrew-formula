@@ -3,13 +3,13 @@ class Gn < Formula
   homepage "https://gn.googlesource.com/gn"
   head "https://gn.googlesource.com/gn.git", branch: "master"
 
-  depends_on "ninja" => :build
-  depends_on "python" => :build
+  depends_on "ninja-head" => :build
+  depends_on "python@3.12" => :build
 
   def install
-    system "#{Formula["python"].bin}/python3", "build/gen.py",
+    system "#{Formula["python@3.12"].bin}/python3", "build/gen.py",
       "--platform=darwin", "--use-lto", "--use-icf"
-    system "#{Formula["ninja"].opt_prefix}/bin/ninja", "-C", "out", "gn"
+    system "#{Formula["ninja-head"].opt_prefix}/bin/ninja", "-C", "out", "gn"
 
     bin.install "out/gn" => "gn"
     lib.install "out/gn_lib.a" => "gn_lib.a"
