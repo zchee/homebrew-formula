@@ -31,8 +31,8 @@ class ZshHead < Formula
       cflags  = "-std=c11 -march=x86-64-v4 -Ofast -flto"
       ldflags = "-march=x86-64-v4 -Ofast -flto"
     else
-      cflags  = "-march=apple-latest -Ofast -flto"
-      ldflags = "-march=apple-latest -Ofast -flto"
+      cflags  = "-march=native -Ofast -flto"
+      ldflags = "-march=native -Ofast -flto"
     end
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
