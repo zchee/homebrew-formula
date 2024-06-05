@@ -22,7 +22,7 @@ class BatHead < Formula
 
     ENV["SHELL_COMPLETIONS_DIR"] = buildpath
 
-    system "rustup", "run", "nightly", "cargo", "install", "--all-features", "--root", prefix, "--path", "."
+    system "rustup", "run", "nightly", "cargo", "install", "--features", "default,regex-fancy", "--root", prefix, "--path", "."
 
     assets_dir = Dir["target/release/build/bat-*/out/assets"].first
     man1.install "#{assets_dir}/manual/bat.1"
