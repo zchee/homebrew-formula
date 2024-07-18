@@ -4,6 +4,8 @@ class BatHead < Formula
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/sharkdp/bat.git", branch: "master"
 
+  depends_on "libgit2"
+  depends_on "oniguruma"
   uses_from_macos "zlib"
 
   env :std
@@ -22,7 +24,7 @@ class BatHead < Formula
 
     ENV["SHELL_COMPLETIONS_DIR"] = buildpath
 
-    system "rustup", "run", "nightly", "cargo", "install", "--features", "default,regex-fancy", "--root", prefix, "--path", "."
+    system "rustup", "run", "nightly", "cargo", "install", "--features", "default", "--root", prefix, "--path", "."
 
     assets_dir = Dir["target/release/build/bat-*/out/assets"].first
     man1.install "#{assets_dir}/manual/bat.1"
