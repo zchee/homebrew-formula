@@ -6,6 +6,7 @@ class GitDeltaHead < Formula
 
   depends_on "rust" => :build
   depends_on "llvm" => :build
+  depends_on "zlib" => :build
 
   conflicts_with "delta", because: "both install a `delta` binary"
 
