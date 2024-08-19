@@ -6,7 +6,7 @@ class BatHead < Formula
 
   depends_on "libgit2"
   depends_on "oniguruma"
-  uses_from_macos "zlib"
+  depends_on "zlib"
 
   env :std
 
