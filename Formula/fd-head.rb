@@ -6,6 +6,8 @@ class FdHead < Formula
 
   env :std
 
+  depends_on "jemalloc-head"
+
   def install
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
     target_cpu = Hardware::CPU.intel? ? "x86-64-v4" : "apple-latest"
@@ -19,7 +21,7 @@ class FdHead < Formula
     File.open("#{buildpath}/.git/info/exclude", "w") { |f| f.write ".brew_home/\n.DS_Store\n" }
     system "git", "config", "--local", "index.skipHash", "false"
 
-    system "rustup", "run", "nightly", "cargo", "install", "--all-features", "--root", prefix, "--path", "."
+    system "rustup", "run", "nightly", "cargo", "install", "--features", "use-jemalloc,completions", "--root", prefix, "--path", "."
 
     man1.install "doc/fd.1"
     generate_completions_from_executable(bin/"fd", "--gen-completions", shells: [:bash, :fish], base_name: "fd")
