@@ -3,16 +3,12 @@ class ZshHead < Formula
   homepage "https://www.zsh.org/"
   license "MIT-Modern-Variant"
 
-  livecheck do
-    url "https://sourceforge.net/projects/zsh/rss?path=/zsh"
-  end
-
   head do
-    url "https://git.code.sf.net/p/zsh/code.git", branch: "master"
+    url "https://github.com/zsh-users/zsh.git", branch: "master"
     depends_on "autoconf" => :build
     depends_on "gdbm" => :build
     depends_on "libiconv" => :build
-    depends_on "ncurses" => :build
+    depends_on "ncurses-head" => :build
     depends_on "pcre2" => :build
     depends_on "yodl" => :build
   end
@@ -65,20 +61,6 @@ class ZshHead < Formula
     # Do not version installation directories.
     inreplace ["Makefile", "Src/Makefile"],
               "$(libdir)/$(tzsh)/$(VERSION)", "$(libdir)"
-
-    # TODO(zchee): static linking
-    # inreplace "Makefile" do |s|
-    #   s.delete! "-L/usr/local/Cellar/pcre2/10.43/lib", ""
-    #   s.delete! "-lpcre2-8", ""
-    #   s.delete! "-lgdbm", ""
-    #   s.delete! "-liconv", ""
-    # end
-    # inreplace "Src/Makefile" do |s|
-    #   s.delete! "-L/usr/local/Cellar/pcre2/10.43/lib", ""
-    #   s.delete! "-lpcre2-8", ""
-    #   s.delete! "-lgdbm", ""
-    #   s.delete! "-liconv", ""
-    # end
 
     inreplace "config.modules", "link=no", "link=static"
     inreplace "config.modules", "auto=yes", "auto=no"
