@@ -32,7 +32,7 @@ class ZshHead < Formula
     end
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
-    ENV.append "CPPFLAGS", "-D_DARWIN_C_SOURCE -I#{Formula["ncurses"].opt_include}/ncursesw"
+    ENV.append "CPPFLAGS", "-D_DARWIN_C_SOURCE -I#{Formula["ncurses-head"].opt_include}/ncursesw"
     # TODO(zchee): static linking
     # ENV.append "LDFLAGS", "#{Formula["gdbm"].opt_lib}/libgdbm.a"
     # ENV.append "LDFLAGS", "#{Formula["ncurses"].opt_lib}/libncursesw.a"
