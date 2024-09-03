@@ -10,6 +10,7 @@ class CcacheHead < Formula
   depends_on "git-head" => :build
   depends_on "hiredis" => :build
   depends_on "libtool" => :build
+  depends_on "xxhash" => :build
   depends_on "zstd" => :build
 
   def install
@@ -24,6 +25,8 @@ class CcacheHead < Formula
     args << "-DA2X_EXE:FILEPATH=#{Formula["asciidoc"].opt_bin}/a2x"
     args << "-DASCIIDOC_EXE:FILEPATH=#{Formula["asciidoc"].opt_bin}/asciidoc"
     args << "-DGIT_EXECUTABLE:FILEPATH=#{Formula["git"].opt_bin}/git"
+    args << "-DXXHASH_INCLUDE_DIR:PATH=#{Formula["xxhash"].opt_include}"
+    args << "-DXXHASH_LIBRARY:FILEPATH=#{Formula["xxhash"].opt_lib}/libxxhash.dylib"
     args << "-DZSTD_INCLUDE_DIR:PATH=#{Formula["zstd"].opt_include}"
     args << "-DZSTD_LIBRARY:FILEPATH=#{Formula["zstd"].opt_lib}/libzstd.dylib"
 
