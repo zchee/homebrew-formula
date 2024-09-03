@@ -8,7 +8,8 @@ class LimaHead < Formula
   depends_on "qemu"
 
   def install
-    system "make", "VERSION=#{version}", "clean", "binaries", "codesign"
+    system "git", "fetch", "--all"
+    system "make", "clean", "binaries", "codesign"
 
     bin.install Dir["_output/bin/*"]
     share.install Dir["_output/share/*"]
