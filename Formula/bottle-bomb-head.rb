@@ -1,4 +1,4 @@
-class BottleBomb < Formula
+class BottleBombHead < Formula
   desc "Homebrew Bottle Downloader"
   homepage "https://github.com/blacktop/bottle-bomb"
   license "MIT"
