@@ -4,10 +4,10 @@ class Gn < Formula
   head "https://gn.googlesource.com/gn.git", branch: "master"
 
   depends_on "ninja-head" => :build
-  depends_on "python@3.12" => :build
+  depends_on "python@3.13" => :build
 
   def install
-    system "#{Formula["python@3.12"].bin}/python3", "build/gen.py",
+    system "#{Formula["python@3.13"].bin}/python3.13", "build/gen.py",
       "--platform=darwin", "--use-lto", "--use-icf"
     system "#{Formula["ninja-head"].opt_prefix}/bin/ninja", "-C", "out", "gn"
 
