@@ -15,7 +15,7 @@ class LimaHead < Formula
     end
 
     ENV["SHELL"] = "#{Formula["bash"].opt_bin}/bash"
-    system "make", "clean", "binaries", "codesign"
+    system "make", "clean", "binaries"
 
     bin.install Dir["_output/bin/*"]
     share.install Dir["_output/share/*"]
