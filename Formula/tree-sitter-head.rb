@@ -1,37 +1,20 @@
-require "language/node"
-
 class TreeSitterHead < Formula
   desc "Parser generator tool and incremental parsing library"
   homepage "https://tree-sitter.github.io/"
-  url "https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v0.20.8.tar.gz"
-  sha256 "6181ede0b7470bfca37e293e7d5dc1d16469b9485d13f13a605baec4a8b1f791"
   license "MIT"
   head "https://github.com/tree-sitter/tree-sitter.git", branch: "master"
 
-  depends_on "emscripten" => [:build, :test]
-  depends_on "node" => [:build, :test]
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
+
   depends_on "rust" => :build
+  depends_on "node" => :test
 
   def install
-    system "make", "AMALGAMATED=1"
-    system "make", "install", "PREFIX=#{prefix}"
-
-    # NOTE: This step needs to be done *before* `cargo install`
-    cd "lib/binding_web" do
-      system "npm", "install", *Language::Node.local_npm_install_args
-    end
-    inreplace "script/build-wasm", 'emscripten_flags="-O3"', 'emscripten_flags="-O3 -Wno-undefined"'
-    system "script/build-wasm"
-
-    cd "cli" do
-      system "cargo", "install", *std_cargo_args
-    end
-
-    # Install the wasm module into the prefix.
-    # NOTE: This step needs to be done *after* `cargo install`.
-    %w[tree-sitter.js tree-sitter-web.d.ts tree-sitter.wasm package.json].each do |file|
-      (lib/"binding_web").install "lib/binding_web/#{file}"
-    end
+    system "make", "install", "AMALGAMATED=1", "PREFIX=#{prefix}"
+    system "cargo", "install", *std_cargo_args(path: "cli")
   end
 
   test do
@@ -65,9 +48,10 @@ class TreeSitterHead < Formula
       ---
       (source_file)
     EOS
-    system "#{bin}/tree-sitter", "test"
+    system bin/"tree-sitter", "test"
 
-    (testpath/"test_program.c").write <<~EOS
+    (testpath/"test_program.c").write <<~C
+      #include <stdio.h>
       #include <string.h>
       #include <tree_sitter/api.h>
       int main(int argc, char* argv[]) {
@@ -92,12 +76,8 @@ class TreeSitterHead < Formula
         ts_parser_delete(parser);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test_program.c", "-L#{lib}", "-ltree-sitter", "-o", "test_program"
     assert_equal "tree creation failed", shell_output("./test_program")
-
-    # test `tree-sitter build-wasm`
-    ENV.delete "CPATH"
-    system bin/"tree-sitter", "build-wasm"
   end
 end
