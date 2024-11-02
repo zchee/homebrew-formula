@@ -41,22 +41,6 @@ class PythonAT313t < Formula
 
   env :std
 
-  link_overwrite "bin/2to3"
-  link_overwrite "bin/idle3"
-  link_overwrite "bin/pip3"
-  link_overwrite "bin/pydoc3"
-  link_overwrite "bin/python3"
-  link_overwrite "bin/python3-config"
-  link_overwrite "bin/wheel3"
-  link_overwrite "share/man/man1/python3.1"
-  link_overwrite "lib/libpython3.so"
-  link_overwrite "lib/pkgconfig/python3.pc"
-  link_overwrite "lib/pkgconfig/python3-embed.pc"
-  link_overwrite "Frameworks/Python.framework/Headers"
-  link_overwrite "Frameworks/Python.framework/Python"
-  link_overwrite "Frameworks/Python.framework/Resources"
-  link_overwrite "Frameworks/Python.framework/Versions/Current"
-
   # Always update to latest release
   resource "flit-core" do
     url "https://files.pythonhosted.org/packages/c4/e6/c1ac50fe3eebb38a155155711e6e864e254ce4b6e17fe2429b4c4d5b9e80/flit_core-3.9.0.tar.gz"
@@ -81,10 +65,7 @@ class PythonAT313t < Formula
   # Modify default sysconfig to match the brew install layout.
   # Remove when a non-patching mechanism is added (https://bugs.python.org/issue43976).
   # We (ab)use osx_framework_library to exploit pip behaviour to allow --prefix to still work.
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/8b5bcbb262d1ea4e572bba55043bf7d2341a6821/python/3.13-sysconfig.diff"
-    sha256 "e1c2699cf3e39731a19207ed69400a67336cda7767aa08f6f46029f26b1d733b"
-  end
+  patch :DATA
 
   def lib_cellar
     on_macos do
@@ -126,6 +107,9 @@ class PythonAT313t < Formula
     # these flags because they want one build that will work across many macOS
     # releases. Homebrew is not so constrained because the bottling
     # infrastructure specializes for each macOS major release.
+    #
+    # TODO(zchee): enable
+    # --enable-bolt
     args = %W[
       --prefix=#{prefix}
       --enable-ipv6
@@ -143,8 +127,6 @@ class PythonAT313t < Formula
       --with-mimalloc=yes
       --with-readline=readline
     ]
-      # TODO(zchee): enable
-      # --enable-bolt
 
     # Python re-uses flags when building native modules.
     # Since we don't want native modules prioritizing the brew
@@ -185,7 +167,7 @@ class PythonAT313t < Formula
     end
 
     # Resolve HOMEBREW_PREFIX in our sysconfig modification.
-    inreplace "Lib/sysconfig/__init__.py", "@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX
+    inreplace "Lib/sysconfig/__init__.py", "@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX, audit_result: false
 
     # Allow python modules to use ctypes.find_library to find homebrew's stuff
     # even if homebrew is not a /usr/local/lib. Try this with:
@@ -211,8 +193,12 @@ class PythonAT313t < Formula
     system "make"
 
     ENV.deparallelize do
+      # The `altinstall` target prevents the installation of files with only Python's major
+      # version in its name. This allows us to link multiple versioned Python formulae.
+      #   https://github.com/python/cpython#installing-multiple-versions
+      #
       # Tell Python not to install into /Applications (default for framework builds)
-      system "make", "install", "PYTHONAPPSDIR=#{prefix}"
+      system "make", "altinstall", "PYTHONAPPSDIR=#{prefix}"
       system "make", "frameworkinstallextras", "PYTHONAPPSDIR=#{pkgshare}" if OS.mac?
     end
 
@@ -241,20 +227,13 @@ class PythonAT313t < Formula
       # Symlink the pkgconfig files into HOMEBREW_PREFIX so they're accessible.
       (lib/"pkgconfig").install_symlink pc_dir.children
 
-      # Error: inreplace failed
-      # /usr/local/Cellar/python@3.13t/3.13.0/Frameworks/Python.framework/Versions/3.13/lib/python3.13/_sysconfigdata__darwin_darwin.py:
-      #   expected replacement of "/usr/local/Cellar/python@3.13t/3.13.0" with "/usr/local/opt/python@3.13t"
-      # /usr/local/Cellar/python@3.13t/3.13.0/Frameworks/Python.framework/Versions/3.13/lib/python3.13/config-3.13-darwin/Makefile:
-      #   expected replacement of "/usr/local/Cellar/python@3.13t/3.13.0" with "/usr/local/opt/python@3.13t"
-      # /usr/local/Homebrew/Library/Homebrew/ignorable.rb:27:in `block in raise'
-      
-      # system "cat", "/usr/local/Cellar/python@3.13t/3.13.0/Frameworks/Python.framework/Versions/3.13/lib/python3.13/_sysconfigdata__darwin_darwin.py"
-      # system "cat", "/usr/local/Cellar/python@3.13t/3.13.0/Frameworks/Python.framework/Versions/3.13/lib/python3.13/config-3.13-darwin/Makefile"
-
       # Fix for https://github.com/Homebrew/homebrew-core/issues/21212
       # inreplace lib_cellar/"_sysconfigdata__darwin_darwin.py",
-      #           %r{('LINKFORSHARED': .*?) (Python.framework/Versions/3.\d+/Python)'}m,
+      #           %r{('LINKFORSHARED': .*?) (Python.framework/Versions/3.\d+t/Python)'}m,
       #           "\\1 #{opt_prefix}/Frameworks/\\2'"
+
+      # Remove symlinks that conflict with the main Python formula.
+      rm %w[Headers Python Resources Versions/Current].map { |subdir| frameworks/"Python.framework"/subdir }
     else
       # Prevent third-party packages from building against fragile Cellar paths
       inreplace Dir[lib_cellar/"**/_sysconfigdata_*linux_x86_64-*.py",
@@ -266,6 +245,9 @@ class PythonAT313t < Formula
       inreplace bin/"python#{version.major_minor}t-config",
                 'prefix_real=$(installed_prefix "$0")',
                 "prefix_real=#{opt_prefix}"
+
+      # Remove symlinks that conflict with the main Python formula.
+      rm lib/"libpython3.so"
     end
 
     # Remove the site-packages that Python created in its Cellar.
@@ -310,12 +292,16 @@ class PythonAT313t < Formula
     # Write out sitecustomize.py
     (lib_cellar/"sitecustomize.py").atomic_write(sitecustomize)
 
-    # Install unversioned symlinks in libexec/bin.
+    # Install unversioned and major-versioned symlinks in libexec/bin.
     {
-      "idle"          => "idle#{version.major_minor}",
-      "pydoc"         => "pydoc#{version.major_minor}",
-      "python"        => "python#{version.major_minor}",
-      "python-config" => "python#{version.major_minor}-config",
+      "idle"           => "idle#{version.major_minor}",
+      "idle3"          => "idle#{version.major_minor}",
+      "pydoc"          => "pydoc#{version.major_minor}",
+      "pydoc3"         => "pydoc#{version.major_minor}",
+      "python"         => "python#{version.major_minor}",
+      "python3"        => "python#{version.major_minor}",
+      "python-config"  => "python#{version.major_minor}t-config",
+      "python3-config" => "python#{version.major_minor}t-config",
     }.each do |short_name, long_name|
       (libexec/"bin").install_symlink (bin/long_name).realpath => short_name
     end
@@ -367,21 +353,23 @@ class PythonAT313t < Formula
     # target, so move its contents into the appropriate location
     mv (site_packages/"bin").children, bin
     rmdir site_packages/"bin"
+    mv bin/"pip#{version.major_minor}", bin/"pip#{version.major_minor}t"
 
-    rm_r(bin/"pip")
-    mv bin/"wheel", bin/"wheel#{version.major_minor}"
-    bin.install_symlink "wheel#{version.major_minor}" => "wheel3"
+    rm_r(bin.glob("pip{,3}"))
+    mv bin/"wheel", bin/"wheel#{version.major_minor}t"
 
-    # Install unversioned symlinks in libexec/bin.
+    # Install unversioned and major-versioned symlinks in libexec/bin.
     {
-      "pip"   => "pip#{version.major_minor}",
-      "wheel" => "wheel#{version.major_minor}",
+      "pip"    => "pip#{version.major_minor}t",
+      "pip3"   => "pip#{version.major_minor}t",
+      "wheel"  => "wheel#{version.major_minor}t",
+      "wheel3" => "wheel#{version.major_minor}t",
     }.each do |short_name, long_name|
       (libexec/"bin").install_symlink (bin/long_name).realpath => short_name
     end
 
     # post_install happens after link
-    %W[wheel3 pip3 wheel#{version.major_minor} pip#{version.major_minor}].each do |e|
+    %W[wheel3 pip3 wheel#{version.major_minor}t pip#{version.major_minor}t].each do |e|
       (HOMEBREW_PREFIX/"bin").install_symlink bin/e
     end
 
@@ -449,7 +437,7 @@ class PythonAT313t < Formula
           sys.path.extend(library_packages)
           # the Cellar site-packages is a symlink to the HOMEBREW_PREFIX
           # site_packages; prefer the shorter paths
-          long_prefix = re.compile(r'#{rack}/[0-9\\._abrc]+/Frameworks/Python\\.framework/Versions/#{version.major_minor}t/lib/python#{version.major_minor}t/site-packages')
+          long_prefix = re.compile(r'#{rack}/[0-9\\._abrc]+/Frameworks/Python\\.framework/Versions/#{version.major_minor}/lib/python#{version.major_minor}t/site-packages')
           sys.path = [long_prefix.sub('#{site_packages}', p) for p in sys.path]
           # Set the sys.executable to use the opt_prefix. Only do this if PYTHONEXECUTABLE is not
           # explicitly set and we are not in a virtualenv:
@@ -480,11 +468,14 @@ class PythonAT313t < Formula
   def caveats
     <<~EOS
       Python is installed as
-        #{HOMEBREW_PREFIX}/bin/python3
+        #{HOMEBREW_PREFIX}/bin/python#{version.major_minor}t
 
-      Unversioned symlinks `python`, `python-config`, `pip` etc. pointing to
-      `python3`, `python3-config`, `pip3` etc., respectively, are installed into
+      Unversioned and major-versioned symlinks `python`, `python3`, `python-config`, `python3-config`, `pip`, `pip3`, etc. pointing to
+      `python#{version.major_minor}t`, `python#{version.major_minor}t-config`, `pip#{version.major_minor}t` etc., respectively, are installed into
         #{opt_libexec}/bin
+
+      If you do not need a specific version of Python, and always want Homebrew's `python3` in your PATH:
+        brew install python3
 
       See: https://docs.brew.sh/Homebrew-and-Python
     EOS
@@ -542,228 +533,49 @@ class PythonAT313t < Formula
   end
 end
 
-# Optional Features:
-#   --disable-option-checking  ignore unrecognized --enable/--with options
-#   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
-#   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-#   --enable-universalsdk[=SDKDIR]
-#                           create a universal binary build. SDKDIR specifies
-#                           which macOS SDK should be used to perform the build,
-#                           see Mac/README.rst. (default is no)
-#   --enable-framework[=INSTALLDIR]
-#                           create a Python.framework rather than a traditional
-#                           Unix install. optional INSTALLDIR specifies the
-#                           installation path. see Mac/README.rst (default is
-#                           no)
-#   --enable-wasm-dynamic-linking
-#                           Enable dynamic linking support for WebAssembly
-#                           (default is no)
-#   --enable-wasm-pthreads  Enable pthread emulation for WebAssembly (default is
-#                           no)
-#   --enable-shared         enable building a shared Python library (default is
-#                           no)
-#   --enable-profiling      enable C-level code profiling with gprof (default is
-#                           no)
-#   --disable-gil           enable experimental support for running without the
-#                           GIL (default is no)
-#   --enable-pystats        enable internal statistics gathering (default is no)
-#   --enable-experimental-jit[=no|yes|yes-off|interpreter]
-#                           build the experimental just-in-time compiler
-#                           (default is no)
-#   --enable-optimizations  enable expensive, stable optimizations (PGO, etc.)
-#                           (default is no)
-#   --enable-bolt           enable usage of the llvm-bolt post-link optimizer
-#                           (default is no)
-#   --enable-loadable-sqlite-extensions
-#                           support loadable extensions in the sqlite3 module,
-#                           see Doc/library/sqlite3.rst (default is no)
-#   --enable-ipv6           enable ipv6 (with ipv4) support, see
-#                           Doc/library/socket.rst (default is yes if supported)
-#   --enable-big-digits[=15|30]
-#                           use big digits (30 or 15 bits) for Python longs
-#                           (default is 30)]
-#   --disable-test-modules  don't build nor install test modules
-#
-# Optional Packages:
-#   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
-#   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-#   --with-build-python=python3.13
-#                           path to build python binary for cross compiling
-#                           (default: _bootstrap_python or python3.13)
-#   --with-pkg-config=[yes|no|check]
-#                           use pkg-config to detect build options (default is
-#                           check)
-#   --with-universal-archs=ARCH
-#                           specify the kind of macOS universal binary that
-#                           should be created. This option is only valid when
-#                           --enable-universalsdk is set; options are:
-#                           ("universal2", "intel-64", "intel-32", "intel",
-#                           "32-bit", "64-bit", "3-way", or "all") see
-#                           Mac/README.rst
-#   --with-framework-name=FRAMEWORK
-#                           specify the name for the python framework on macOS
-#                           only valid when --enable-framework is set. see
-#                           Mac/README.rst (default is 'Python')
-#   --with-app-store-compliance=[PATCH-FILE]
-#                           Enable any patches required for compiliance with app
-#                           stores. Optional PATCH-FILE specifies the custom
-#                           patch to apply.
-#   --with-emscripten-target=[browser|node]
-#                           Emscripten platform
-#   --with-suffix=SUFFIX    set executable suffix to SUFFIX (default is empty,
-#                           yes is mapped to '.exe')
-#   --without-static-libpython
-#                           do not build libpythonMAJOR.MINOR.a and do not
-#                           install python.o (default is yes)
-#   --with-pydebug          build with Py_DEBUG defined (default is no)
-#   --with-trace-refs       enable tracing references for debugging purpose
-#                           (default is no)
-#   --with-assertions       build with C assertions enabled (default is no)
-#   --with-lto=[full|thin|no|yes]
-#                           enable Link-Time-Optimization in any build (default
-#                           is no)
-#   --with-strict-overflow  if 'yes', add -fstrict-overflow to CFLAGS, else add
-#                           -fno-strict-overflow (default is no)
-#   --with-dsymutil         link debug information into final executable with
-#                           dsymutil in macOS (default is no)
-#   --with-address-sanitizer
-#                           enable AddressSanitizer memory error detector,
-#                           'asan' (default is no)
-#   --with-memory-sanitizer enable MemorySanitizer allocation error detector,
-#                           'msan' (default is no)
-#   --with-undefined-behavior-sanitizer
-#                           enable UndefinedBehaviorSanitizer undefined
-#                           behaviour detector, 'ubsan' (default is no)
-#   --with-thread-sanitizer enable ThreadSanitizer data race detector, 'tsan'
-#                           (default is no)
-#   --with-hash-algorithm=[fnv|siphash13|siphash24]
-#                           select hash algorithm for use in Python/pyhash.c
-#                           (default is SipHash13)
-#   --with-tzpath=<list of absolute paths separated by pathsep>
-#                           Select the default time zone search path for
-#                           zoneinfo.TZPATH
-#   --with-libs='lib1 ...'  link against additional libs (default is no)
-#   --with-system-expat     build pyexpat module using an installed expat
-#                           library, see Doc/library/pyexpat.rst (default is no)
-#   --with-system-libmpdec  build _decimal module using an installed mpdecimal
-#                           library, see Doc/library/decimal.rst (default is
-#                           yes)
-#   --with-decimal-contextvar
-#                           build _decimal module using a coroutine-local rather
-#                           than a thread-local context (default is yes)
-#   --with-dbmliborder=db1:db2:...
-#                           override order to check db backends for dbm; a valid
-#                           value is a colon separated string with the backend
-#                           names `ndbm', `gdbm' and `bdb'.
-#   --with-doc-strings      enable documentation strings (default is yes)
-#   --with-mimalloc         build with mimalloc memory allocator (default is yes
-#                           if C11 stdatomic.h is available.)
-#   --with-pymalloc         enable specialized mallocs (default is yes)
-#   --with-freelists        enable object freelists (default is yes)
-#   --with-c-locale-coercion
-#                           enable C locale coercion to a UTF-8 based locale
-#                           (default is yes)
-#   --with-valgrind         enable Valgrind support (default is no)
-#   --with-dtrace           enable DTrace support (default is no)
-#   --with-libm=STRING      override libm math library to STRING (default is
-#                           system-dependent)
-#   --with-libc=STRING      override libc C library to STRING (default is
-#                           system-dependent)
-#   --with-platlibdir=DIRNAME
-#                           Python library directory name (default is "lib")
-#   --with-wheel-pkg-dir=PATH
-#                           Directory of wheel packages used by ensurepip
-#                           (default: none)
-#   --with(out)-readline[=editline|readline|no]
-#                           use libedit for backend or disable readline module
-#   --with-computed-gotos   enable computed gotos in evaluation loop (enabled by
-#                           default on supported compilers)
-#   --with-ensurepip[=install|upgrade|no]
-#                           "install" or "upgrade" using bundled pip (default is
-#                           upgrade)
-#   --with-openssl=DIR      root of the OpenSSL directory
-#   --with-openssl-rpath=[DIR|auto|no]
-#                           Set runtime library directory (rpath) for OpenSSL
-#                           libraries, no (default): don't set rpath, auto:
-#                           auto-detect rpath from --with-openssl and
-#                           pkg-config, DIR: set an explicit rpath
-#   --with-ssl-default-suites=[python|openssl|STRING]
-#                           override default cipher suites string, python: use
-#                           Python's preferred selection (default), openssl:
-#                           leave OpenSSL's defaults untouched, STRING: use a
-#                           custom string, python and STRING also set TLS 1.2 as
-#                           minimum TLS version
-#   --with-builtin-hashlib-hashes=md5,sha1,sha2,sha3,blake2
-#                           builtin hash modules, md5, sha1, sha2, sha3 (with
-#                           shake), blake2
-#
-# Some influential environment variables:
-#   PKG_CONFIG  path to pkg-config utility
-#   PKG_CONFIG_PATH
-#               directories to add to pkg-config's search path
-#   PKG_CONFIG_LIBDIR
-#               path overriding pkg-config's built-in search path
-#   MACHDEP     name for machine-dependent library files
-#   CC          C compiler command
-#   CFLAGS      C compiler flags
-#   LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
-#               nonstandard directory <lib dir>
-#   LIBS        libraries to pass to the linker, e.g. -l<library>
-#   CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
-#               you have headers in a nonstandard directory <include dir>
-#   CPP         C preprocessor
-#   HOSTRUNNER  Program to run CPython for the host platform
-#   PROFILE_TASK
-#               Python args for PGO generation task
-#   BOLT_INSTRUMENT_FLAGS
-#               Arguments to llvm-bolt when instrumenting binaries
-#   BOLT_APPLY_FLAGS
-#               Arguments to llvm-bolt when creating a BOLT optimized binary
-#   LIBUUID_CFLAGS
-#               C compiler flags for LIBUUID, overriding pkg-config
-#   LIBUUID_LIBS
-#               linker flags for LIBUUID, overriding pkg-config
-#   LIBFFI_CFLAGS
-#               C compiler flags for LIBFFI, overriding pkg-config
-#   LIBFFI_LIBS linker flags for LIBFFI, overriding pkg-config
-#   LIBMPDEC_CFLAGS
-#               C compiler flags for LIBMPDEC, overriding pkg-config
-#   LIBMPDEC_LIBS
-#               linker flags for LIBMPDEC, overriding pkg-config
-#   LIBSQLITE3_CFLAGS
-#               C compiler flags for LIBSQLITE3, overriding pkg-config
-#   LIBSQLITE3_LIBS
-#               linker flags for LIBSQLITE3, overriding pkg-config
-#   TCLTK_CFLAGS
-#               C compiler flags for TCLTK, overriding pkg-config
-#   TCLTK_LIBS  linker flags for TCLTK, overriding pkg-config
-#   X11_CFLAGS  C compiler flags for X11, overriding pkg-config
-#   X11_LIBS    linker flags for X11, overriding pkg-config
-#   GDBM_CFLAGS C compiler flags for gdbm
-#   GDBM_LIBS   additional linker flags for gdbm
-#   ZLIB_CFLAGS C compiler flags for ZLIB, overriding pkg-config
-#   ZLIB_LIBS   linker flags for ZLIB, overriding pkg-config
-#   BZIP2_CFLAGS
-#               C compiler flags for BZIP2, overriding pkg-config
-#   BZIP2_LIBS  linker flags for BZIP2, overriding pkg-config
-#   LIBLZMA_CFLAGS
-#               C compiler flags for LIBLZMA, overriding pkg-config
-#   LIBLZMA_LIBS
-#               linker flags for LIBLZMA, overriding pkg-config
-#   LIBREADLINE_CFLAGS
-#               C compiler flags for LIBREADLINE, overriding pkg-config
-#   LIBREADLINE_LIBS
-#               linker flags for LIBREADLINE, overriding pkg-config
-#   LIBEDIT_CFLAGS
-#               C compiler flags for LIBEDIT, overriding pkg-config
-#   LIBEDIT_LIBS
-#               linker flags for LIBEDIT, overriding pkg-config
-#   CURSES_CFLAGS
-#               C compiler flags for CURSES, overriding pkg-config
-#   CURSES_LIBS linker flags for CURSES, overriding pkg-config
-#   PANEL_CFLAGS
-#               C compiler flags for PANEL, overriding pkg-config
-#   PANEL_LIBS  linker flags for PANEL, overriding pkg-config
-#   LIBB2_CFLAGS
-#               C compiler flags for LIBB2, overriding pkg-config
-#   LIBB2_LIBS  linker flags for LIBB2, overriding pkg-config
+__END__
+diff --git a/Lib/sysconfig/__init__.py b/Lib/sysconfig/__init__.py
+index 80aef34..4af9376 100644
+--- a/Lib/sysconfig/__init__.py
++++ b/Lib/sysconfig/__init__.py
+@@ -98,6 +98,16 @@ _INSTALL_SCHEMES = {
+         'scripts': '{base}/Scripts',
+         'data': '{base}',
+         },
++    'osx_framework_library': {
++        'stdlib': '{installed_base}/{platlibdir}/python{py_version_short}t',
++        'platstdlib': '{platbase}/{platlibdir}/python{py_version_short}t',
++        'purelib': '@@HOMEBREW_PREFIX@@/lib/python{py_version_short}t/site-packages',
++        'platlib': '@@HOMEBREW_PREFIX@@/{platlibdir}/python{py_version_short}t/site-packages',
++        'include': '{installed_base}/include/python{py_version_short}t{abiflags}',
++        'platinclude': '{installed_platbase}/include/python{py_version_short}t{abiflags}',
++        'scripts': '@@HOMEBREW_PREFIX@@/bin',
++        'data': '@@HOMEBREW_PREFIX@@',
++        },
+     }
+
+ # For the OS-native venv scheme, we essentially provide an alias:
+@@ -288,20 +298,20 @@ def _get_preferred_schemes():
+         }
+     if sys.platform == 'darwin' and sys._framework:
+         return {
+-            'prefix': 'posix_prefix',
++            'prefix': 'osx_framework_library',
+             'home': 'posix_home',
+             'user': 'osx_framework_user',
+         }
+
+     return {
+-        'prefix': 'posix_prefix',
++        'prefix': 'osx_framework_library',
+         'home': 'posix_home',
+         'user': 'posix_user',
+     }
+
+
+ def get_preferred_scheme(key):
+-    if key == 'prefix' and sys.prefix != sys.base_prefix:
++    if key == 'prefix' and (sys.prefix != sys.base_prefix or os.environ.get("ENSUREPIP_OPTIONS", None)):
+         return 'venv'
+     scheme = _get_preferred_schemes()[key]
+     if scheme not in _INSTALL_SCHEMES:
