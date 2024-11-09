@@ -6,7 +6,7 @@ class LuarocksLuajit < Formula
   license "MIT"
   head "https://github.com/luarocks/luarocks.git", branch: "master"
 
-  depends_on "openresty/brew/openresty"
+  depends_on "luajit-openresty"
 
   uses_from_macos "unzip"
 
@@ -14,26 +14,26 @@ class LuarocksLuajit < Formula
     system "./configure", "--prefix=#{prefix}",
                           "--sysconfdir=#{etc}",
                           "--rocks-tree=#{HOMEBREW_PREFIX}",
-                          "--with-lua=#{Formula["openresty/brew/openresty"].opt_prefix}/luajit",
-                          "--with-lua-bin=#{Formula["openresty/brew/openresty"].opt_prefix}/luajit/bin",
+                          "--with-lua=#{Formula["luajit-openresty"].opt_prefix}",
+                          "--with-lua-bin=#{Formula["luajit-openresty"].opt_bin}",
                           "--lua-version=5.1",
-                          "--with-lua-include=#{Formula["openresty/brew/openresty"].opt_prefix}/luajit/include/luajit-2.1",
-                          "--with-lua-lib=#{Formula["openresty/brew/openresty"].opt_prefix}/luajit/lib"
+                          "--with-lua-include=#{Formula["luajit-openresty"].opt_include}/luajit-2.1",
+                          "--with-lua-lib=#{Formula["luajit-openresty"].opt_lib}"
 
     system "make", "install"
 
     mv bin/"luarocks", bin/"luarocks-luajit"
     mv bin/"luarocks-admin", bin/"luarocks-admin-luajit"
-    # mv share/"lua/5.1/luarocks", share/"lua/5.1/luarocks-luajit"
+    mv share/"lua/5.1/luarocks", share/"lua/5.1/luarocks-luajit"
   end
 
   def caveats
     <<~EOS
       LuaRocks supports multiple versions of Lua. By default it is configured
-      to use Lua#{Formula["lua"].version.major_minor}, but you can require it to use another version at runtime
+      to use Lua#{Formula["luajit-openresty"].version.major_minor}, but you can require it to use another version at runtime
       with the `--lua-dir` flag, like this:
 
-        luarocks --lua-dir=#{Formula["lua@5.1"].opt_prefix} install say
+        luarocks --lua-dir=#{Formula["luajit-openresty"].opt_prefix} install say
     EOS
   end
 
@@ -69,7 +69,7 @@ class LuarocksLuajit < Formula
         # LuaJIT is compatible with lua5.1, so we can also test it here
         unless Hardware::CPU.arm?
           rmdir testpath/"blank_space"
-          system "#{Formula["luajit"].bin}/luajit", "lfs_#{luaversion}test.lua"
+          system "#{Formula["luajit-openresty"].bin}/luajit", "lfs_#{luaversion}test.lua"
           assert_predicate testpath/"blank_space", :directory?,
             "Luafilesystem failed to create the expected directory"
         end
