@@ -69,7 +69,6 @@ class TmuxHead < Formula
     ENV["JEMALLOC_LIBS"] = "#{Formula["jemalloc-head"].opt_lib}/libjemalloc.a"
 
     cflags = "-march=native -Ofast -flto -std=c2x"
-    cflags += Hardware::CPU.intel? ? " -mcpu=x86-64-v4" : " -mcpu=apple-latest"
     ldflags = "-march=native -Ofast -flto -L/usr/local/lib -lresolv"  # -lutil?
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
