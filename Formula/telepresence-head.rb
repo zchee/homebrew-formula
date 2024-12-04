@@ -9,7 +9,7 @@ class TelepresenceHead < Formula
   def install
     system "make", "build"
     bin.install "build-output/bin/telepresence"
-    bin.install "build-output/fuseftp-darwin-amd64" => "fuseftp"
+    # bin.install "build-output/fuseftp-darwin-amd64" => "fuseftp"
 
     generate_completions_from_executable(bin/"telepresence", "completion", base_name: "telepresence")
   end
