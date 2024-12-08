@@ -35,7 +35,7 @@ class PythonAT313t < Formula
     depends_on "libtirpc"
   end
 
-  depends_on "llvm@18" => :build # for --enable-experimental-jit
+  depends_on "llvm@18" => :build # NOTE(zchee): for --enable-experimental-jit
   depends_on "ncurses-head"
   depends_on "readline"
 
@@ -43,23 +43,23 @@ class PythonAT313t < Formula
 
   # Always update to latest release
   resource "flit-core" do
-    url "https://files.pythonhosted.org/packages/c4/e6/c1ac50fe3eebb38a155155711e6e864e254ce4b6e17fe2429b4c4d5b9e80/flit_core-3.9.0.tar.gz"
-    sha256 "72ad266176c4a3fcfab5f2930d76896059851240570ce9a98733b658cb786eba"
+    url "https://files.pythonhosted.org/packages/d5/ae/09427bea9227a33ec834ed5461432752fd5d02b14f93dd68406c91684622/flit_core-3.10.1.tar.gz"
+    sha256 "66e5b87874a0d6e39691f0e22f09306736b633548670ad3c09ec9db03c5662f7"
   end
 
   resource "pip" do
-    url "https://files.pythonhosted.org/packages/4d/87/fb90046e096a03aeab235e139436b3fe804cdd447ed2093b0d70eba3f7f8/pip-24.2.tar.gz"
-    sha256 "5b5e490b5e9cb275c879595064adce9ebd31b854e3e803740b72f9ccf34a45b8"
+    url "https://files.pythonhosted.org/packages/f4/b1/b422acd212ad7eedddaf7981eee6e5de085154ff726459cf2da7c5a184c1/pip-24.3.1.tar.gz"
+    sha256 "ebcb60557f2aefabc2e0f918751cd24ea0d56d8ec5445fe1807f1d2109660b99"
   end
 
   resource "setuptools" do
-    url "https://files.pythonhosted.org/packages/27/b8/f21073fde99492b33ca357876430822e4800cdf522011f18041351dfa74b/setuptools-75.1.0.tar.gz"
-    sha256 "d59a21b17a275fb872a9c3dae73963160ae079f1049ed956880cd7c09b120538"
+    url "https://files.pythonhosted.org/packages/43/54/292f26c208734e9a7f067aea4a7e282c080750c4546559b58e2e45413ca0/setuptools-75.6.0.tar.gz"
+    sha256 "8199222558df7c86216af4f84c30e9b34a61d8ba19366cc914424cdbd28252f6"
   end
 
   resource "wheel" do
-    url "https://files.pythonhosted.org/packages/b7/a0/95e9e962c5fd9da11c1e28aa4c0d8210ab277b1ada951d2aee336b505813/wheel-0.44.0.tar.gz"
-    sha256 "a29c3f2817e95ab89aa4660681ad547c0e9547f20e75b0562fe7723c9a2a9d49"
+    url "https://files.pythonhosted.org/packages/8a/98/2d9906746cdc6a6ef809ae6338005b3f21bb568bea3165cfc6a243fdc25c/wheel-0.45.1.tar.gz"
+    sha256 "661e1abd9198507b1409a20c02106d9670b2576e916d58f520316666abca6729"
   end
 
   # Modify default sysconfig to match the brew install layout.
@@ -94,6 +94,7 @@ class PythonAT313t < Formula
     # and not into some other Python the user has installed.
     ENV["PYTHONHOME"] = nil
     ENV["PYTHONPATH"] = nil
+    ENV["SDKROOT"] = MacOS.sdk_path
 
     # Override the auto-detection of libmpdec, which assumes a universal build.
     # This is currently an inreplace due to https://github.com/python/cpython/issues/98557.
@@ -135,7 +136,7 @@ class PythonAT313t < Formula
     # leave it as-is.
     cflags         = []
     cflags_nodist  = ["-I#{HOMEBREW_PREFIX}/include"]
-    ldflags        = ["-L#{Formula["llvm@18"].opt_lib}/c++", "-L#{Formula["llvm@18"].opt_lib}", "-lunwind"]
+    ldflags        = ["-L#{Formula["llvm@18"].opt_lib}", "-L#{Formula["llvm@18"].opt_lib}/c++", "-L#{Formula["llvm@18"].opt_lib}", "-lunwind", "-fuse-ld=lld", "--ld-path=#{Formula["llvm@18"].opt_bin}/ld64.lld"]
     ldflags_nodist = ["-L#{HOMEBREW_PREFIX}/lib", "-Wl,-rpath,#{HOMEBREW_PREFIX}/lib"]
     cppflags       = ["-I#{HOMEBREW_PREFIX}/include", "-I#{Formula["llvm@18"].opt_include}"]
 
@@ -212,7 +213,6 @@ class PythonAT313t < Formula
 
       # Prevent third-party packages from building against fragile Cellar paths
       bad_cellar_path_files = [
-        # lib_cellar/"_sysconfigdata__darwin_darwin.py",
         lib_cellar/"config-#{version.major_minor}t-darwin/Makefile",
         pc_dir/"python-#{version.major_minor}t.pc",
         pc_dir/"python-#{version.major_minor}t-embed.pc",
@@ -226,11 +226,6 @@ class PythonAT313t < Formula
 
       # Symlink the pkgconfig files into HOMEBREW_PREFIX so they're accessible.
       (lib/"pkgconfig").install_symlink pc_dir.children
-
-      # Fix for https://github.com/Homebrew/homebrew-core/issues/21212
-      # inreplace lib_cellar/"_sysconfigdata__darwin_darwin.py",
-      #           %r{('LINKFORSHARED': .*?) (Python.framework/Versions/3.\d+t/Python)'}m,
-      #           "\\1 #{opt_prefix}/Frameworks/\\2'"
 
       # Remove symlinks that conflict with the main Python formula.
       rm %w[Headers Python Resources Versions/Current].map { |subdir| frameworks/"Python.framework"/subdir }
@@ -356,6 +351,9 @@ class PythonAT313t < Formula
     mv bin/"pip#{version.major_minor}", bin/"pip#{version.major_minor}t"
 
     rm_r(bin.glob("pip{,3}"))
+    rm_r(bin/"python3.13")
+    mv bin/"idle#{version.major_minor}", bin/"idle#{version.major_minor}t"
+    mv bin/"pydoc#{version.major_minor}", bin/"pydoc#{version.major_minor}t"
     mv bin/"wheel", bin/"wheel#{version.major_minor}t"
 
     # Install unversioned and major-versioned symlinks in libexec/bin.
