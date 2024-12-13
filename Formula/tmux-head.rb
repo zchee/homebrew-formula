@@ -16,7 +16,6 @@ class TmuxHead < Formula
   end
 
   depends_on "pkg-config" => :build
-  depends_on "jemalloc-head"
   depends_on "libevent-head"
   depends_on "ncurses-head"
 
@@ -41,7 +40,6 @@ class TmuxHead < Formula
 
     args = %W[
       --enable-sixel
-      --enable-jemalloc
       --sysconfdir=#{etc}
     ]
 
@@ -65,8 +63,6 @@ class TmuxHead < Formula
     ENV["LIBNCURSES_CFLAGS"] = "-I#{Formula["ncurses-head"].opt_include} -I#{Formula["ncurses-head"].opt_include}/ncursesw"
     ENV["LIBNCURSES_LIBS"] = "#{Formula["ncurses-head"].opt_lib}/libncursesw.a"
     ENV["LIBNCURSESW_CFLAGS"] = "-I#{Formula["ncurses-head"].opt_include} -I#{Formula["ncurses-head"].opt_include}/ncursesw"
-    ENV["JEMALLOC_CFLAGS"] = "-I#{Formula["jemalloc-head"].opt_include}"
-    ENV["JEMALLOC_LIBS"] = "#{Formula["jemalloc-head"].opt_lib}/libjemalloc.a"
 
     cflags = "-march=native -Ofast -flto -std=c2x"
     ldflags = "-march=native -Ofast -flto -L/usr/local/lib -lresolv"  # -lutil?
