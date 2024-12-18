@@ -8,8 +8,6 @@ class GitDeltaHead < Formula
   depends_on "llvm" => :build
   depends_on "zlib" => :build
 
-  conflicts_with "delta", because: "both install a `delta` binary"
-
   def install
     system "cargo", "install", *std_cargo_args, "--all-features"
     bin.install_symlink "delta" => "git-delta"
