@@ -7,7 +7,6 @@ class K6Head < Formula
   depends_on "go" => :build
 
   def install
-    # CGO_ENABLED=0 go build -o dist/k6-v0.43.1-51-ge5653169-linux-amd64/k6 -trimpath -ldflags -X go.k6.io/k6/lib/consts.VersionDetails=2023-03-06T08:21:05+0000/v0.43.1-51-ge5653169
     revision = Utils.git_short_head
     ldflags = %W[
       -s -w
@@ -16,17 +15,7 @@ class K6Head < Formula
     puts *std_go_args
     system "go", "build", "-mod=vendor", "-trimpath", "-o=#{prefix}/bin/k6", "-ldflags", ldflags.join(" ")
 
-    # Install bash completion
-    output = Utils.safe_popen_read(bin/"k6", "completion", "bash")
-    (bash_completion/"k6").write output
-
-    # Install zsh completion
-    output = Utils.safe_popen_read(bin/"k6", "completion", "zsh")
-    (zsh_completion/"_k6").write output
-
-    # Install fish completion
-    output = Utils.safe_popen_read(bin/"k6", "completion", "fish")
-    (fish_completion/"k6.fish").write output
+    generate_completions_from_executable(bin/"k6", "completion")
   end
 
   test do
