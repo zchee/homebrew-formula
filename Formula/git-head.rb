@@ -10,20 +10,24 @@ class GitHead < Formula
   end
 
   depends_on "asciidoc"
-  depends_on "brotli"
   depends_on "c-ares"
-  depends_on "curl"
-  depends_on "gettext"
+
+  depends_on "cloudflare/cloudflare/curl"
+  depends_on "brotli"
   depends_on "libidn2"
-  depends_on "libmetalink"
+  depends_on "libnghttp2"
   depends_on "libssh2"
   depends_on "openldap"
-  depends_on "pcre2"
   depends_on "rtmpdump"
-  depends_on "xmlto"
-  depends_on "zlib"
   depends_on "zstd"
 
+  depends_on "gettext"
+  depends_on "libmetalink"
+  depends_on "pcre2"
+  depends_on "xmlto"
+  depends_on "zlib"
+
+  uses_from_macos "krb5"
   uses_from_macos "expat"
 
   on_linux do
@@ -60,8 +64,8 @@ class GitHead < Formula
     cflags = "-std=c11 -march=native -Ofast -flto"
     cxxflags = "-std=c++17 -stdlib=libc++ -march=native -Ofast -flto"
     ldflags = "-march=native -Ofast -flto"
-    ldflags += " -L#{Formula["brotli"].opt_lib} -L#{Formula["c-ares"].opt_lib} -L#{Formula["curl-quic"].opt_lib} -L#{Formula["libidn2"].opt_lib}"
-    ldflags += " -L#{Formula["libmetalink"].opt_lib} -L#{Formula["libssh2"].opt_lib} -L#{Formula["nghttp2"].opt_lib} -L#{Formula["nghttp3"].opt_lib} -L#{Formula["ngtcp2"].opt_lib}"
+    ldflags += " -L#{Formula["brotli"].opt_lib} -L#{Formula["c-ares"].opt_lib} -L#{Formula["cloudflare/cloudflare/curl"].opt_lib} -L#{Formula["libidn2"].opt_lib}"
+    ldflags += " -L#{Formula["libmetalink"].opt_lib} -L#{Formula["libssh2"].opt_lib} -L#{Formula["libnghttp2"].opt_lib} -L#{Formula["nghttp3"].opt_lib} -L#{Formula["ngtcp2"].opt_lib}"
     ldflags += " -L#{Formula["openldap"].opt_lib} -L#{Formula["pcre2"].opt_lib} -L#{Formula["rtmpdump"].opt_lib}"
     ldflags += " -L#{Formula["zlib"].opt_lib} -L#{Formula["zstd"].opt_lib}"
     ENV.append "CFLAGS", *cflags
