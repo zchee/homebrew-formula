@@ -1,36 +1,30 @@
-$pkg     = "github.com/xo/usql"
-$tags    = %w(most sqlite_app_armor sqlite_fts5 sqlite_introspect sqlite_json1 sqlite_math_functions sqlite_stat4 sqlite_userauth sqlite_vtable no_adodb)
 class UsqlHead < Formula
   desc "universal command-line SQL client interface"
-  homepage "https://#{$pkg}"
-  head "https://#{$pkg}.git"
+  homepage "https://github.com/xo/usql"
+  head "https://github.com/xo/usql.git", branch: "master"
 
   option "with-odbc", "Build with ODBC (unixodbc) support"
 
   depends_on "go" => :build
   depends_on "icu4c" => :build
 
-  if build.with? "odbc" then
-    $tags   << "odbc"
-    depends_on "unixodbc"
-  end
-
   def install
-    (buildpath/"src/#{$pkg}").install buildpath.children
+    (buildpath/"src/github.com/xo/usql").install buildpath.children
 
-    cd "src/#{$pkg}" do
+    tags = %W[most sqlite_app_armor sqlite_fts5 sqlite_introspect sqlite_json1 sqlite_math_functions sqlite_stat4 sqlite_userauth sqlite_vtable no_adodb]
+    if build.with? "odbc" then
+      tags += %w[%w[NO_OPENSSL=1 APPLE_COMMON_CRYPTO=1]]
+      depends_on "unixodbc"
+    end
+
+    cd "src/github.com/xo/usql" do
       revision = Utils.git_short_head
-
-      inreplace "go.mod" do |s|
-        s.gsub! "	github.com/xo/chartfmt v0.0.0", ""
-        s.gsub! "replace github.com/xo/chartfmt => ../chartfmt", ""
-      end
 
       system "go", "mod", "tidy", "-v"
       system "go", "build",
         "-trimpath",
-        "-tags",    $tags.join(" "),
-        "-ldflags", "-s -w -X #{$pkg}/text.CommandVersion=#{revision}",
+        "-tags=#{tags.join(" ")}",
+        "-ldflags", "-s -w -X github.com/xo/usql/text.CommandVersion=#{revision}",
         "-o",       bin/"usql"
     end
   end
