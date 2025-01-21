@@ -8,18 +8,29 @@ class KubebuilderHead < Formula
 
   def install
     system "make", "build"
-    bin.install "bin/kubebuilder" => "kubebuilder-head"
+    bin.install "bin/kubebuilder" => "kubebuilder"
 
-    generate_completions_from_executable(bin/"kubebuilder-head", "completion")
+    generate_completions_from_executable(bin/"kubebuilder", "completion", base_name: "kubebuilder")
   end
 
   test do
-    assert_match "KubeBuilderVersion:\"#{version}\"", shell_output("#{bin}/kubebuilder-head version 2>&1")
     mkdir "test" do
       system "go", "mod", "init", "example.com"
-      system "#{bin}/kubebuilder-head", "init",
-        "--plugins", "go/v3", "--project-version", "3",
-        "--skip-go-version-check"
+      system bin/"kubebuilder", "init",
+                 "--plugins", "go.kubebuilder.io/v4",
+                 "--project-version", "3",
+                 "--skip-go-version-check"
     end
+
+    assert_match <<~YAML, (testpath/"test/PROJECT").read
+      domain: my.domain
+      layout:
+      - go.kubebuilder.io/v4
+      projectName: test
+      repo: example.com
+      version: "3"
+    YAML
+
+    assert_match version.to_s, shell_output("#{bin}/kubebuilder version")
   end
 end
