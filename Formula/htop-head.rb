@@ -13,7 +13,8 @@ class HtopHead < Formula
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
-  depends_on "ncurses" # enables mouse scroll
+  depends_on "hwloc" => :build
+  depends_on "ncurses-head" # enables mouse scroll
 
   on_linux do
     depends_on "lm-sensors"
