@@ -53,7 +53,7 @@ class ZshHead < Formula
            "--enable-gdbm",
            "--enable-zsh-secure-free",
            "--enable-unicode9",
-           "--enable-etcdir=/etc",
+           "--disable-etcdir",
            "--with-tcsetpgrp",
            "--disable-dynamic",
            "DL_EXT=bundle"
