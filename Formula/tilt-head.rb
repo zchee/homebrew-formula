@@ -23,7 +23,7 @@ class TiltHead < Formula
       -X main.commit=#{Utils.git_head}
       -X main.date=#{time.iso8601}
     ]
-    system "go", "build", "-tags=osusergo", "-mod=vendor", *std_go_args(output: bin/"tilt", ldflags: ldflags), "./cmd/tilt"
+    system "go", "build", "-tags=osusergo,netgo,static", "-mod=vendor", *std_go_args(output: bin/"tilt", ldflags: ldflags), "./cmd/tilt"
 
     generate_completions_from_executable(bin/"tilt", "completion", base_name: "tilt")
   end
