@@ -21,7 +21,7 @@ class ZshHead < Formula
     # Work around configure issues with Xcode 12
     # https://www.zsh.org/mla/workers/2020/index.html
     # https://github.com/Homebrew/homebrew-core/issues/64921
-    ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1200
+    ENV.append_to_cflags "-Wno-implicit-int" if DevelopmentTools.clang_build_version >= 1403
 
     if Hardware::CPU.intel?
       cflags  = "-std=c11 -march=x86-64-v4 -Ofast -flto"
@@ -33,11 +33,6 @@ class ZshHead < Formula
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
     ENV.append "CPPFLAGS", "-D_DARWIN_C_SOURCE -I#{Formula["ncurses-head"].opt_include}/ncursesw"
-    # TODO(zchee): static linking
-    # ENV.append "LDFLAGS", "#{Formula["gdbm"].opt_lib}/libgdbm.a"
-    # ENV.append "LDFLAGS", "#{Formula["ncurses"].opt_lib}/libncursesw.a"
-    # ENV.append "LDFLAGS", "#{Formula["pcre2"].opt_lib}/libpcre2-8.a"
-    # ENV.append "LDFLAGS", "#{Formula["libiconv"].opt_lib}/libiconv.a"
 
     system "Util/preconfig" if build.head?
 
@@ -51,12 +46,10 @@ class ZshHead < Formula
            "--enable-multibyte",
            "--enable-pcre",
            "--enable-gdbm",
-           "--enable-zsh-secure-free",
            "--enable-unicode9",
            "--disable-etcdir",
-           "--with-tcsetpgrp",
            "--disable-dynamic",
-           "DL_EXT=bundle"
+           "--enable-year2038"
 
     # Do not version installation directories.
     inreplace ["Makefile", "Src/Makefile"],
