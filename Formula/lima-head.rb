@@ -9,10 +9,9 @@ class LimaHead < Formula
   depends_on "bash" => :build
 
   def install
-    inreplace "Makefile" do |s|
-      s.gsub! "codesign -f -v --entitlements vz.entitlements -s - $@", "codesign -f -v --entitlements vz.entitlements -s - $@ || true"
-      s.gsub! "codesign --entitlements vz.entitlements -s - $<", "codesign --entitlements vz.entitlements -s - $< || true"
-    end
+    inreplace "Makefile",
+      "codesign -f -v --entitlements vz.entitlements -s - $@",
+      "codesign -f -v --entitlements vz.entitlements -s - $@ || true"
 
     ENV["SHELL"] = "#{Formula["bash"].opt_bin}/bash"
     system "make", "clean", "binaries"
