@@ -22,6 +22,7 @@ class Grpcdebug < Formula
       static
     ].join(",")
 
+    system "go", "mod", "tidy"
     system "go", "build", *std_go_args(ldflags: ldflags), "-tags=#{tags}"
   end
 end
