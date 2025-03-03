@@ -7,6 +7,7 @@ class SopsHead < Formula
   depends_on "go" => :build
 
   def install
+    system "go", "mod", "tidy"
     system "go", "build", *std_go_args, "-o", bin/"sops", "./cmd/sops"
     pkgshare.install "example.yaml"
   end
