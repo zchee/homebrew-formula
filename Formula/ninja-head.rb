@@ -9,30 +9,27 @@ class NinjaHead < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-  # Ninja only needs Python for some non-core functionality.
-  depends_on "python@3.12" => :build
-  uses_from_macos "python" => :test, since: :catalina
+  depends_on "python@3.13" => :build
+  uses_from_macos "python" => [:build, :test], since: :catalina
 
   def install
-    system "python3.12", "configure.py", "--bootstrap", "--verbose", "--with-python=python3"
+    system "python3.13", "configure.py", "--bootstrap", "--verbose", "--with-python=python3"
 
     bin.install "ninja"
-    bash_completion.install "misc/bash-completion" => "ninja-completion.sh"
+    bash_completion.install "misc/bash-completion" => "ninja"
     zsh_completion.install "misc/zsh-completion" => "_ninja"
     doc.install "doc/manual.asciidoc"
-    elisp.install "misc/ninja-mode.el"
-    (share/"vim/vimfiles/syntax").install "misc/ninja.vim"
   end
 
   test do
-    (testpath/"build.ninja").write <<~EOS
+    (testpath/"build.ninja").write <<~NINJA
       cflags = -Wall
 
       rule cc
         command = gcc $cflags -c $in -o $out
 
       build foo.o: cc foo.c
-    EOS
+    NINJA
     system bin/"ninja", "-t", "targets"
     port = free_port
     fork do
