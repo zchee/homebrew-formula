@@ -18,6 +18,7 @@ class PythonAT313t < Formula
   depends_on "llvm@19" => :build # NOTE(zchee): for --enable-experimental-jit
   depends_on "lld" => :build
   depends_on "gettext"
+  depends_on "python@3.13" => :build
 
   # not actually used, we just want this installed to ensure there are no conflicts.
   uses_from_macos "python" => :test
@@ -123,7 +124,8 @@ class PythonAT313t < Formula
       --with-readline=editline
       --disable-gil
 
-      --enable-experimental-jit=interpreter
+      --with-build-python=#{Formula["python@3.13"].opt_bin}/python3.13
+      --enable-experimental-jit=yes
       --with-mimalloc=yes
     ]
 
@@ -168,6 +170,8 @@ class PythonAT313t < Formula
               "DEFAULT_LIBRARY_FALLBACK = [ '#{HOMEBREW_PREFIX}/lib', '#{Formula["openssl@3"].opt_lib}',"
       f.gsub! "DEFAULT_FRAMEWORK_FALLBACK = [", "DEFAULT_FRAMEWORK_FALLBACK = [ '#{HOMEBREW_PREFIX}/Frameworks',"
     end
+
+    inreplace "Tools/jit/_llvm.py", "_LLVM_VERSION = 18", "_LLVM_VERSION = 19"
 
     args << "CFLAGS=#{cflags.join(" ")}" unless cflags.empty?
     args << "CFLAGS_NODIST=#{cflags_nodist.join(" ")}" unless cflags_nodist.empty?
