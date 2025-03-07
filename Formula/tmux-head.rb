@@ -1,4 +1,6 @@
 class TmuxHead < Formula
+  desc "Terminal multiplexer"
+  homepage "https://tmux.github.io/"
   license "ISC"
 
   livecheck do
@@ -8,20 +10,19 @@ class TmuxHead < Formula
   end
 
   head do
-    url "https://github.com/tmux/tmux.git", branch: "master"
+    url "https://github.com/zchee/tmux-homebrew.git", branch: "homebrew"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
-  depends_on "jemalloc-head"
+  depends_on "pkgconf" => :build
   depends_on "libevent-head"
   depends_on "ncurses-head"
+  depends_on "jemalloc-head"
 
-  depends_on "bison" => :build # for yacc
-  # uses_from_macos "bison" => :build # for yacc
+  uses_from_macos "bison" => :build # for yacc
 
   # Old versions of macOS libc disagree with utf8proc character widths.
   # https://github.com/tmux/tmux/issues/2223
@@ -30,33 +31,28 @@ class TmuxHead < Formula
   end
 
   resource "completion" do
-    url "https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/f5d53239f7658f8e8fbaf02535cc369009c436d6/completions/tmux"
-    sha256 "b5f7bbd78f9790026bbff16fc6e3fe4070d067f58f943e156bd1a8c3c99f6a6f"
+    url "https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/8da7f797245970659b259b85e5409f197b8afddd/completions/tmux"
+    sha256 "4e2179053376f4194b342249d75c243c1573c82c185bfbea008be1739048e709"
   end
 
   def install
-    inreplace "configure.ac", /AC_INIT\(\[tmux\],[^)]*\)/, "AC_INIT([tmux], master)"
-
     system "sh", "autogen.sh" if build.head?
 
     args = %W[
       --enable-sixel
-      --enable-jemalloc
       --sysconfdir=#{etc}
+
+      --enable-jemalloc
     ]
 
-    if OS.mac?
-      # tmux finds the `tmux-256color` terminfo provided by our ncurses
-      # and uses that as the default `TERM`, but this causes issues for
-      # tools that link with the very old ncurses provided by macOS.
-      # https://github.com/Homebrew/homebrew-core/issues/102748
-      args << "--with-TERM=screen-256color" if MacOS.version < :sonoma
-      args << "--enable-utf8proc" if MacOS.version >= :high_sierra
-      ENV["LIBUTF8PROC_CFLAGS"] = "-I#{Formula["utf8proc-head"].opt_include}" if MacOS.version >= :high_sierra
-      ENV["LIBUTF8PROC_LIBS"] = "#{Formula["utf8proc-head"].opt_lib}/libutf8proc.a" if MacOS.version >= :high_sierra
-    else
-      args << "--enable-utf8proc"
-    end
+    # tmux finds the `tmux-256color` terminfo provided by our ncurses
+    # and uses that as the default `TERM`, but this causes issues for
+    # tools that link with the very old ncurses provided by macOS.
+    # https://github.com/Homebrew/homebrew-core/issues/102748
+    args << "--with-TERM=screen-256color" if OS.mac? && MacOS.version < :sonoma
+    args << "--enable-utf8proc" if OS.linux? || MacOS.version >= :high_sierra
+    ENV["LIBUTF8PROC_CFLAGS"] = "-I#{Formula["utf8proc-head"].opt_include}" if MacOS.version >= :high_sierra
+    ENV["LIBUTF8PROC_LIBS"] = "#{Formula["utf8proc-head"].opt_lib}/libutf8proc.a" if MacOS.version >= :high_sierra
 
     ENV["LIBEVENT_CORE_CFLAGS"] = "-I#{Formula["libevent-head"].opt_include}"
     ENV["LIBEVENT_CORE_LIBS"] = "#{Formula["libevent-head"].opt_lib}/libevent_core.a"
@@ -68,12 +64,14 @@ class TmuxHead < Formula
     ENV["JEMALLOC_CFLAGS"] = "-I#{Formula["jemalloc-head"].opt_include}"
     ENV["JEMALLOC_LIBS"] = "#{Formula["jemalloc-head"].opt_lib}/libjemalloc.a"
 
-    cflags = "-march=native -Ofast -flto -std=c2x"
-    ldflags = "-march=native -Ofast -flto -L/usr/local/lib -lresolv"  # -lutil?
+    target_cpu_flags = Hardware::CPU.intel? ? "-march=x86-64-v4 -mtune=skylake-avx512" : "-march=apple-latest"
+    cflags = "#{target_cpu_flags} -O3 -ffast-math -flto -std=c2x"
+    ldflags = "#{target_cpu_flags} -flto -lresolv"  # -lutil?
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
 
-    system "./configure", *std_configure_args, *args
+    ENV.append "LDFLAGS", "-lresolv"
+    system "./configure", *args, *std_configure_args
 
     system "make", "install"
 
@@ -94,10 +92,10 @@ class TmuxHead < Formula
     require "pty"
 
     socket = testpath/tap.user
-    PTY.spawn bin/"tmux", "-S", socket, "-f", "/dev/null"
+    PTY.spawn bin/"tmux", "-S", socket, "-f", File::NULL
     sleep 10
 
-    assert_predicate socket, :exist?
+    assert_path_exists socket
     assert_predicate socket, :socket?
     assert_equal "no server running on #{socket}", shell_output("#{bin}/tmux -S#{socket} list-sessions 2>&1", 1).chomp
   end
