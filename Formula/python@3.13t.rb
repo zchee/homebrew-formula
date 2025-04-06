@@ -19,6 +19,7 @@ class PythonAT313t < Formula
   depends_on "lld" => :build
   depends_on "gettext"
   depends_on "python@3.13" => :build
+  depends_on "gettext"
 
   # not actually used, we just want this installed to ensure there are no conflicts.
   uses_from_macos "python" => :test
@@ -49,8 +50,8 @@ class PythonAT313t < Formula
   end
 
   resource "setuptools" do
-    url "https://files.pythonhosted.org/packages/e8/42/0e5f75d734f181367de4acd9aba8f875453a5905169c5485ca8416b015ae/setuptools-75.8.1.tar.gz"
-    sha256 "65fb779a8f28895242923582eadca2337285f0891c2c9e160754df917c3d2530"
+    url "https://files.pythonhosted.org/packages/d1/53/43d99d7687e8cdef5ab5f9ec5eaf2c0423c2b35133a2b7e7bc276fc32b21/setuptools-75.8.2.tar.gz"
+    sha256 "4880473a969e5f23f2a2be3646b2dfd84af9028716d398e46192f84bc36900d2"
   end
 
   resource "wheel" do
@@ -135,10 +136,10 @@ class PythonAT313t < Formula
     # Note: Changing CPPFLAGS causes issues with dbm, so we
     # leave it as-is.
     cflags         = []
-    cflags_nodist  = ["-I#{HOMEBREW_PREFIX}/include"]
-    ldflags        = ["-L#{Formula["llvm@19"].opt_lib}", "-L#{Formula["llvm@19"].opt_lib}/c++", "--ld-path=#{Formula["lld"].opt_bin}/ld64.lld", "-L#{Formula["gettext"].opt_lib}"]
-    ldflags_nodist = ["-L#{HOMEBREW_PREFIX}/lib", "-Wl,-rpath,#{HOMEBREW_PREFIX}/lib"]
-    cppflags       = ["-I#{HOMEBREW_PREFIX}/include", "-I#{Formula["llvm@19"].opt_include}", "-I#{Formula["gettext"].opt_include}"]
+    cflags_nodist  = ["-I#{HOMEBREW_PREFIX}/include", "-I#{Formula["llvm@19"].opt_include}", "-I#{Formula["gettext"].opt_include}"]
+    ldflags        = ["#{Formula["gettext"].opt_lib}/libintl.a", "-liconv"]
+    ldflags_nodist = ["-L#{HOMEBREW_PREFIX}/lib", "-Wl,-rpath,#{HOMEBREW_PREFIX}/lib", "-L#{Formula["llvm@19"].opt_lib}", "-L#{Formula["llvm@19"].opt_lib}/c++", "--ld-path=#{Formula["lld"].opt_bin}/ld64.lld", "#{Formula["gettext"].opt_lib}/libintl.a", "-liconv"]
+    cppflags       = ["-I#{HOMEBREW_PREFIX}/include"]
 
     if OS.mac?
       # for --enable-experimental-jit
