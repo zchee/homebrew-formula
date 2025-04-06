@@ -50,9 +50,11 @@ class TmuxHead < Formula
     # tools that link with the very old ncurses provided by macOS.
     # https://github.com/Homebrew/homebrew-core/issues/102748
     args << "--with-TERM=screen-256color" if OS.mac? && MacOS.version < :sonoma
-    args << "--enable-utf8proc" if OS.linux? || MacOS.version >= :high_sierra
-    ENV["LIBUTF8PROC_CFLAGS"] = "-I#{Formula["utf8proc-head"].opt_include}" if MacOS.version >= :high_sierra
-    ENV["LIBUTF8PROC_LIBS"] = "#{Formula["utf8proc-head"].opt_lib}/libutf8proc.a" if MacOS.version >= :high_sierra
+    on_system :linux, macos: :sierra_or_newer do
+      args << "--enable-utf8proc" if OS.linux? || MacOS.version >= :high_sierra
+      ENV["LIBUTF8PROC_CFLAGS"] = "-I#{Formula["utf8proc-head"].opt_include}" if MacOS.version >= :high_sierra
+      ENV["LIBUTF8PROC_LIBS"] = "#{Formula["utf8proc-head"].opt_lib}/libutf8proc.a" if MacOS.version >= :high_sierra
+    end
 
     ENV["LIBEVENT_CORE_CFLAGS"] = "-I#{Formula["libevent-head"].opt_include}"
     ENV["LIBEVENT_CORE_LIBS"] = "#{Formula["libevent-head"].opt_lib}/libevent_core.a"
@@ -66,11 +68,10 @@ class TmuxHead < Formula
 
     target_cpu_flags = Hardware::CPU.intel? ? "-march=x86-64-v4 -mtune=skylake-avx512" : "-march=apple-latest"
     cflags = "#{target_cpu_flags} -O3 -ffast-math -flto -std=c2x"
-    ldflags = "#{target_cpu_flags} -flto -lresolv"  # -lutil?
+    ldflags = "#{target_cpu_flags} -O3 -ffast-math -lresolv"
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
 
-    ENV.append "LDFLAGS", "-lresolv"
     system "./configure", *args, *std_configure_args
 
     system "make", "install"
