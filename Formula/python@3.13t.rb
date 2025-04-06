@@ -39,21 +39,25 @@ class PythonAT313t < Formula
   end
 
   # Always update to latest release
+  # https://pypi.org/project/flit-core/#files
   resource "flit-core" do
-    url "https://files.pythonhosted.org/packages/bc/18/b9b81cab2b8f63e6e7f72e1ba2766a0454fcd563e7a77b8299cb917ba805/flit_core-3.11.0.tar.gz"
-    sha256 "6ceeee3219e9d2ea282041f3e027c441597b450b33007cb81168e887b6113a8f"
+    url "https://files.pythonhosted.org/packages/69/59/b6fc2188dfc7ea4f936cd12b49d707f66a1cb7a1d2c16172963534db741b/flit_core-3.12.0.tar.gz"
+    sha256 "18f63100d6f94385c6ed57a72073443e1a71a4acb4339491615d0f16d6ff01b2"
   end
 
+  # https://pypi.org/project/pip/#files
   resource "pip" do
     url "https://files.pythonhosted.org/packages/70/53/b309b4a497b09655cb7e07088966881a57d082f48ac3cb54ea729fd2c6cf/pip-25.0.1.tar.gz"
     sha256 "88f96547ea48b940a3a385494e181e29fb8637898f88d88737c5049780f196ea"
   end
 
+  # https://pypi.org/project/setuptools/#files
   resource "setuptools" do
-    url "https://files.pythonhosted.org/packages/d1/53/43d99d7687e8cdef5ab5f9ec5eaf2c0423c2b35133a2b7e7bc276fc32b21/setuptools-75.8.2.tar.gz"
-    sha256 "4880473a969e5f23f2a2be3646b2dfd84af9028716d398e46192f84bc36900d2"
+    url "https://files.pythonhosted.org/packages/a9/5a/0db4da3bc908df06e5efae42b44e75c81dd52716e10192ff36d0c1c8e379/setuptools-78.1.0.tar.gz"
+    sha256 "18fd474d4a82a5f83dac888df697af65afa82dec7323d09c3e37d1f14288da54"
   end
 
+  # https://pypi.org/project/wheel/#files
   resource "wheel" do
     url "https://files.pythonhosted.org/packages/8a/98/2d9906746cdc6a6ef809ae6338005b3f21bb568bea3165cfc6a243fdc25c/wheel-0.45.1.tar.gz"
     sha256 "661e1abd9198507b1409a20c02106d9670b2576e916d58f520316666abca6729"
