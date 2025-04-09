@@ -66,7 +66,7 @@ class TmuxHead < Formula
     ENV["JEMALLOC_CFLAGS"] = "-I#{Formula["jemalloc-head"].opt_include}"
     ENV["JEMALLOC_LIBS"] = "#{Formula["jemalloc-head"].opt_lib}/libjemalloc.a"
 
-    target_cpu_flags = Hardware::CPU.intel? ? "-march=x86-64-v4 -mtune=skylake-avx512" : "-march=apple-latest"
+    target_cpu_flags = Hardware::CPU.intel? ? "-march=x86-64-v4 -mtune=skylake-avx512" : "-march=native"
     cflags = "#{target_cpu_flags} -O3 -ffast-math -flto -std=c2x"
     ldflags = "#{target_cpu_flags} -O3 -ffast-math -lresolv"
     ENV.append "CFLAGS", *cflags
