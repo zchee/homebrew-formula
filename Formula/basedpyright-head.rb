@@ -8,7 +8,7 @@ class BasedpyrightHead < Formula
   depends_on "uv"
 
   def install
-    system "uv", "sync", "--verbose"
+    system "uv", "sync", "--verbose", "--no-default-groups"
     system "npm", "install"
 
     cd "packages/pyright" do
