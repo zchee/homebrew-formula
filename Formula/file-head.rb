@@ -18,7 +18,7 @@ class FileHead < Formula
 
   keg_only :provided_by_macos
 
-  depends_on "libmagic"
+  depends_on "libmagic-head"
   depends_on "zlib"
   depends_on "bzip2"
   depends_on "xz"
@@ -26,7 +26,7 @@ class FileHead < Formula
   depends_on "lzlib"
 
   def install
-    ENV.prepend "LDFLAGS", "#{Formula["libmagic"].opt_lib}/libmagic.a"
+    ENV.prepend "LDFLAGS", "#{Formula["libmagic-head"].opt_lib}/libmagic.a"
     ENV.prepend "LDFLAGS", "#{Formula["lzlib"].opt_lib}/liblz.a"
 
     system "autoreconf", "-fiv"
