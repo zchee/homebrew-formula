@@ -40,11 +40,7 @@ class RipgrepHead < Formula
     # setup nightly cargo with rustup
     ENV.append_path "PATH", "#{root_dir}/local/rust/rustup/bin"
     ENV["RUSTUP_HOME"] = "#{root_dir}/local/rust/rustup"
-    ENV["RUSTFLAGS"] = "#{rust_flags}"
-
-    ENV.append_path "PATH", "#{ENV["HOMEBREW_PREFIX"]}/rust/rustup/bin"
-    ENV["RUSTUP_HOME"] = "#{ENV["HOMEBREW_PREFIX"]}/rust/rustup"
-    ENV["RUSTFLAGS"] = "-C target-cpu=native"
+    ENV["RUSTFLAGS"] = rust_flags.join(" ")
     ENV["PCRE2_SYS_STATIC"] = "1"
 
     system "rustup", "run", "nightly", "cargo", "install", "--features", "pcre2", *std_cargo_args
