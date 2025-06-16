@@ -1,8 +1,8 @@
 class PythonAT313t < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  url "https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tgz"
-  sha256 "988d735a6d33568cbaff1384a65cb22a1fb18a9ecb73d43ef868000193ce23ed"
+  url "https://www.python.org/ftp/python/3.13.5/Python-3.13.5.tgz"
+  sha256 "e6190f52699b534ee203d9f417bdbca05a92f23e35c19c691a50ed2942835385"
   license "Python-2.0"
 
   livecheck do
@@ -32,29 +32,6 @@ class PythonAT313t < Formula
   uses_from_macos "unzip"
   uses_from_macos "zlib"
 
-  # depends_on "pkgconf" => :build
-  # depends_on "mpdecimal"
-  # depends_on "ncurses"
-  # depends_on "openssl@3"
-  # depends_on "sqlite"
-  # depends_on "xz"
-  # depends_on "llvm@19" => :build # NOTE(zchee): for --enable-experimental-jit
-  # depends_on "lld" => :build
-  # depends_on "gettext"
-  # depends_on "python@3.13" => :build
-  # depends_on "gettext"
-  #
-  # # not actually used, we just want this installed to ensure there are no conflicts.
-  # uses_from_macos "python" => :test
-  # uses_from_macos "bzip2"
-  # uses_from_macos "expat", since: :sequoia
-  # uses_from_macos "libedit"
-  # uses_from_macos "libffi", since: :catalina
-  # uses_from_macos "libxcrypt"
-  # uses_from_macos "ncurses"
-  # uses_from_macos "unzip"
-  # uses_from_macos "zlib"
-
   on_linux do
     depends_on "berkeley-db@5"
     depends_on "libnsl"
@@ -73,14 +50,14 @@ class PythonAT313t < Formula
 
   # https://pypi.org/project/pip/#files
   resource "pip" do
-    url "https://files.pythonhosted.org/packages/70/53/b309b4a497b09655cb7e07088966881a57d082f48ac3cb54ea729fd2c6cf/pip-25.0.1.tar.gz"
-    sha256 "88f96547ea48b940a3a385494e181e29fb8637898f88d88737c5049780f196ea"
+    url "https://files.pythonhosted.org/packages/59/de/241caa0ca606f2ec5fe0c1f4261b0465df78d786a38da693864a116c37f4/pip-25.1.1.tar.gz"
+    sha256 "3de45d411d308d5054c2168185d8da7f9a2cd753dbac8acbfa88a8909ecd9077"
   end
 
   # https://pypi.org/project/setuptools/#files
   resource "setuptools" do
-    url "https://files.pythonhosted.org/packages/7d/19/fecb7e2825616270f34512b3394cdcf6f45a79b5b6d94fdbd86a509e67b5/setuptools-79.0.0.tar.gz"
-    sha256 "9828422e7541213b0aacb6e10bbf9dd8febeaa45a48570e09b6d100e063fc9f9"
+    url "https://files.pythonhosted.org/packages/18/5d/3bf57dcd21979b887f014ea83c24ae194cfcd12b9e0fda66b957c69d1fca/setuptools-80.9.0.tar.gz"
+    sha256 "f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c"
   end
 
   # https://pypi.org/project/wheel/#files
