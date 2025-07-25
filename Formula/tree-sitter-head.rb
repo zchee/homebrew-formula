@@ -10,11 +10,13 @@ class TreeSitterHead < Formula
   end
 
   depends_on "rust" => :build
+  depends_on "cmake" => :build
+  depends_on "wasmtime" => :build
   depends_on "node" => :test
 
   def install
     system "make", "install", "AMALGAMATED=1", "PREFIX=#{prefix}"
-    system "cargo", "install", *std_cargo_args(path: "cli")
+    system "cargo", "install", "--features=wasm", *std_cargo_args(path: "crates/cli")
   end
 
   test do
