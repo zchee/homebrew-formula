@@ -3,7 +3,7 @@ class Gn < Formula
   homepage "https://gn.googlesource.com/gn"
   head "https://gn.googlesource.com/gn.git", branch: "master"
 
-  depends_on "ninja-head" => :build
+  depends_on "ninja" => :build
   depends_on "python@3.13" => :build
 
   def install
