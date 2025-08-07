@@ -10,12 +10,6 @@ class PythonArgcompleteHead < Formula
 
   def install
     virtualenv_install_with_resources
-
-    # Bash completions are not compatible with Bash 3 so don't use v1 directory.
-    # Ref: https://kislyuk.github.io/argcomplete/#global-completion
-    bash_completion_script = "argcomplete/bash_completion.d/_python-argcomplete"
-    (share/"bash-completion/completions").install bash_completion_script => "python-argcomplete"
-    zsh_completion.install_symlink bash_completion/"python-argcomplete" => "_python-argcomplete"
   end
 
   test do
