@@ -230,7 +230,7 @@ class PythonAT313t < Formula
 
     else
       # Prevent third-party packages from building against fragile Cellar paths
-      inreplace Dir[lib_cellar/"**/_sysconfigdata_*linux_x86_64-*.py",
+      inreplace Dir[lib_cellar/"**/_sysconfigdata_t_*linux_x86_64-*.py",
                     lib_cellar/"config*/Makefile",
                     bin/"python#{version.major_minor}t-config",
                     lib/"pkgconfig/python-3*.pc"],
@@ -245,7 +245,7 @@ class PythonAT313t < Formula
     end
 
     # Remove the site-packages that Python created in its Cellar.
-    rm_r(site_packages_cellar)
+    rm_r site_packages_cellar.children
 
     # Prepare a wheel of wheel to install later.
     common_pip_args = %w[
@@ -314,6 +314,7 @@ class PythonAT313t < Formula
     # pip install with --target flag will just place the bin folder into the
     # target, so move its contents into the appropriate location
     mv (root_site_packages/"bin").children, bin
+    rmdir root_site_packages/"bin"
 
     rm [bin/"pip", bin/"pip3"]
     mv bin/"wheel", bin/"wheel#{version.major_minor}t"
