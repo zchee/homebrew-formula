@@ -18,7 +18,6 @@ class JemallocHead < Formula
       --disable-debug
       --prefix=#{prefix}
       --with-jemalloc-prefix=
-      --enable-experimental-fp-prefetch
     ]
 
     if build.head?
