@@ -4,9 +4,10 @@ class BatHead < Formula
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/sharkdp/bat.git", branch: "master"
 
-  depends_on "libgit2"
-  depends_on "oniguruma"
-  depends_on "zlib"
+  depends_on "pkgconf" => :build
+  depends_on "libgit2" => :build
+  depends_on "oniguruma" => :build
+  depends_on "zlib" => :build
 
   env :std
 
@@ -18,24 +19,30 @@ class BatHead < Formula
     ENV["RUSTUP_HOME"] = "#{root_dir}/local/rust/rustup"
     ENV["RUSTFLAGS"] = "-C target-cpu=native -C target-cpu=#{target_cpu}"
 
-    # avoid invalid data in index - calculated checksum does not match expected
-    File.open("#{buildpath}/.git/info/exclude", "w") { |f| f.write ".brew_home/\n.DS_Store\n" }
-    system "git", "config", "--local", "index.skipHash", "false"
-
-    ENV["SHELL_COMPLETIONS_DIR"] = buildpath
+    ENV["LIBGIT2_NO_VENDOR"] = "1"
+    ENV["RUSTONIG_DYNAMIC_LIBONIG"] = "1"
+    ENV["RUSTONIG_SYSTEM_LIBONIG"] = "1"
 
     system "rustup", "run", "nightly", "cargo", "install", "--features", "default", "--root", prefix, "--path", "."
 
-    assets_dir = Dir["target/release/build/bat-*/out/assets"].first
-    man1.install "#{assets_dir}/manual/bat.1"
-    bash_completion.install "#{assets_dir}/completions/bat.bash" => "bat"
-    fish_completion.install "#{assets_dir}/completions/bat.fish"
-    zsh_completion.install "#{assets_dir}/completions/bat.zsh" => "_bat"
+    assets = buildpath.glob("target/release/build/bat-*/out/assets").first
+    man1.install assets/"manual/bat.1"
+    generate_completions_from_executable(bin/"bat", "--completion")
   end
 
   test do
+    require "utils/linkage"
+
     pdf = test_fixtures("test.pdf")
     output = shell_output("#{bin}/bat #{pdf} --color=never")
     assert_match "Homebrew test", output
+
+    [
+      Formula["libgit2"].opt_lib/shared_library("libgit2"),
+      Formula["oniguruma"].opt_lib/shared_library("libonig"),
+    ].each do |library|
+      assert Utils.binary_linked_to_library?(bin/"bat", library),
+             "No linkage with #{library.basename}! Cargo is likely using a vendored version."
+    end
   end
 end
