@@ -7,6 +7,7 @@ class ZshHead < Formula
     url "https://github.com/zsh-users/zsh.git", branch: "master"
     depends_on "autoconf" => :build
     depends_on "gdbm" => :build
+    depends_on "groff" => :build
     depends_on "libiconv" => :build
     depends_on "ncurses-head" => :build
     depends_on "pcre2" => :build
@@ -61,7 +62,7 @@ class ZshHead < Formula
 
     system "cat", "config.modules"
 
-    system "make", "install.bin", "install.modules", "install.fns", "install.man"
+    system "make", "install.bin", "install.modules", "install.fns", "install.man", "install.html"
   end
 
   test do
