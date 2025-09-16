@@ -14,7 +14,7 @@ class BazeliskHead < Formula
   end
 
   def install
-    system "go", "build", *std_go_args(ldflags: "-s -w -X github.com/bazelbuild/bazelisk/core.BazeliskVersion=#{version}")
+    system "go", "build", *std_go_args(output: bin/"bazelisk", ldflags: "-s -w -X github.com/bazelbuild/bazelisk/core.BazeliskVersion=#{version}")
 
     bin.install_symlink "bazelisk" => "bazel"
 
