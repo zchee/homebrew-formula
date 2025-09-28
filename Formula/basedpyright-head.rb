@@ -5,7 +5,8 @@ class BasedpyrightHead < Formula
   head "https://github.com/detachhead/basedpyright.git", branch: "main"
 
   depends_on "node"
-  depends_on "uv"
+
+  env :std
 
   def install
     system "uv", "sync", "--verbose", "--no-default-groups"
