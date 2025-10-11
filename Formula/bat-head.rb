@@ -17,7 +17,7 @@ class BatHead < Formula
     # setup nightly cargo with rustup
     ENV.append_path "PATH", "#{root_dir}/local/rust/rustup/bin"
     ENV["RUSTUP_HOME"] = "#{root_dir}/local/rust/rustup"
-    ENV["RUSTFLAGS"] = "-C target-cpu=native -C target-cpu=#{target_cpu}"
+    ENV["RUSTFLAGS"] = "-C target-cpu=native -C target-cpu=#{target_cpu} -C opt-level=3 -C force-frame-pointers=on -C debug-assertions=off -C incremental=on -C overflow-checks=off"
 
     ENV["LIBGIT2_NO_VENDOR"] = "1"
     ENV["RUSTONIG_DYNAMIC_LIBONIG"] = "1"
