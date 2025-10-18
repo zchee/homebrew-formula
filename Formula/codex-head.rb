@@ -12,7 +12,6 @@ class CodexHead < Formula
   env :std
 
   depends_on "rust" => :build
-  depends_on "ripgrep"
 
   on_linux do
     depends_on "openssl@3"
