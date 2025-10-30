@@ -11,7 +11,8 @@ class CodexHead < Formula
 
   env :std
 
-  depends_on "rust" => :build
+  depends_on "ripgrep-head" => :build
+  depends_on "sccache" => :build
 
   on_linux do
     depends_on "openssl@3"
@@ -25,13 +26,18 @@ class CodexHead < Formula
     ENV.append_path "PATH", "#{root_dir}/local/rust/rustup/bin"
     ENV["RUSTUP_HOME"] = "#{root_dir}/local/rust/rustup"
     ENV["RUSTFLAGS"] = "-C target-cpu=native -C target-cpu=#{target_cpu} -C opt-level=3 -C force-frame-pointers=on -C debug-assertions=off -C incremental=on -C overflow-checks=off"
+    # setup sccache
+    ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
+    sccache_cache = HOMEBREW_CACHE/"sccache_cache"
+    mkdir_p sccache_cache
+    ENV["SCCACHE_DIR"] = sccache_cache
 
     if OS.linux?
       ENV["OPENSSL_DIR"] = Formula["openssl@3"].opt_prefix
       ENV["OPENSSL_NO_VENDOR"] = "1"
     end
 
-    system "rustup", "run", "nightly", "cargo", "install", "--all-features", *std_cargo_args(path: "codex-rs/cli")
+    system "rustup", "run", "nightly", "cargo", "install", "--verbose", "--all-features", *std_cargo_args(path: "codex-rs/cli")
     generate_completions_from_executable(bin/"codex", "completion", shells: [:bash, :zsh, :fish])
   end
 
