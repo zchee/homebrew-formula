@@ -31,7 +31,7 @@ class CodexHead < Formula
       ENV["OPENSSL_NO_VENDOR"] = "1"
     end
 
-    system "rustup", "run", "nightly", "cargo", "install", "--all-features", *std_cargo_args()
+    system "rustup", "run", "nightly", "cargo", "install", "--all-features", *std_cargo_args(path: "codex-rs/cli")
     generate_completions_from_executable(bin/"codex", "completion", shells: [:bash, :zsh, :fish])
   end
 
