@@ -10,6 +10,7 @@ class CcacheHead < Formula
   depends_on "git-head" => :build
   depends_on "hiredis" => :build
   depends_on "libtool" => :build
+  depends_on "pandoc" => :build
   depends_on "xxhash" => :build
   depends_on "zstd" => :build
 
