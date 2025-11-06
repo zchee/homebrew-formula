@@ -26,9 +26,7 @@ class TmuxHead < Formula
 
   # Old versions of macOS libc disagree with utf8proc character widths.
   # https://github.com/tmux/tmux/issues/2223
-  on_system :linux, :macos do
-    depends_on "utf8proc-head"
-  end
+  depends_on "utf8proc-head"
 
   def install
     system "sh", "autogen.sh" if build.head?
@@ -45,7 +43,7 @@ class TmuxHead < Formula
     # tools that link with the very old ncurses provided by macOS.
     # https://github.com/Homebrew/homebrew-core/issues/102748
     args << "--with-TERM=screen-256color" if OS.mac? && MacOS.version < :sonoma
-    on_system :linux, macos: :sierra_or_newer do
+    on_system :linux, macos: :mojave_or_newer do
       args << "--enable-utf8proc" if OS.linux? || MacOS.version >= :high_sierra
       ENV["LIBUTF8PROC_CFLAGS"] = "-I#{Formula["utf8proc-head"].opt_include}" if MacOS.version >= :high_sierra
       ENV["LIBUTF8PROC_LIBS"] = "#{Formula["utf8proc-head"].opt_lib}/libutf8proc.a" if MacOS.version >= :high_sierra
