@@ -1,16 +1,22 @@
 class LuarocksLuajit < Formula
   desc "Package manager for the Lua programming language"
   homepage "https://luarocks.org/"
-  url "https://luarocks.org/releases/luarocks-3.7.0.tar.gz"
-  sha256 "9255d97fee95cec5b54fc6ac718b11bf5029e45bed7873e053314919cd448551"
   license "MIT"
-  head "https://github.com/luarocks/luarocks.git", branch: "master"
+  head "https://github.com/luarocks/luarocks.git", branch: "main"
+
+  livecheck do
+    url :homepage
+    regex(%r{/luarocks[._-]v?(\d+(?:\.\d+)+)\.t}i)
+  end
 
   depends_on "luajit-openresty"
 
   uses_from_macos "unzip"
 
   def install
+    # Fix the lua config file missing issue for luarocks-admin build
+    ENV.deparallelize
+
     system "./configure", "--prefix=#{prefix}",
                           "--sysconfdir=#{etc}",
                           "--rocks-tree=#{HOMEBREW_PREFIX}",
@@ -19,12 +25,25 @@ class LuarocksLuajit < Formula
                           "--lua-version=5.1",
                           "--with-lua-include=#{Formula["luajit-openresty"].opt_include}/luajit-2.1",
                           "--with-lua-lib=#{Formula["luajit-openresty"].opt_lib}"
-
     system "make", "install"
+    generate_completions_from_executable(bin/"luarocks", "completion", base_name: "luarocks-luajit")
+
+    inreplace_files = %w[
+      cmd/config
+      cmd/which
+      core/cfg
+      deps
+    ].map { |file| share/"lua/5.1/luarocks/#{file}.lua" }
+    inreplace inreplace_files, "/usr/local", HOMEBREW_PREFIX
 
     mv bin/"luarocks", bin/"luarocks-luajit"
     mv bin/"luarocks-admin", bin/"luarocks-admin-luajit"
     mv share/"lua/5.1/luarocks", share/"lua/5.1/luarocks-luajit"
+
+    inreplace Dir.glob("**/*.lua", base: share/"lua/5.1/luarocks-luajit").map do |f|
+      f.gsub! 'require("luarocks', 'require("luarocks-luajit'
+    end
+    inreplace bin/"luarocks-luajit", '"luarocks', '"luarocks-luajit'
   end
 
   def caveats
@@ -39,16 +58,20 @@ class LuarocksLuajit < Formula
 
   test do
     luas = [
-      Formula["luajit-openresty"],
+      Formula["lua"],
+      Formula["luajit"],
     ]
 
     luas.each do |lua|
-      luaversion = lua.version.major_minor
-      luaexec = "#{lua.bin}/lua-#{luaversion}"
+      luaversion, luaexec = case lua.name
+      when "luajit" then ["5.1", lua.opt_bin/"luajit"]
+      else [lua.version.major_minor, lua.opt_bin/"lua-#{lua.version.major_minor}"]
+      end
+
       ENV["LUA_PATH"] = "#{testpath}/share/lua/#{luaversion}/?.lua"
       ENV["LUA_CPATH"] = "#{testpath}/lib/lua/#{luaversion}/?.so"
 
-      system "#{bin}/luarocks", "install",
+      system bin/"luarocks", "install",
                                 "luafilesystem",
                                 "--tree=#{testpath}",
                                 "--lua-dir=#{lua.opt_prefix}"
@@ -57,27 +80,19 @@ class LuarocksLuajit < Formula
 
       case luaversion
       when "5.1"
-        (testpath/"lfs_#{luaversion}test.lua").write <<~EOS
+        (testpath/"lfs_#{luaversion}test.lua").write <<~LUA
           require("lfs")
           lfs.mkdir("blank_space")
-        EOS
+        LUA
 
         system luaexec, "lfs_#{luaversion}test.lua"
         assert_predicate testpath/"blank_space", :directory?,
           "Luafilesystem failed to create the expected directory"
-
-        # LuaJIT is compatible with lua5.1, so we can also test it here
-        unless Hardware::CPU.arm?
-          rmdir testpath/"blank_space"
-          system "#{Formula["luajit-openresty"].bin}/luajit", "lfs_#{luaversion}test.lua"
-          assert_predicate testpath/"blank_space", :directory?,
-            "Luafilesystem failed to create the expected directory"
-        end
       else
-        (testpath/"lfs_#{luaversion}test.lua").write <<~EOS
+        (testpath/"lfs_#{luaversion}test.lua").write <<~LUA
           require("lfs")
           print(lfs.currentdir())
-        EOS
+        LUA
 
         assert_match testpath.to_s, shell_output("#{luaexec} lfs_#{luaversion}test.lua")
       end
