@@ -43,11 +43,9 @@ class TmuxHead < Formula
     # tools that link with the very old ncurses provided by macOS.
     # https://github.com/Homebrew/homebrew-core/issues/102748
     args << "--with-TERM=screen-256color" if OS.mac? && MacOS.version < :sonoma
-    on_system :linux, macos: :mojave_or_newer do
-      args << "--enable-utf8proc" if OS.linux? || MacOS.version >= :high_sierra
-      ENV["LIBUTF8PROC_CFLAGS"] = "-I#{Formula["utf8proc-head"].opt_include}" if MacOS.version >= :high_sierra
-      ENV["LIBUTF8PROC_LIBS"] = "#{Formula["utf8proc-head"].opt_lib}/libutf8proc.a" if MacOS.version >= :high_sierra
-    end
+    args << "--enable-utf8proc" if OS.linux? || MacOS.version >= :high_sierra
+    ENV["LIBUTF8PROC_CFLAGS"] = "-I#{Formula["utf8proc-head"].opt_include}" if MacOS.version >= :high_sierra
+    ENV["LIBUTF8PROC_LIBS"] = "#{Formula["utf8proc-head"].opt_lib}/libutf8proc.a" if MacOS.version >= :high_sierra
 
     ENV["LIBEVENT_CORE_CFLAGS"] = "-I#{Formula["libevent-head"].opt_include}"
     ENV["LIBEVENT_CORE_LIBS"] = "#{Formula["libevent-head"].opt_lib}/libevent_core.a"
