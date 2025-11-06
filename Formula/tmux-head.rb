@@ -26,7 +26,7 @@ class TmuxHead < Formula
 
   # Old versions of macOS libc disagree with utf8proc character widths.
   # https://github.com/tmux/tmux/issues/2223
-  on_system :linux, macos: :sierra_or_newer do
+  on_system :linux, :macos do
     depends_on "utf8proc-head"
   end
 
