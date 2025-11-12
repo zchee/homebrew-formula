@@ -27,9 +27,9 @@ class CodexHead < Formula
     ENV["RUSTUP_HOME"] = "#{root_dir}/local/rust/rustup"
     ENV["RUSTFLAGS"] = "-C target-cpu=native -C target-cpu=#{target_cpu} -C opt-level=3 -C force-frame-pointers=on -C debug-assertions=off -C incremental=on -C overflow-checks=off"
     # setup sccache
-    ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
     sccache_cache = HOMEBREW_CACHE/"sccache_cache"
     mkdir_p sccache_cache
+    ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
     ENV["SCCACHE_DIR"] = sccache_cache
 
     if OS.linux?
@@ -44,8 +44,7 @@ class CodexHead < Formula
   test do
     assert_match version.to_s, shell_output("#{bin}/codex --version")
 
-    assert_equal "Reading prompt from stdin...\nNo prompt provided via stdin.\n",
-pipe_output("#{bin}/codex exec 2>&1", "", 1)
+    assert_equal "Reading prompt from stdin...\nNo prompt provided via stdin.\n", pipe_output("#{bin}/codex exec 2>&1", "", 1)
 
     return unless OS.linux?
 
