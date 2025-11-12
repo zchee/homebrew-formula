@@ -20,41 +20,32 @@ class TmuxHead < Formula
   depends_on "pkgconf" => :build
   depends_on "libevent-head"
   depends_on "ncurses-head"
+  depends_on "utf8proc-head"
   depends_on "jemalloc-head"
 
   uses_from_macos "bison" => :build # for yacc
-
-  # Old versions of macOS libc disagree with utf8proc character widths.
-  # https://github.com/tmux/tmux/issues/2223
-  depends_on "utf8proc-head"
 
   def install
     system "sh", "autogen.sh" if build.head?
 
     args = %W[
+      --with-TERM=tmux-256color
       --enable-sixel
       --sysconfdir=#{etc}
-
+      --enable-utf8proc=#{Formula["utf8proc-head"].opt_prefix}
       --enable-jemalloc
     ]
 
-    # tmux finds the `tmux-256color` terminfo provided by our ncurses
-    # and uses that as the default `TERM`, but this causes issues for
-    # tools that link with the very old ncurses provided by macOS.
-    # https://github.com/Homebrew/homebrew-core/issues/102748
-    args << "--with-TERM=screen-256color" if OS.mac? && MacOS.version < :sonoma
-    args << "--enable-utf8proc" if OS.linux? || MacOS.version >= :high_sierra
-    ENV["LIBUTF8PROC_CFLAGS"] = "-I#{Formula["utf8proc-head"].opt_include}" if MacOS.version >= :high_sierra
-    ENV["LIBUTF8PROC_LIBS"] = "#{Formula["utf8proc-head"].opt_lib}/libutf8proc.a" if MacOS.version >= :high_sierra
-
+    ENV["JEMALLOC_CFLAGS"] = "-I#{Formula["jemalloc-head"].opt_include}"
+    ENV["JEMALLOC_LIBS"] = "#{Formula["jemalloc-head"].opt_lib}/libjemalloc.a"
+    ENV["LIBEVENT_CFLAGS"] = "-I#{Formula["libevent-head"].opt_include}"
     ENV["LIBEVENT_CORE_CFLAGS"] = "-I#{Formula["libevent-head"].opt_include}"
     ENV["LIBEVENT_CORE_LIBS"] = "#{Formula["libevent-head"].opt_lib}/libevent_core.a"
-    ENV["LIBEVENT_CFLAGS"] = "-I#{Formula["libevent-head"].opt_include}"
     ENV["LIBEVENT_LIBS"] = "#{Formula["libevent-head"].opt_lib}/libevent.a"
     ENV["LIBNCURSESW_CFLAGS"] = "-I#{Formula["ncurses-head"].opt_include} -I#{Formula["ncurses-head"].opt_include}/ncursesw"
     ENV["LIBNCURSESW_LIBS"] = "#{Formula["ncurses-head"].opt_lib}/libncursesw.a"
-    ENV["JEMALLOC_CFLAGS"] = "-I#{Formula["jemalloc-head"].opt_include}"
-    ENV["JEMALLOC_LIBS"] = "#{Formula["jemalloc-head"].opt_lib}/libjemalloc.a"
+    ENV["LIBUTF8PROC_CFLAGS"] = "-I#{Formula["utf8proc-head"].opt_include}"
+    ENV["LIBUTF8PROC_LIBS"] = "#{Formula["utf8proc-head"].opt_lib}/libutf8proc.a"
 
     target_cpu_flags = Hardware::CPU.intel? ? "-march=x86-64-v4 -mtune=skylake-avx512" : "-march=native"
     cflags = "#{target_cpu_flags} -O3 -ffast-math -flto -std=c2x"
@@ -63,7 +54,6 @@ class TmuxHead < Formula
     ENV.append "LDFLAGS", *ldflags
 
     system "./configure", *args, *std_configure_args
-
     system "make", "install"
 
     pkgshare.install "example_tmux.conf"
