@@ -38,7 +38,7 @@ class CodexHead < Formula
     end
 
     system "rustup", "run", "nightly", "cargo", "install", "--verbose", "--all-features", *std_cargo_args(path: "codex-rs/cli")
-    generate_completions_from_executable(bin/"codex", "completion", shells: [:bash, :zsh, :fish])
+    generate_completions_from_executable(bin/"codex", "completion", shells: :zsh)
   end
 
   test do
