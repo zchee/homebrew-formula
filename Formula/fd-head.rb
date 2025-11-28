@@ -7,21 +7,26 @@ class FdHead < Formula
   env :std
 
   depends_on "jemalloc-head"
+  depends_on "sccache" => :build
 
   def install
+    # setup nightly cargo with rustup
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
     target_cpu = Hardware::CPU.intel? ? "x86-64-v4" : "apple-latest"
-
-    # setup nightly cargo with rustup
     ENV.append_path "PATH", "#{root_dir}/local/rust/rustup/bin"
     ENV["RUSTUP_HOME"] = "#{root_dir}/local/rust/rustup"
     ENV["RUSTFLAGS"] = "-C target-cpu=native -C target-cpu=#{target_cpu} -C opt-level=3 -C force-frame-pointers=on -C debug-assertions=off -C incremental=on -C overflow-checks=off"
 
+    # setup sccache
+    sccache_cache = HOMEBREW_CACHE/"sccache_cache"
+    mkdir_p sccache_cache
+    ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
+    ENV["SCCACHE_DIR"] = sccache_cache
+
     system "rustup", "run", "nightly", "cargo", "install", "--features", "use-jemalloc,completions", "--root", prefix, "--path", "."
 
     man1.install "doc/fd.1"
-    generate_completions_from_executable(bin/"fd", "--gen-completions", shells: [:bash, :fish], base_name: "fd")
-    zsh_completion.install "contrib/completion/_fd"
+    generate_completions_from_executable(bin/"fd", "--gen-completions", shells: [:zsh, :fish], base_name: "fd")
   end
 
   test do
