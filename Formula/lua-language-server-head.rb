@@ -4,30 +4,20 @@ class LuaLanguageServerHead < Formula
   license "MIT"
   head "https://github.com/LuaLS/lua-language-server.git", branch: "master"
 
-  no_autobump! because: :requires_manual_review
-
   depends_on "ninja" => :build
 
   def install
-    ENV.cxx11
+    # Workaround until upstream can update bee.lua submodule
+    color_h = ["3rd/bee.lua/3rd/fmt/fmt/color.h", "3rd/luamake/bee.lua/3rd/fmt/fmt/color.h"]
+    inreplace color_h, '#include "format.h"', "\\0\n#include <algorithm>"
 
-    # add `<algorithm>` for `std::copy`
-    # upstream PR to bump bee.lua version, https://github.com/LuaLS/lua-language-server/pull/3210
-    inreplace buildpath.glob("**/fmt/fmt/color.h") do |s|
-      s.gsub!("    const auto& value = arg.value;\n", "")
-      s.gsub!("out = std::copy(emphasis.begin(), emphasis.end(), out);", "out = detail::copy<Char>(emphasis.begin(), emphasis.end(), out);")
-      s.gsub!("out = std::copy(foreground.begin(), foreground.end(), out);", "out = detail::copy<Char>(foreground.begin(), foreground.end(), out);")
-      s.gsub!("out = std::copy(background.begin(), background.end(), out);", "out = detail::copy<Char>(background.begin(), background.end(), out);")
-      s.gsub!("out = formatter<T, Char>::format(value, ctx);", "out = formatter<T, Char>::format(arg.value, ctx);")
-      s.gsub!("out = std::copy(reset_color.begin(), reset_color.end(), out);", "out = detail::copy<Char>(reset_color.begin(), reset_color.end(), out);")
-    end
     # disable all tests by build script (fail in build environment)
     inreplace buildpath.glob("**/3rd/bee.lua/test/test.lua"),
       "os.exit(lt.run(), true)",
       "os.exit(true, true)"
 
     chdir "3rd/luamake" do
-      system "compile/build.sh"
+      system "compile/install.sh"
     end
     system "3rd/luamake/luamake", "rebuild"
 
@@ -42,9 +32,11 @@ class LuaLanguageServerHead < Formula
         --metapath="${XDG_CACHE_HOME:-${HOME}/.cache}/lua-language-server/meta" \
         "$@"
     BASH
+    libexec.install_symlink prefix/"changelog.md"
   end
 
   test do
+    assert_match version.to_s, shell_output("#{bin}/lua-language-server --version")
     pid = spawn bin/"lua-language-server", "--logpath=."
     sleep 5
     assert_path_exists testpath/"service.log"
