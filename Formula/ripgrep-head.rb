@@ -9,44 +9,33 @@ class RipgrepHead < Formula
     strategy :github_latest
   end
 
-  depends_on "asciidoctor" => :build
-  depends_on "pkg-config" => :build
-  depends_on "pcre2"
-
   env :std
 
+  depends_on "asciidoctor" => :build
+  depends_on "pkg-config" => :build
+  depends_on "sccache" => :build
+  depends_on "pcre2"
+
   def install
+    # setup nightly cargo with rustup
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
     target_cpu = Hardware::CPU.intel? ? "x86-64-v4" : "apple-latest"
-    rust_flags = %W[
-      -C target-cpu=native
-      -C target-cpu=#{target_cpu}
-      -C opt-level=3
-      -C force-frame-pointers=on
-      -C debug-assertions=off
-      -C incremental=on
-      -C overflow-checks=off
-      -C panic=abort
-      -C codegen-units=1
-      -C embed-bitcode=yes
-      -C strip=symbols
-      -Z dylib-lto
-      -Z location-detail=none
-    ]
-    if Hardware::CPU.intel?
-      rust_flags << "-C target-feature=+aes,+avx,+avx2,+avx512f,+avx512dq,+avx512cd,+avx512bw,+avx512vl,+avx512vnni"
-    end
-
-    # setup nightly cargo with rustup
     ENV.append_path "PATH", "#{root_dir}/local/rust/rustup/bin"
     ENV["RUSTUP_HOME"] = "#{root_dir}/local/rust/rustup"
-    ENV["RUSTFLAGS"] = rust_flags.join(" ")
+    ENV["RUSTFLAGS"] = "-C target-cpu=native -C target-cpu=#{target_cpu} -C opt-level=3 -C force-frame-pointers=on -C debug-assertions=off -C incremental=on -C overflow-checks=off"
+
+    # setup sccache
+    sccache_cache = HOMEBREW_CACHE/"sccache_cache"
+    mkdir_p sccache_cache
+    ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
+    ENV["SCCACHE_DIR"] = sccache_cache
+
     ENV["PCRE2_SYS_STATIC"] = "1"
 
-    system "rustup", "run", "nightly", "cargo", "install", "--features", "pcre2", *std_cargo_args
+    system "rustup", "run", "nightly", "cargo", "install", "--verbose", "--features", "pcre2", *std_cargo_args
     bin.install "target/release/rg"
 
-    generate_completions_from_executable(bin/"rg", "--generate", base_name: "rg", shell_parameter_format: "complete-")
+    generate_completions_from_executable(bin/"rg", "--generate", base_name: "rg", shell_parameter_format: "complete-", shells: [:bash, :zsh, :fish])
     (man1/"rg.1").write Utils.safe_popen_read(bin/"rg", "--generate", "man")
   end
 
