@@ -37,7 +37,7 @@ class CodexHead < Formula
       ENV["OPENSSL_NO_VENDOR"] = "1"
     end
 
-    inreplace "codex-rs/Cargo.toml", 'version = "0.0.0"', 'version = "0.75.0"'
+    inreplace "codex-rs/Cargo.toml", 'version = "0.0.0"', 'version = "1.0.0"'
 
     system "rustup", "run", "nightly", "cargo", "install", "--verbose", "--all-features", *std_cargo_args(path: "codex-rs/cli")
     generate_completions_from_executable(bin/"codex", "completion", shells: [:zsh, :fish])
