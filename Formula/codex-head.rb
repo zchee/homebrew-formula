@@ -27,10 +27,10 @@ class CodexHead < Formula
     ENV["RUSTFLAGS"] = "-C target-cpu=native -C target-cpu=#{target_cpu} -C opt-level=3 -C force-frame-pointers=on -C debug-assertions=off -C incremental=on -C overflow-checks=off"
 
     # setup sccache
-    sccache_cache = HOMEBREW_CACHE/"sccache_cache"
-    mkdir_p sccache_cache
+    sccache_dir = "#{Etc.getpwuid.dir}/.cache/sccache"
+    mkdir_p sccache_dir
     ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
-    ENV["SCCACHE_DIR"] = sccache_cache
+    ENV["SCCACHE_DIR"] = sccache_dir
 
     if OS.linux?
       ENV["OPENSSL_DIR"] = Formula["openssl@3"].opt_prefix
