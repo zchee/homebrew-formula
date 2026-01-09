@@ -10,7 +10,7 @@ class JemallocHead < Formula
     depends_on "docbook-xsl" => :build
     depends_on "libxslt" => :build
 
-    patch :DATA
+    # patch :DATA
   end
 
   def install
@@ -18,6 +18,7 @@ class JemallocHead < Formula
       --disable-debug
       --prefix=#{prefix}
       --with-jemalloc-prefix=
+      --with-experimental-sys-process-madvise=75
     ]
 
     if build.head?
