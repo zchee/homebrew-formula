@@ -16,7 +16,6 @@ class FlyctlHead < Formula
 
   depends_on "go" => :build
 
-  # YEAR.MONTH.DAY
   def install
     ENV["CGO_ENABLED"] = "0"
     ldflags = %W[
@@ -25,12 +24,13 @@ class FlyctlHead < Formula
       -X github.com/superfly/flyctl/internal/buildinfo.buildVersion=#{Time.now.strftime('%-Y.%-m.%-d')}
       -X github.com/superfly/flyctl/internal/buildinfo.commit=#{Utils.git_short_head}
     ]
-    system "go", "build", *std_go_args(output: bin/"flyctl", ldflags: ldflags), "-tags", "production"
+    system "go", "build", *std_go_args(ldflags:, tags: "production")
 
     bin.install_symlink "flyctl" => "fly"
 
-    generate_completions_from_executable(bin/"flyctl", "completion")
-    generate_completions_from_executable(bin/"fly", "completion")
+    %w[flyctl fly].each do |cmd|
+      generate_completions_from_executable(bin/cmd, shell_parameter_format: :cobra)
+    end
   end
 
   test do
@@ -38,5 +38,12 @@ class FlyctlHead < Formula
 
     flyctl_status = shell_output("#{bin}/flyctl status 2>&1", 1)
     assert_match "Error: No access token available. Please login with 'flyctl auth login'", flyctl_status
+
+    json = <<~JSON
+      {"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26"}}
+      {"jsonrpc":"2.0","id":2,"method":"tools/list"}
+    JSON
+
+    assert_match "Create a new Fly.io app", pipe_output("#{bin}/flyctl mcp server", json, 0)
   end
 end
