@@ -19,7 +19,7 @@ class LuaLanguageServerHead < Formula
     chdir "3rd/luamake" do
       system "compile/install.sh"
     end
-    system "3rd/luamake/luamake", "rebuild"
+    system "3rd/luamake/luamake", "rebuild", "--notest"
 
     (libexec/"bin").install "bin/lua-language-server", "bin/main.lua"
     libexec.install "main.lua", "debugger.lua", "locale", "meta", "script"
