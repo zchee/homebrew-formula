@@ -39,7 +39,9 @@ class CodexHead < Formula
 
     inreplace "codex-rs/Cargo.toml", 'version = "0.0.0"', 'version = "1.0.0"'
 
-    system "rustup", "run", "nightly", "cargo", "install", "--verbose", "--all-features", *std_cargo_args(path: "codex-rs/cli")
+    cd "codex-rs" do
+      system "cargo", "install", "--verbose", "--all-features", *std_cargo_args(path: "cli")
+    end
     generate_completions_from_executable(bin/"codex", "completion", shells: [:zsh, :fish])
   end
 
