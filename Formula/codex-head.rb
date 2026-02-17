@@ -12,6 +12,7 @@ class CodexHead < Formula
   env :std
 
   depends_on "ripgrep-head" => :build
+  depends_on "sqlite3"
   depends_on "sccache" => :build
 
   on_linux do
@@ -19,7 +20,7 @@ class CodexHead < Formula
   end
 
   def install
-    # setup nightly cargo with rustup
+    # setup cargo with rustup
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
     target_cpu = Hardware::CPU.intel? ? "x86-64-v4" : "apple-latest"
     ENV.append_path "PATH", "#{root_dir}/local/rust/rustup/bin"
