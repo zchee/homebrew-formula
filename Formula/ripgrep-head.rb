@@ -17,7 +17,7 @@ class RipgrepHead < Formula
   depends_on "pcre2"
 
   def install
-    # setup nightly cargo with rustup
+    # setup cargo with rustup
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
     target_cpu = Hardware::CPU.intel? ? "x86-64-v4" : "apple-latest"
     ENV.append_path "PATH", "#{root_dir}/local/rust/rustup/bin"
@@ -32,7 +32,7 @@ class RipgrepHead < Formula
 
     ENV["PCRE2_SYS_STATIC"] = "1"
 
-    system "rustup", "run", "nightly", "cargo", "install", "--verbose", "--features", "pcre2", *std_cargo_args
+    system "cargo", "install", "--verbose", "--features", "pcre2", *std_cargo_args
     bin.install "target/release/rg"
 
     generate_completions_from_executable(bin/"rg", "--generate", base_name: "rg", shell_parameter_format: "complete-", shells: [:bash, :zsh, :fish])

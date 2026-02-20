@@ -13,7 +13,7 @@ class BatHead < Formula
   depends_on "sccache" => :build
 
   def install
-    # setup nightly cargo with rustup
+    # setup cargo with rustup
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
     target_cpu = Hardware::CPU.intel? ? "x86-64-v4" : "apple-latest"
     ENV.append_path "PATH", "#{root_dir}/local/rust/rustup/bin"
@@ -30,7 +30,7 @@ class BatHead < Formula
     ENV["RUSTONIG_DYNAMIC_LIBONIG"] = "1"
     ENV["RUSTONIG_SYSTEM_LIBONIG"] = "1"
 
-    system "rustup", "run", "nightly", "cargo", "install", "--features", "default", "--root", prefix, "--path", "."
+    system "cargo", "install", "--features", "default", "--root", prefix, "--path", "."
 
     assets = buildpath.glob("target/release/build/bat-*/out/assets").first
     man1.install assets/"manual/bat.1"

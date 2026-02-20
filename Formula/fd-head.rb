@@ -10,7 +10,7 @@ class FdHead < Formula
   depends_on "sccache" => :build
 
   def install
-    # setup nightly cargo with rustup
+    # setup cargo with rustup
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
     target_cpu = Hardware::CPU.intel? ? "x86-64-v4" : "apple-latest"
     ENV.append_path "PATH", "#{root_dir}/local/rust/rustup/bin"
@@ -23,7 +23,7 @@ class FdHead < Formula
     ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
     ENV["SCCACHE_DIR"] = sccache_dir
 
-    system "rustup", "run", "nightly", "cargo", "install", "--features", "use-jemalloc,completions", "--root", prefix, "--path", "."
+    system "cargo", "install", "--features", "use-jemalloc,completions", "--root", prefix, "--path", "."
 
     man1.install "doc/fd.1"
     generate_completions_from_executable(bin/"fd", "--gen-completions", shells: [:zsh, :fish], base_name: "fd")
