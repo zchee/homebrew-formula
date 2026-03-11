@@ -12,7 +12,7 @@ class GitHead < Formula
   depends_on "asciidoc"
   depends_on "c-ares"
 
-  depends_on "curl-cloudflare"
+  depends_on "curl"
   depends_on "brotli"
   depends_on "libidn2"
   depends_on "libnghttp2"
