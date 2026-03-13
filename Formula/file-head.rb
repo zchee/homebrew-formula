@@ -15,6 +15,8 @@ class FileHead < Formula
     regex(/href=.*?file[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  keg_only :provided_by_macos
+
   depends_on "libmagic-head"
   depends_on "zlib"
   depends_on "bzip2"
