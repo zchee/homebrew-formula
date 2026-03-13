@@ -1,8 +1,7 @@
 class FileHead < Formula
   desc "Utility to determine file types"
   homepage "https://darwinsys.com/file/"
-  # file has a BSD-2-Clause-like license
-  license :cannot_represent
+  license "BSD-2-Clause-Darwin"
   head do
     url "https://github.com/file/file.git", branch: "master"
 
@@ -16,8 +15,6 @@ class FileHead < Formula
     regex(/href=.*?file[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  keg_only :provided_by_macos
-
   depends_on "libmagic-head"
   depends_on "zlib"
   depends_on "bzip2"
@@ -26,17 +23,17 @@ class FileHead < Formula
   depends_on "lzlib"
 
   def install
-    ENV.prepend "LDFLAGS", "#{Formula["libmagic-head"].opt_lib}/libmagic.a"
-    ENV.prepend "LDFLAGS", "#{Formula["lzlib"].opt_lib}/liblz.a"
+    ENV.prepend "LDFLAGS", "-L#{Formula["libmagic-head"].opt_lib} -lmagic"
 
     system "autoreconf", "-fiv"
 
-    inreplace "./src/Makefile.in", "file_DEPENDENCIES = libmagic.la", ""
-    inreplace "./src/Makefile.in", "libmagic.la -lm", "$(LDADD) -lm"
+    inreplace "src/Makefile.in" do |s|
+      s.gsub! "file_DEPENDENCIES = libmagic.la", ""
+      s.gsub! "libmagic.la -lm", "$(LDADD) -lm"
+    end
 
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
-                          "--enable-lzlib",
                           "--enable-zlib",
                           "--enable-bzlib",
                           "--enable-xzlib",
