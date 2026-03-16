@@ -30,7 +30,7 @@ class BatHead < Formula
     ENV["RUSTONIG_DYNAMIC_LIBONIG"] = "1"
     ENV["RUSTONIG_SYSTEM_LIBONIG"] = "1"
 
-    system "cargo", "install", "--features", "default", "--root", prefix, "--path", "."
+    system "rustup", "run", "stable", "cargo", "install", "--features", "default", "--root", prefix, "--path", "."
 
     assets = buildpath.glob("target/release/build/bat-*/out/assets").first
     man1.install assets/"manual/bat.1"

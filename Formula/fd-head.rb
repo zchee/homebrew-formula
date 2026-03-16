@@ -23,7 +23,7 @@ class FdHead < Formula
     ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
     ENV["SCCACHE_DIR"] = sccache_dir
 
-    system "cargo", "install", "--features", "use-jemalloc,completions", "--root", prefix, "--path", "."
+    system "rustup", "run", "stable", "cargo", "install", "--features", "use-jemalloc,completions", "--root", prefix, "--path", "."
 
     man1.install "doc/fd.1"
     generate_completions_from_executable(bin/"fd", "--gen-completions", shells: [:zsh, :fish], base_name: "fd")
