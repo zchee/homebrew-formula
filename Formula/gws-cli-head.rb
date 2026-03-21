@@ -22,6 +22,6 @@ class GwsCliHead < Formula
     ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
     ENV["SCCACHE_DIR"] = sccache_dir
 
-    system "cargo", "install", "--verbose", "--all-features", *std_cargo_args
+    system "rustup", "run", "stable", "cargo", "install", "--verbose", "--all-features", *std_cargo_args
   end
 end
