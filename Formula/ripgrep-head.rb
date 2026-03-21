@@ -32,7 +32,7 @@ class RipgrepHead < Formula
 
     ENV["PCRE2_SYS_STATIC"] = "1"
 
-    system "cargo", "install", "--verbose", "--features", "pcre2", *std_cargo_args
+    system "rustup", "run", "stable", "cargo", "install", "--verbose", "--features", "pcre2", *std_cargo_args
     bin.install "target/release/rg"
 
     generate_completions_from_executable(bin/"rg", "--generate", base_name: "rg", shell_parameter_format: "complete-", shells: [:bash, :zsh, :fish])
