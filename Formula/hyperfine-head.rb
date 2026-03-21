@@ -23,7 +23,7 @@ class HyperfineHead < Formula
 
     ENV["SHELL_COMPLETIONS_DIR"] = buildpath
 
-    system "cargo", "install", "--all-features", "--root", prefix, "--path", "."
+    system "rustup", "run", "stable", "cargo", "install", "--all-features", "--root", prefix, "--path", "."
 
     bash_completion.install "hyperfine.bash" => "hyperfine"
     fish_completion.install "hyperfine.fish"
