@@ -42,7 +42,7 @@ class CodexHead < Formula
 
     cd "codex-rs" do
       system "cargo", "install", "--verbose", "--all-features", *std_cargo_args(path: "cli")
-      system "cargo", "install", "--verbose", "--all-features", *std_cargo_args(path: "codex-responses-api-proxy")
+      system "cargo", "install", "--verbose", "--all-features", *std_cargo_args(path: "responses-api-proxy")
     end
 
     system "codesign", "--force", "--options", "runtime", "--timestamp", "--entitlements", ".github/actions/macos-code-sign/codex.entitlements.plist", "--sign", "-", bin/"codex"
