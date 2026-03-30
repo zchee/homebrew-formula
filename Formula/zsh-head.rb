@@ -62,6 +62,7 @@ class ZshHead < Formula
 
     system "cat", "config.modules"
 
+    system "make", "html"
     system "make", "install.bin", "install.modules", "install.fns", "install.man", "install.html"
   end
 
