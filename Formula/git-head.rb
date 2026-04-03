@@ -35,9 +35,14 @@ class GitHead < Formula
     depends_on "openssl@1.1" # Uses CommonCrypto on macOS
   end
 
+  resource "Authen::SASL" do
+    url "https://cpan.metacpan.org/authors/id/E/EH/EHUELS/Authen-SASL-2.2000.tar.gz"
+    sha256 "8cdf5a7f185448b614471675dae5b26f8c6e330b62264c3ff5d91172d6889b99"
+  end
+
   resource "html" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.51.0.tar.xz"
-    sha256 "dd33897c676ea140d57a652758e458756fa93582801cfd1d7e1f62acd5fa7580"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.53.0.tar.xz"
+    sha256 "994b93cbf25a9c13f1206dcc1751f0559633d5152155e16fc025ab776af08e0d"
 
     livecheck do
       formula :parent
@@ -45,8 +50,8 @@ class GitHead < Formula
   end
 
   resource "man" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.51.0.tar.xz"
-    sha256 "c10aea63316865ace762078a6e67fc3cf117b11a5c9d4a2a52cb3762ae22ed35"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.53.0.tar.xz"
+    sha256 "957ffe4409eeb90c7332bff4abee8d5169d28ef5c7c3bf08419f4239be13f77f"
 
     livecheck do
       formula :parent
@@ -59,6 +64,9 @@ class GitHead < Formula
   end
 
   def install
+    odie "html resource needs to be updated" if build.stable? && version != resource("html").version
+    odie "man resource needs to be updated" if build.stable? && version != resource("man").version
+
     # If these things are installed, tell Git build system not to use them
     ENV["NO_FINK"] = "1"
     ENV["NO_DARWIN_PORTS"] = "1"
@@ -154,6 +162,11 @@ class GitHead < Formula
       git_core.install "git-subtree"
     end
 
+    # Install git-jump
+    cd "contrib/git-jump" do
+      git_core.install "git-jump"
+    end
+
     # install the completion script first because it is inside "contrib"
     bash_completion.install "contrib/completion/git-completion.bash"
     bash_completion.install "contrib/completion/git-prompt.sh"
@@ -176,11 +189,16 @@ class GitHead < Formula
       (share/"perl5").install "lib/Net"
     end
 
+    resource("Authen::SASL").stage do
+      (share/"perl5").install "lib/Authen"
+    end
+
     # This is only created when building against system Perl, but it isn't
     # purged by Homebrew's post-install cleaner because that doesn't check
     # "Library" directories. It is however pointless to keep around as it
     # only contains the perllocal.pod installation file.
-    rm_rf prefix/"Library/Perl"
+    perl_dir = prefix/"Library/Perl"
+    rm_r perl_dir if perl_dir.exist?
 
     # Set the macOS keychain credential helper by default
     # (as Apple's CLT's git also does this).
