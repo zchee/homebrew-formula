@@ -10,8 +10,6 @@ class GitWorktreeRunner < Formula
   end
 
   def install
-    inreplace "bin/git-gtr", 'exec "$SCRIPT_DIR/gtr" "$@"', 'exec "$SCRIPT_DIR/../libexec/gtr" "$@"'
-
     prefix.install ["adapters", "lib", "templates"]
     bin.install "bin/git-gtr"
     libexec.install "bin/gtr"
