@@ -14,7 +14,7 @@ class SccacheHead < Formula
 
   def install
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
-    target_cpu = Hardware::CPU.intel? ? "x86-64-v4" : "apple-latest"
+    target_cpu = Hardware::CPU.intel? ? "x86-64-v4" : %x( sysctl -n machdep.cpu.brand_string | awk '{ print tolower($1"-"$2) }' )
 
     # setup cargo with rustup
     ENV.append_path "PATH", "#{root_dir}/local/rust/rustup/bin"
