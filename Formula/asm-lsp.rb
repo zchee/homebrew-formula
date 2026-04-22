@@ -6,6 +6,8 @@ class AsmLsp < Formula
 
   env :std
 
+  depends_on "sccache" => :build
+
   def install
     # setup cargo with rustup
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
@@ -20,6 +22,6 @@ class AsmLsp < Formula
     ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
     ENV["SCCACHE_DIR"] = sccache_dir
 
-    system "rustup", "run", "stable", "cargo", "install", "--all-features", "--root", prefix, "--path", "asm-lsp"
+    system "rustup", "run", "stable", "cargo", "install", "--all-features", *std_cargo_args(path: "asm-lsp")
   end
 end

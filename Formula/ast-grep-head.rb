@@ -6,6 +6,8 @@ class AstGrepHead < Formula
 
   env :std
 
+  depends_on "sccache" => :build
+
   def install
     # setup cargo with rustup
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
@@ -17,8 +19,8 @@ class AstGrepHead < Formula
     # setup sccache
     sccache_dir = "#{Etc.getpwuid.dir}/.cache/sccache"
     mkdir_p sccache_dir
-    ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
     ENV["SCCACHE_DIR"] = sccache_dir
+    ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
 
     system "cargo", "install", "--verbose", "--all-features", *std_cargo_args(path: "crates/cli")
 

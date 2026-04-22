@@ -6,6 +6,8 @@ class PastelHead < Formula
 
   env :std
 
+  depends_on "sccache" => :build
+
   def install
     # setup cargo with rustup
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
@@ -20,7 +22,7 @@ class PastelHead < Formula
     ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
     ENV["SCCACHE_DIR"] = sccache_dir
 
-    system "rustup", "run", "nightly", "cargo", "install", "--all-features", "--root", prefix, "--path", "."
+    system "rustup", "run", "nightly", "cargo", "install", "--all-features", *std_cargo_args
   end
 
   test do

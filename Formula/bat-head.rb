@@ -27,10 +27,10 @@ class BatHead < Formula
     ENV["SCCACHE_DIR"] = sccache_dir
 
     ENV["LIBGIT2_NO_VENDOR"] = "1"
-    ENV["RUSTONIG_DYNAMIC_LIBONIG"] = "1"
+    ENV["RUSTONIG_DYNAMIC_LIBONIG"] = "0"
     ENV["RUSTONIG_SYSTEM_LIBONIG"] = "1"
 
-    system "rustup", "run", "stable", "cargo", "install", "--features", "default", "--root", prefix, "--path", "."
+    system "rustup", "run", "stable", "cargo", "install", "--features", "default", *std_cargo_args(features: ["build-assets", "clap", "etcetera", "paging", "regex-onig", "wild", "git", "shell-words", "grep-cli", "minus", "lessopen"])
 
     assets = buildpath.glob("target/release/build/bat-*/out/assets").first
     man1.install assets/"manual/bat.1"
