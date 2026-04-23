@@ -6,6 +6,7 @@ class GitDeltaHead < Formula
 
   env :std
 
+  depends_on "sccache" => :build
   depends_on "zlib" => :build
 
   def install
@@ -22,7 +23,7 @@ class GitDeltaHead < Formula
     ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
     ENV["SCCACHE_DIR"] = sccache_dir
 
-    system "rustup", "run", "stable", "cargo", "install", *std_cargo_args, "--verbose", "--all-features"
+    system "rustup", "run", "nightly", "cargo", "install", "--verbose", "--all-features", *std_cargo_args
     bin.install_symlink "delta" => "git-delta"
 
     zsh_completion.install "etc/completion/completion.zsh" => "_delta"

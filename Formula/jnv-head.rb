@@ -6,6 +6,8 @@ class JnvHead < Formula
 
   env :std
 
+  depends_on "sccache" => :build
+
   def install
     # setup cargo with rustup
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"

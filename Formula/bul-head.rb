@@ -6,6 +6,8 @@ class BulHead < Formula
 
   env :std
 
+  depends_on "sccache" => :build
+
   def install
     # setup cargo with rustup
     root_dir = Hardware::CPU.intel? ? "/usr" : "/opt"
@@ -22,6 +24,6 @@ class BulHead < Formula
 
     ENV["SHELL_COMPLETIONS_DIR"] = buildpath
 
-    system "rustup", "run", "nightly", "cargo", "install", "--all-features", "--root", prefix, "--path", "."
+    system "rustup", "run", "nightly", "cargo", "install", "--all-features", *std_cargo_args
   end
 end
