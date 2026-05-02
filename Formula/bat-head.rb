@@ -43,7 +43,7 @@ class BatHead < Formula
       minus
       lessopen
     ]
-    system "rustup", "run", "nightly", "cargo", "install", "--features", "default", *std_cargo_args(features: features)
+    system "rustup", "run", "nightly", "cargo", "install", *std_cargo_args(features: features)
 
     assets = buildpath.glob("target/release/build/bat-*/out/assets").first
     man1.install assets/"manual/bat.1"
