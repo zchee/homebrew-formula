@@ -41,8 +41,8 @@ class GitHead < Formula
   end
 
   resource "html" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.53.0.tar.xz"
-    sha256 "994b93cbf25a9c13f1206dcc1751f0559633d5152155e16fc025ab776af08e0d"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.54.0.tar.xz"
+    sha256 "7ff72bfdfed4f20563f34416cf27614fb9c35bfad590db0062f2a0a9636514e4"
 
     livecheck do
       formula :parent
@@ -50,8 +50,8 @@ class GitHead < Formula
   end
 
   resource "man" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.53.0.tar.xz"
-    sha256 "957ffe4409eeb90c7332bff4abee8d5169d28ef5c7c3bf08419f4239be13f77f"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.54.0.tar.xz"
+    sha256 "292062d18f3a215213ea8317ed22b94f02ad9572520b9293164d7db3eb888953"
 
     livecheck do
       formula :parent
