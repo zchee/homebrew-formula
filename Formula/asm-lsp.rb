@@ -22,6 +22,6 @@ class AsmLsp < Formula
     ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
     ENV["SCCACHE_DIR"] = sccache_dir
 
-    system "rustup", "run", "stable", "cargo", "install", "--all-features", *std_cargo_args(path: "asm-lsp")
+    system "rustup", "run", "nightly", "cargo", "install", "--all-features", *std_cargo_args(path: "asm-lsp")
   end
 end

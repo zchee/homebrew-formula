@@ -22,7 +22,7 @@ class HlHead < Formula
     ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
     ENV["SCCACHE_DIR"] = sccache_dir
 
-    system "rustup", "run", "stable", "cargo", "install", *std_cargo_args
+    system "rustup", "run", "nightly", "cargo", "install", *std_cargo_args
 
     generate_completions_from_executable(bin/"hl", "--shell-completions", shells: [:zsh, :fish])
     (man1/"hl.1").write Utils.safe_popen_read(bin/"hl", "--man-page")

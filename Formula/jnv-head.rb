@@ -24,6 +24,6 @@ class JnvHead < Formula
 
     ENV["SHELL_COMPLETIONS_DIR"] = buildpath
 
-    system "rustup", "run", "nightly", "cargo", "install", "--all-features", "--root", prefix, "--path", "."
+    system "rustup", "run", "nightly", "cargo", "install", "--all-features", *std_cargo_args
   end
 end

@@ -30,7 +30,20 @@ class BatHead < Formula
     ENV["RUSTONIG_DYNAMIC_LIBONIG"] = "0"
     ENV["RUSTONIG_SYSTEM_LIBONIG"] = "1"
 
-    system "rustup", "run", "stable", "cargo", "install", "--features", "default", *std_cargo_args(features: ["build-assets", "clap", "etcetera", "paging", "regex-onig", "wild", "git", "shell-words", "grep-cli", "minus", "lessopen"])
+    features = %w[
+      build-assets
+      clap
+      etcetera
+      paging
+      regex-onig
+      wild
+      git
+      shell-words
+      grep-cli
+      minus
+      lessopen
+    ]
+    system "rustup", "run", "nightly", "cargo", "install", "--features", "default", *std_cargo_args(features: features)
 
     assets = buildpath.glob("target/release/build/bat-*/out/assets").first
     man1.install assets/"manual/bat.1"

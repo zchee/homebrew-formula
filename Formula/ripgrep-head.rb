@@ -32,7 +32,7 @@ class RipgrepHead < Formula
 
     ENV["PCRE2_SYS_STATIC"] = "1"
 
-    system "rustup", "run", "stable", "cargo", "install", "--verbose", *std_cargo_args(features: "pcre2")
+    system "rustup", "run", "nightly", "cargo", "install", "--verbose", *std_cargo_args(features: "pcre2")
 
     generate_completions_from_executable(bin/"rg", "--generate", base_name: "rg", shell_parameter_format: "complete-", shells: [:bash, :zsh, :fish])
     (man1/"rg.1").write Utils.safe_popen_read(bin/"rg", "--generate", "man")

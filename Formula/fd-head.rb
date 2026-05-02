@@ -6,7 +6,7 @@ class FdHead < Formula
 
   env :std
 
-  depends_on "jemalloc-head"
+  depends_on "jemalloc-head" => :build
   depends_on "sccache" => :build
 
   def install
@@ -23,7 +23,7 @@ class FdHead < Formula
     ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
     ENV["SCCACHE_DIR"] = sccache_dir
 
-    system "rustup", "run", "stable", "cargo", "install", "--features", "use-jemalloc,completions", "--root", prefix, "--path", "."
+    system "rustup", "run", "nightly", "cargo", "install", "--features", "use-jemalloc,completions", *std_cargo_args
 
     man1.install "doc/fd.1"
     generate_completions_from_executable(bin/"fd", "--gen-completions", shells: [:zsh, :fish], base_name: "fd")

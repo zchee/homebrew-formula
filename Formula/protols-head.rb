@@ -22,6 +22,6 @@ class ProtolsHead < Formula
     ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
     ENV["SCCACHE_DIR"] = sccache_dir
 
-    system "cargo", "install", "--verbose", "--all-features", "--root", prefix, "--path", "."
+    system "rustup", "run", "nightly", "cargo", "install", "--verbose", "--all-features", std_cargo_args
   end
 end

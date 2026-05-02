@@ -22,6 +22,10 @@ class RcodesignHead < Formula
     ENV["RUSTC_WRAPPER"] = "#{Formula["sccache"].opt_bin}/sccache"
     ENV["SCCACHE_DIR"] = sccache_dir
 
-    system "rustup", "run", "stable", "cargo", "install", "--features", "notarize,smartcard", "--root", prefix, "--bin", "rcodesign", "--path", "apple-codesign"
+    features = %w[
+      notarize
+      smartcard
+    ]
+    system "rustup", "run", "nightly", "cargo", "install", "--features=#{features}", *std_cargo_args(bin: "rcodesign", path: "apple-codesign")
   end
 end
