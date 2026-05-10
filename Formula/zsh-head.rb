@@ -18,6 +18,11 @@ class ZshHead < Formula
     depends_on "texinfo" => :build
   end
 
+  patch do
+    url "https://raw.githubusercontent.com/openai/codex/refs/heads/main/codex-rs/shell-escalation/patches/zsh-exec-wrapper.patch"
+    sha256 "696b7d923b8071554d00e811afb9a08fcad4baada796f7314d12ecd72d06152c"
+  end
+
   def install
     # Work around configure issues with Xcode 12
     # https://www.zsh.org/mla/workers/2020/index.html
@@ -25,11 +30,11 @@ class ZshHead < Formula
     ENV.append_to_cflags "-Wno-implicit-int" if DevelopmentTools.clang_build_version >= 1403
 
     if Hardware::CPU.intel?
-      cflags  = "-std=c11 -march=x86-64-v4 -Ofast -flto"
-      ldflags = "-march=x86-64-v4 -Ofast -flto"
+      cflags  = "-march=x86-64-v4 -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c2x"
+      ldflags = "-march=x86-64-v4 -O3 -funroll-loops -ffast-math -fforce-addr -flto"
     else
-      cflags  = "-march=native -Ofast -flto"
-      ldflags = "-march=native -Ofast -flto"
+      cflags  = "-mcpu=#{%x( sysctl -n machdep.cpu.brand_string | awk '{ print tolower($1"-"$2) }' )} -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c2x"
+      ldflags = "-mcpu=#{%x( sysctl -n machdep.cpu.brand_string | awk '{ print tolower($1"-"$2) }' )} -O3 -funroll-loops -ffast-math -fforce-addr -flto"
     end
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
