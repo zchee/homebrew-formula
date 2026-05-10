@@ -15,12 +15,13 @@ class LessHead < Formula
     uses_from_macos "perl" => :build
   end
 
-  depends_on "ncurses"
-  depends_on "pcre2"
+  depends_on "ncurses-head" => :build
+  depends_on "pcre2" => :build
 
   def install
     system "make", "-f", "Makefile.aut", "distfiles" if build.head?
-    system "./configure", "--prefix=#{prefix}", "--with-regex=pcre2"
+    system "./configure", "--prefix=#{prefix}", "--with-regex=pcre2", "--enable-year2038"
+    inreplace "Makefile", /(LIBS = \$\(LIBSAN\))  -lncursesw -lpcre2-8/, "\\1 #{Formula["pcre2"].opt_lib}/libpcre2-8.a #{Formula["ncurses-head"].opt_lib}/libncursesw.a"
     system "make", "install"
   end
 
