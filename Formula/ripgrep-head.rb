@@ -12,9 +12,21 @@ class RipgrepHead < Formula
   env :std
 
   depends_on "asciidoctor" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "sccache" => :build
   depends_on "pcre2"
+
+  # macOS: improve default explicit-file mmap searches
+  patch do
+    url "https://patch-diff.githubusercontent.com/raw/BurntSushi/ripgrep/pull/3340.patch?full_index=1"
+    sha256 "ddd5954ad690692dee60e55a4b1a9df0a97b675b1d4045210bacebc722593bb7"
+  end
+
+  # fix: perf(ignore): don't search subdirs for git/ignore files if max depth is reached
+  patch do
+    url "https://patch-diff.githubusercontent.com/raw/BurntSushi/ripgrep/pull/3353.patch?full_index=1"
+    sha256 "04b72a1e6591e63e6ca8568a7339d0dc3922415910174048a182962d2f2eaf64"
+  end
 
   def install
     # setup cargo with rustup
