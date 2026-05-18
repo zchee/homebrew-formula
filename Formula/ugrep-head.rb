@@ -20,6 +20,10 @@ class UgrepHead < Formula
   def install
     system "autoreconf", "-fiv"
 
+    # hard coded to `Static::cores` is 4 when [__APPLE__ && HAVE_NEON]. `Static::cores = std::thread::hardware_concurrency();` instead of.
+    inreplace "src/ugrep.cpp", /(#if defined\(__APPLE__\)) && (defined\(HAVE_NEON\))/, "\\1 && !\\2"
+    system "cat", "src/ugrep.cpp"
+
     args = %W[
       --disable-dependency-tracking
       --disable-silent-rules
@@ -38,8 +42,8 @@ class UgrepHead < Formula
       --with-zsh-completion-dir
     ]
 
-    cxxflags = "-march=native -Ofast -flto -std=c++20"
-    cxxflags += Hardware::CPU.intel? ? " -mcpu=x86-64-v4" : " -mcpu=apple-latest"
+    target_cpu = Hardware::CPU.intel? ? "x86-64-v4" : %x( sysctl -n machdep.cpu.brand_string | awk '{ print tolower($1"-"$2) }' )
+    cxxflags = "-march=native -mcpu=#{target_cpu} -O3 -flto -std=c++20"
     libs = %W[
       #{Formula["pcre2"].opt_lib}/libpcre2-8.a
       #{Formula["zlib"].opt_lib}/libz.a
