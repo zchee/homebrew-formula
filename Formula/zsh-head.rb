@@ -18,9 +18,14 @@ class ZshHead < Formula
     depends_on "texinfo" => :build
   end
 
+  # OpenAI Codex shell escalation wrapper
+  # https://github.com/openai/codex/tree/main/codex-rs/shell-escalation
+  patch :DATA
+
+  # macOS 26 Tahoe FD_SET overflow EXC_GUARD guard
   patch do
-    url "https://raw.githubusercontent.com/openai/codex/refs/heads/main/codex-rs/shell-escalation/patches/zsh-exec-wrapper.patch"
-    sha256 "696b7d923b8071554d00e811afb9a08fcad4baada796f7314d12ecd72d06152c"
+    url "https://raw.githubusercontent.com/zchee/homebrew-formula/refs/heads/main/Formula/patches/zsh-fdset-overflow-macos26.patch"
+    sha256 "e4026cafc16cd7e1b56240f0f6d6aaaa53f25c163fd486b48b4cf2dc683c283b"
   end
 
   def install
@@ -33,12 +38,14 @@ class ZshHead < Formula
       cflags  = "-march=x86-64-v4 -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c2x"
       ldflags = "-march=x86-64-v4 -O3 -funroll-loops -ffast-math -fforce-addr -flto"
     else
-      cflags  = "-mcpu=#{%x( sysctl -n machdep.cpu.brand_string | awk '{ print tolower($1"-"$2) }' )} -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c2x"
-      ldflags = "-mcpu=#{%x( sysctl -n machdep.cpu.brand_string | awk '{ print tolower($1"-"$2) }' )} -O3 -funroll-loops -ffast-math -fforce-addr -flto"
+      cpu = `sysctl -n machdep.cpu.brand_string | awk '{ print tolower($1"-"$2) }'`.chomp
+      cflags  = "-mcpu=#{cpu} -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c2x"
+      ldflags = "-mcpu=#{cpu} -O3 -funroll-loops -ffast-math -fforce-addr -flto"
     end
+    cppflags = "-D_DARWIN_C_SOURCE -D_POSIX_C_SOURCE=200809L " "-I#{Formula["ncurses-head"].opt_include}/ncursesw"
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
-    ENV.append "CPPFLAGS", "-D_DARWIN_C_SOURCE -I#{Formula["ncurses-head"].opt_include}/ncursesw"
+    ENV.append "CPPFLAGS", *cppflags
 
     system "Util/preconfig" if build.head?
 
@@ -76,3 +83,39 @@ class ZshHead < Formula
     system bin/"zsh", "-c", "printf -v hello -- '%s'"
   end
 end
+
+__END__
+diff --git a/Src/exec.c b/Src/exec.c
+index 2c730b910..8e10e09f5 100644
+--- a/Src/exec.c
++++ b/Src/exec.c
+@@ -505,7 +505,9 @@ zexecve(char *pth, char **argv, char **newenvp)
+ {
+     int eno;
+     static char buf[PATH_MAX * 2+2+1+1]; /* enough room if pwd fits in PATH_MAX */
+-    char **eep;
++    char **eep, **exec_argv;
++    char *orig_pth = pth;
++    char *exec_wrapper;
+ 
+     unmetafy(pth, NULL);
+     for (eep = argv; *eep; eep++)
+@@ -525,8 +527,16 @@ zexecve(char *pth, char **argv, char **newenvp)
+ 
+     if (newenvp == NULL)
+ 	    newenvp = environ;
++	    exec_argv = argv;
++	    if ((exec_wrapper = getenv("EXEC_WRAPPER")) &&*exec_wrapper && !inblank(*exec_wrapper)) {
++		    exec_argv = argv - 2;
++		    exec_argv[0] = exec_wrapper;
++		    exec_argv[1] = orig_pth;
++		    pth = exec_wrapper;
++	    }
+     winch_unblock();
+-    execve(pth, argv, newenvp);
++    execve(pth, exec_argv, newenvp);
++    pth = orig_pth;
+ 
+     /* If the execve returns (which in general shouldn't happen),   *
+      * then check for an errno equal to ENOEXEC.  This errno is set *
+
