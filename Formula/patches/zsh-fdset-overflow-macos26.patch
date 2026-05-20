@@ -36,9 +36,10 @@ This is a no-op on Linux and pre-Tahoe macOS (SHTTY is already low).
  1 file changed, 47 insertions(+)
 
 diff --git a/Src/Zle/zle_main.c b/Src/Zle/zle_main.c
+index 37d587d02..9a9d971cd 100644
 --- a/Src/Zle/zle_main.c
 +++ b/Src/Zle/zle_main.c
-@@ -30,9 +30,17 @@
+@@ -30,9 +30,16 @@
  #include "zle.mdh"
  #include "zle_main.pro"
  
@@ -52,11 +53,10 @@ diff --git a/Src/Zle/zle_main.c b/Src/Zle/zle_main.c
 +#ifdef HAVE_SYS_SELECT_H
 +# include <sys/select.h>
 +#endif
- 
  #if defined(HAVE_POLL) && !defined(POLLIN) && !defined(POLLNORM)
  # undef HAVE_POLL
  #endif
-@@ -2235,6 +2243,45 @@ setup_(UNUSED(Module m))
+@@ -2259,6 +2266,46 @@ setup_(UNUSED(Module m))
      comprecursive = 0;
      rdstrs = NULL;
  
