@@ -1,0 +1,105 @@
+From: zchee <zchee@users.noreply.github.com>
+Date: 2026-05-20
+Subject: [PATCH] Zle: avoid FD_SET overflow EXC_GUARD on macOS 26 (Tahoe)
+
+macOS 26 turned __darwin_check_fd_set_overflow() into a fatal EXC_GUARD
+(Application Triggered Fault, namespc=18, reason_code=0x2) whenever
+FD_SET(fd, ...) is called with fd >= FD_SETSIZE (1024). Previously this
+function was a soft warning.
+
+Tahoe inserts a `disclaimer` wrapper between /usr/bin/login and the
+shell. That wrapper inherits a wide FD table from its parent without
+setting FD_CLOEXEC on every descriptor, so the shell's controlling
+terminal (SHTTY) can be assigned an FD >= 1024.
+
+The crash reliably reproduces via the new (Feb 2025) terminal probe
+introduced by Oliver Kiddle:
+
+  setup_zshQszle -> query_terminal -> probe_terminal -> getbyte ->
+  raw_getbyte -> select()/FD_SET(SHTTY, ...) -> EXC_GUARD
+
+This is fatal at every interactive shell startup on Tahoe builds that:
+  - rely on raw_getbyte's HAVE_SELECT fallback (when configure fails to
+    define HAVE_POLL because <poll.h> guards POLLIN behind a feature-
+    test macro not enabled by -std=c2x), and/or
+  - statically link zsh/zselect and zsh/zpty (whose FD_SET use can be
+    pulled into the hot path by -flto).
+
+Fix: relocate SHTTY below FD_SETSIZE before zle's setup runs anything
+that might select() on it. Also relocate `shout` if it was fdopen()'d
+over SHTTY so subsequent writes hit the new descriptor.
+
+This is a no-op on Linux and pre-Tahoe macOS (SHTTY is already low).
+
+---
+ Src/Zle/zle_main.c | 47 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
+
+diff --git a/Src/Zle/zle_main.c b/Src/Zle/zle_main.c
+--- a/Src/Zle/zle_main.c
++++ b/Src/Zle/zle_main.c
+@@ -30,9 +30,17 @@
+ #include "zle.mdh"
+ #include "zle_main.pro"
+ 
++#include <fcntl.h>
++#include <unistd.h>
++#include <errno.h>
++
+ #ifdef HAVE_POLL_H
+ # include <poll.h>
+ #endif
++#ifdef HAVE_SYS_SELECT_H
++# include <sys/select.h>
++#endif
+ 
+ #if defined(HAVE_POLL) && !defined(POLLIN) && !defined(POLLNORM)
+ # undef HAVE_POLL
+ #endif
+@@ -2235,6 +2243,45 @@ setup_(UNUSED(Module m))
+     comprecursive = 0;
+     rdstrs = NULL;
+ 
++    /*
++     * macOS 26 (Tahoe) hard-faults on FD_SET(fd, ...) when
++     * fd >= FD_SETSIZE. Relocate SHTTY (and shout) below FD_SETSIZE
++     * before query_terminal() runs probe_terminal() -> getbyte()
++     * which may select() on SHTTY.
++     *
++     * No-op when SHTTY is already low or FD_SETSIZE is undefined.
++     */
++#ifdef FD_SETSIZE
++    if (SHTTY >= 0 && SHTTY >= FD_SETSIZE) {
++	int low_fd;
++# ifdef F_DUPFD_CLOEXEC
++	low_fd = fcntl(SHTTY, F_DUPFD_CLOEXEC, 3);
++# else
++	low_fd = fcntl(SHTTY, F_DUPFD, 3);
++	if (low_fd >= 0)
++	    (void) fcntl(low_fd, F_SETFD, FD_CLOEXEC);
++# endif
++	if (low_fd >= 0 && low_fd < FD_SETSIZE) {
++	    if (shout != NULL && fileno(shout) == SHTTY) {
++		FILE *new_shout = fdopen(low_fd, "w");
++		if (new_shout != NULL) {
++		    fflush(shout);
++		    fclose(shout);   /* closes the old high SHTTY */
++		    shout = new_shout;
++		    SHTTY = low_fd;
++		} else {
++		    /* could not rewrap shout; back out */
++		    close(low_fd);
++		}
++	    } else {
++		close(SHTTY);
++		SHTTY = low_fd;
++	    }
++	} else if (low_fd >= 0) {
++	    close(low_fd);   /* dup landed high again; give up safely */
++	}
++    }
++#endif /* FD_SETSIZE */
++
+     /* detect terminal color and features */
+     if (shout)
+ 	query_terminal();
