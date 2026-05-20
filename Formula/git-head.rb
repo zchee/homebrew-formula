@@ -12,13 +12,14 @@ class GitHead < Formula
   depends_on "asciidoc"
   depends_on "c-ares"
 
-  depends_on "curl"
   depends_on "brotli"
+  depends_on "curl"
   depends_on "libidn2"
   depends_on "libnghttp2"
   depends_on "libssh2"
   depends_on "openldap"
   depends_on "rtmpdump"
+  depends_on "rust"
   depends_on "zstd"
 
   depends_on "gettext"
