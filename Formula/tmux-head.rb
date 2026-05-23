@@ -21,7 +21,6 @@ class TmuxHead < Formula
   depends_on "libevent-head"
   depends_on "ncurses-head"
   depends_on "utf8proc-head"
-  depends_on "jemalloc-head"
 
   uses_from_macos "bison" => :build # for yacc
 
@@ -33,11 +32,8 @@ class TmuxHead < Formula
       --enable-sixel
       --sysconfdir=#{etc}
       --enable-utf8proc=#{Formula["utf8proc-head"].opt_prefix}
-      --enable-jemalloc
     ]
 
-    ENV["JEMALLOC_CFLAGS"] = "-I#{Formula["jemalloc-head"].opt_include}"
-    ENV["JEMALLOC_LIBS"] = "#{Formula["jemalloc-head"].opt_lib}/libjemalloc.a"
     ENV["LIBEVENT_CFLAGS"] = "-I#{Formula["libevent-head"].opt_include}"
     ENV["LIBEVENT_CORE_CFLAGS"] = "-I#{Formula["libevent-head"].opt_include}"
     ENV["LIBEVENT_CORE_LIBS"] = "#{Formula["libevent-head"].opt_lib}/libevent_core.a"
@@ -47,9 +43,14 @@ class TmuxHead < Formula
     ENV["LIBUTF8PROC_CFLAGS"] = "-I#{Formula["utf8proc-head"].opt_include}"
     ENV["LIBUTF8PROC_LIBS"] = "#{Formula["utf8proc-head"].opt_lib}/libutf8proc.a"
 
-    target_cpu_flags = Hardware::CPU.intel? ? "-march=x86-64-v4 -mtune=skylake-avx512" : "-march=native"
-    cflags = "#{target_cpu_flags} -O3 -ffast-math -flto -std=c2x"
-    ldflags = "#{target_cpu_flags} -O3 -ffast-math -lresolv"
+    if Hardware::CPU.intel?
+      cflags  = "-march=x86-64-v4 -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c2x"
+      ldflags = "-march=x86-64-v4 -O3 -funroll-loops -ffast-math -fforce-addr -flto"
+    else
+      cpu = `sysctl -n machdep.cpu.brand_string | awk '{ print tolower($1"-"$2) }'`.chomp
+      cflags = "-mcpu=#{cpu} -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c2x"
+      ldflags = "-mcpu=#{cpu} -O3 -funroll-loops -ffast-math -fforce-addr -lresolv"
+    end
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
 
