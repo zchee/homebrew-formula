@@ -1,7 +1,12 @@
 class ZshHead < Formula
   desc "UNIX shell (command interpreter)"
   homepage "https://www.zsh.org/"
-  license "MIT-Modern-Variant"
+  license all_of: [
+    "MIT-Modern-Variant",
+    "GPL-2.0-only", # Completion/Linux/Command/_qdbus, Completion/openSUSE/Command/{_osc,_zypper}
+    "GPL-2.0-or-later", # Completion/Unix/Command/_darcs
+    "ISC", # Src/openssh_bsd_setres_id.c
+  ]
 
   head do
     url "https://github.com/zsh-users/zsh.git", branch: "master"
@@ -9,10 +14,11 @@ class ZshHead < Formula
     depends_on "gdbm" => :build
     depends_on "groff" => :build
     depends_on "libiconv" => :build
-    depends_on "ncurses-head" => :build
-    depends_on "pcre2" => :build
     depends_on "yodl" => :build
   end
+
+  depends_on "ncurses-head" => :build
+  depends_on "pcre2" => :build
 
   on_system :linux, macos: :ventura_or_newer do
     depends_on "texinfo" => :build
@@ -29,9 +35,8 @@ class ZshHead < Formula
   end
 
   def install
-    # Work around configure issues with Xcode 12
-    # https://www.zsh.org/mla/workers/2020/index.html
-    # https://github.com/Homebrew/homebrew-core/issues/64921
+    # Fix compile with newer Clang. Remove in the next release
+    # Ref: https://sourceforge.net/p/zsh/code/ci/ab4d62eb975a4c4c51dd35822665050e2ddc6918/
     ENV.append_to_cflags "-Wno-implicit-int" if DevelopmentTools.clang_build_version >= 1403
 
     if Hardware::CPU.intel?
@@ -118,4 +123,3 @@ index 2c730b910..8e10e09f5 100644
  
      /* If the execve returns (which in general shouldn't happen),   *
       * then check for an errno equal to ENOEXEC.  This errno is set *
-
