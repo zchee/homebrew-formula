@@ -47,7 +47,7 @@ class ZshHead < Formula
       cflags  = "-mcpu=#{cpu} -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c2x"
       ldflags = "-mcpu=#{cpu} -O3 -funroll-loops -ffast-math -fforce-addr -flto"
     end
-    cppflags = "-D_DARWIN_C_SOURCE -D_POSIX_C_SOURCE=200809L " "-I#{Formula["ncurses-head"].opt_include}/ncursesw"
+    cppflags = "-D_DARWIN_C_SOURCE -D_POSIX_C_SOURCE=200809L -I#{formula_opt_include("ncurses-head")}/ncursesw"
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
     ENV.append "CPPFLAGS", *cppflags
@@ -55,12 +55,11 @@ class ZshHead < Formula
     system "Util/preconfig" if build.head?
 
     system "./configure", "--prefix=#{prefix}",
-           "--enable-fndir=#{prefix}/share/zsh/functions",
-           "--enable-scriptdir=#{prefix}/share/zsh/scripts",
+           "--enable-fndir=#{share}/zsh/functions",
+           "--enable-scriptdir=#{share}/zsh/scripts",
            "--enable-site-fndir=#{HOMEBREW_PREFIX}/share/zsh/site-functions",
            "--enable-site-scriptdir=#{HOMEBREW_PREFIX}/share/zsh/site-scripts",
-           "--enable-runhelpdir=#{prefix}/share/zsh/help",
-           "--enable-cap",
+           "--enable-runhelpdir=#{share}/zsh/help",
            "--enable-multibyte",
            "--enable-pcre",
            "--enable-gdbm",
@@ -76,6 +75,16 @@ class ZshHead < Formula
     inreplace "config.modules", "link=no", "link=static"
     inreplace "config.modules", "auto=yes", "auto=no"
     inreplace "config.modules", "load=no", "load=yes"
+
+    # The zsh/cap module wraps the Linux-only POSIX.1e capabilities API
+    # (cap_t, cap_get_proc, cap_get_file, ...), which macOS does not provide
+    # (configure reports "checking for sys/capability.h... no"). cap.c has no
+    # portability guards, so the blanket link/load rewrites above force it to
+    # build and fail. Exclude it after the rewrites so every other module
+    # stays static. getcap/setcap are autofeatures of the same cap.o.
+    inreplace "config.modules",
+              "name=zsh/cap modfile=Src/Modules/cap.mdd link=static auto=no load=yes",
+              "name=zsh/cap modfile=Src/Modules/cap.mdd link=no auto=no load=no"
 
     system "cat", "config.modules"
 
