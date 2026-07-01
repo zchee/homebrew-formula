@@ -26,13 +26,13 @@ class ZshHead < Formula
 
   # OpenAI Codex shell escalation wrapper
   # https://github.com/openai/codex/tree/main/codex-rs/shell-escalation
-  patch :DATA
+  # patch :DATA
 
   # macOS 26 Tahoe FD_SET overflow EXC_GUARD guard
-  patch do
-    url "https://raw.githubusercontent.com/zchee/homebrew-formula/refs/heads/main/Formula/patches/zsh-fdset-overflow-macos26.patch"
-    sha256 "e4026cafc16cd7e1b56240f0f6d6aaaa53f25c163fd486b48b4cf2dc683c283b"
-  end
+  # patch do
+  #   url "https://raw.githubusercontent.com/zchee/homebrew-formula/refs/heads/main/Formula/patches/zsh-fdset-overflow-macos26.patch"
+  #   sha256 "e4026cafc16cd7e1b56240f0f6d6aaaa53f25c163fd486b48b4cf2dc683c283b"
+  # end
 
   def install
     # Fix compile with newer Clang. Remove in the next release
