@@ -53,8 +53,10 @@ class TmuxHead < Formula
       cflags = "-mcpu=#{cpu} -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c2x"
       ldflags = "-mcpu=#{cpu} -O3 -funroll-loops -ffast-math -fforce-addr -lresolv"
     end
+    cppflags = "-DNDEBUG"
     ENV.append "CFLAGS", *cflags
     ENV.append "LDFLAGS", *ldflags
+    ENV.append "CPPFLAGS", *cppflags
 
     system "./configure", *args, *std_configure_args
     system "make", "install"
