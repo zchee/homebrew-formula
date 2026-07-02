@@ -24,6 +24,8 @@ class TmuxHead < Formula
 
   uses_from_macos "bison" => :build # for yacc
 
+  patch :DATA
+
   def install
     system "sh", "autogen.sh" if build.head?
 
@@ -81,3 +83,42 @@ class TmuxHead < Formula
     assert_equal "no server running on #{socket}", shell_output("#{bin}/tmux -S#{socket} list-sessions 2>&1", 1).chomp
   end
 end
+
+__END__
+diff --git a/grid.c b/grid.c
+index 63b3b9d3..221a4450 100644
+--- a/grid.c
++++ b/grid.c
+@@ -18,7 +18,13 @@
+ 
+ #include <sys/types.h>
+ 
+-#ifdef __APPLE__
++/*
++ * GRID_DEBUG enables expensive O(n^2) grid consistency checks used to hunt
++ * grid-corruption bugs. It is opt-in only: leaving it on in normal builds
++ * makes streaming output (which scrolls lines into the history) pathologically
++ * slow, since the checks run on every scrolled line.
++ */
++#if defined(__APPLE__) && defined(GRID_DEBUG)
+ #include <assert.h>
+ #endif
+ #include <stdlib.h>
+@@ -59,7 +65,7 @@ static const struct grid_cell_entry grid_cleared_entry = {
+ 	{ .data = { 0, 8, 8, ' ' } }, GRID_FLAG_CLEARED
+ };
+ 
+-#ifdef __APPLE__
++#if defined(__APPLE__) && defined(GRID_DEBUG)
+ static void
+ grid_check_lines(struct grid *gd)
+ {
+@@ -348,7 +354,7 @@ grid_free_line(struct grid *gd, u_int py)
+ {
+ 	struct grid_line	*gl = &gd->linedata[py];
+ 
+-#ifdef __APPLE__
++#if defined(__APPLE__) && defined(GRID_DEBUG)
+ 	assert(gl->cellused <= gl->cellsize);
+ 	assert(gl->extdsize == 0 || gl->extddata != NULL);
+ 	assert(gl->cellsize == 0 || gl->celldata != NULL);
