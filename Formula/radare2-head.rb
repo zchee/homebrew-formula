@@ -9,16 +9,44 @@ class Radare2Head < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle :unused
+  depends_on "jemalloc" => :build
+  depends_on "libssl" => :build
+  depends_on "libuv" => :build
+  depends_on "libzip" => :build
+  depends_on "lz4" => :build
+  depends_on "openssl@3" => :build
+  depends_on "xxhash" => :build
+  depends_on "zlib" => :build
+  depends_on "zydis" => :build
+
+  # Required for r2pm (https://github.com/radareorg/radare2-pm/issues/170)
+  depends_on "pkgconf"
 
   def install
-    ENV.append "CFLAGS", "-march=native -Ofast -flto -arch x86_64"
-    ENV.append "CXXFLAGS", "-march=native -Ofast -flto -arch x86_64"
+    if Hardware::CPU.intel?
+      cflags  = "-march=x86-64-v4 -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c2x"
+      ldflags = "-march=x86-64-v4 -O3 -funroll-loops -ffast-math -fforce-addr -flto"
+    else
+      cpu = `sysctl -n machdep.cpu.brand_string | awk '{ print tolower($1"-"$2) }'`.chomp
+      cflags  = "-mcpu=#{cpu} -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c2x"
+      ldflags = "-mcpu=#{cpu} -O3 -funroll-loops -ffast-math -fforce-addr -flto"
+    end
+    ENV.append "CFLAGS", *cflags
+    ENV.append "LDFLAGS", *ldflags
 
     args = %W[
       --disable-dependency-tracking
       --prefix=#{prefix}
-      --with-capstone5
+      --with-sysmagic
+      --with-capstone-next
+      --with-syslz4
+      --with-syszip
+      --with-sysxxhash
+      --with-ssl
+      --with-ssl-crypto
+      --with-libuv
+      --with-wasm-browser
+      --with-bundle-prefix
       --with-openssl
       --with-rpath
     ]
