@@ -30,6 +30,8 @@ class TmuxHead < Formula
     system "sh", "autogen.sh" if build.head?
 
     args = %W[
+      --disable-debug
+      --disable-asan
       --with-TERM=tmux-256color
       --enable-sixel
       --sysconfdir=#{etc}
