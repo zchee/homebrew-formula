@@ -35,17 +35,17 @@ class TmuxHead < Formula
       --with-TERM=tmux-256color
       --enable-sixel
       --sysconfdir=#{etc}
-      --enable-utf8proc=#{Formula["utf8proc-head"].opt_prefix}
+      --enable-utf8proc=#{formula_opt_prefix("utf8proc-head")}
     ]
 
-    ENV["LIBEVENT_CFLAGS"] = "-I#{Formula["libevent-head"].opt_include}"
-    ENV["LIBEVENT_CORE_CFLAGS"] = "-I#{Formula["libevent-head"].opt_include}"
-    ENV["LIBEVENT_CORE_LIBS"] = "#{Formula["libevent-head"].opt_lib}/libevent_core.a"
-    ENV["LIBEVENT_LIBS"] = "#{Formula["libevent-head"].opt_lib}/libevent.a"
-    ENV["LIBNCURSESW_CFLAGS"] = "-I#{Formula["ncurses-head"].opt_include} -I#{Formula["ncurses-head"].opt_include}/ncursesw"
-    ENV["LIBNCURSESW_LIBS"] = "#{Formula["ncurses-head"].opt_lib}/libncursesw.a"
-    ENV["LIBUTF8PROC_CFLAGS"] = "-I#{Formula["utf8proc-head"].opt_include}"
-    ENV["LIBUTF8PROC_LIBS"] = "#{Formula["utf8proc-head"].opt_lib}/libutf8proc.a"
+    ENV["LIBEVENT_CFLAGS"] = "-I#{formula_opt_include("libevent-head")}"
+    ENV["LIBEVENT_CORE_CFLAGS"] = "-I#{formula_opt_include("libevent-head")}"
+    ENV["LIBEVENT_CORE_LIBS"] = "#{formula_opt_lib("libevent-head")}/libevent_core.a"
+    ENV["LIBEVENT_LIBS"] = "#{formula_opt_lib("libevent-head")}/libevent.a"
+    ENV["LIBNCURSESW_CFLAGS"] = "-I#{formula_opt_include("ncurses-head")} -I#{formula_opt_include("ncurses-head")}/ncursesw"
+    ENV["LIBNCURSESW_LIBS"] = "#{formula_opt_lib("ncurses-head")}/libncursesw.a"
+    ENV["LIBUTF8PROC_CFLAGS"] = "-I#{formula_opt_include("utf8proc-head")}"
+    ENV["LIBUTF8PROC_LIBS"] = "#{formula_opt_lib("utf8proc-head")}/libutf8proc.a"
 
     if Hardware::CPU.intel?
       cflags  = "-march=x86-64-v4 -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c2x -DNDEBUG"
