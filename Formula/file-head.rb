@@ -2,6 +2,12 @@ class FileHead < Formula
   desc "Utility to determine file types"
   homepage "https://darwinsys.com/file/"
   license "BSD-2-Clause-Darwin"
+
+  livecheck do
+    url :stable
+    regex(/href=.*?file[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   head do
     url "https://github.com/file/file.git", branch: "master"
 
@@ -10,22 +16,18 @@ class FileHead < Formula
     depends_on "libtool" => :build
   end
 
-  livecheck do
-    url "https://astron.com/pub/file/"
-    regex(/href=.*?file[._-]v?(\d+(?:\.\d+)+)\.t/i)
-  end
+  keg_only :shadowed_by_macos, "macOS provides"
 
-  keg_only :provided_by_macos
-
-  depends_on "libmagic-head"
-  depends_on "zlib"
-  depends_on "bzip2"
-  depends_on "xz"
-  depends_on "zstd"
-  depends_on "lzlib"
+  depends_on "bzip2" => :build
+  depends_on "libmagic-head" => :build
+  depends_on "lrzip" => :build
+  depends_on "lzlib" => :build
+  depends_on "xz" => :build
+  depends_on "zlib" => :build
+  depends_on "zstd" => :build
 
   def install
-    ENV.prepend "LDFLAGS", "-L#{Formula["libmagic-head"].opt_lib} -lmagic"
+    ENV.prepend "LDFLAGS", "-L#{formula_opt_lib("libmagic-head")} -lmagic"
 
     system "autoreconf", "-fiv"
 
@@ -36,11 +38,15 @@ class FileHead < Formula
 
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
-                          "--enable-zlib",
                           "--enable-bzlib",
+                          "--enable-lrziplib",
+                          "--enable-lz4lib",
+                          "--enable-lzlib",
                           "--enable-xzlib",
+                          "--enable-zlib",
                           "--enable-zstdlib",
-                          "--enable-lzlib"
+                          "--enable-fsect-man5",
+                          "--disable-year2038"
     system "make", "install-exec"
     system "make", "-C", "doc", "install-man1"
     rm_r lib
