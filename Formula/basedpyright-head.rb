@@ -5,11 +5,11 @@ class BasedpyrightHead < Formula
   head "https://github.com/detachhead/basedpyright.git", branch: "main"
 
   depends_on "node"
-  depends_on "python"
+  depends_on "python@3.14"
 
   def install
-    system "./pw", "uv", "sync"
-    system "npm", "install"
+    system "./build/generateAllDocstubs.sh"
+    system "./gg.cmd", "uv", "-v", "sync", "--config-setting", "regenerate_docstubs=false"
 
     cd "packages/pyright" do
       system "npm", "run", "build"
