@@ -1,39 +1,42 @@
 class GitHead < Formula
   desc "Distributed revision control system"
   homepage "https://git-scm.com"
-  license "GPL-2.0-only"
+  license all_of: [
+    "GPL-2.0-only",
+    "GPL-2.0-or-later",  # imap-send.c; trace.c; ...
+    "LGPL-2.1-or-later", # xdiff/
+    "BSD-3-Clause",      # xdiff/xhistogram.c; reftable/
+    "MIT",               # khash.h; sha1dc/
+  ]
   head "https://github.com/git/git.git", branch: "master"
 
   livecheck do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/"
+    url :stable
     regex(/href=.*?git[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  depends_on "asciidoc"
-  depends_on "c-ares"
+  depends_on "asciidoc" => :build
+  depends_on "brotli" => :build
+  depends_on "c-ares" => :build
+  depends_on "curl" => :build
+  depends_on "libidn2" => :build
+  depends_on "libmetalink" => :build
+  depends_on "libnghttp2" => :build
+  depends_on "libssh2" => :build
+  depends_on "openldap" => :build
+  depends_on "pcre2" => :build
+  depends_on "rtmpdump" => :build
+  depends_on "rust" => :build
+  depends_on "xmlto" => :build
+  depends_on "zlib" => :build
+  depends_on "zstd" => :build
 
-  depends_on "brotli"
-  depends_on "curl"
-  depends_on "libidn2"
-  depends_on "libnghttp2"
-  depends_on "libssh2"
-  depends_on "openldap"
-  depends_on "rtmpdump"
-  depends_on "rust"
-  depends_on "zstd"
-
-  depends_on "gettext"
-  depends_on "libmetalink"
-  depends_on "pcre2"
-  depends_on "xmlto"
-  depends_on "zlib"
-
-  uses_from_macos "krb5"
   uses_from_macos "expat"
+  uses_from_macos "krb5"
 
   on_linux do
-    depends_on "linux-headers@5.15" => :build
-    depends_on "openssl@1.1" # Uses CommonCrypto on macOS
+    depends_on "openssl@3" # for git-imap-send (GPL-2.0-or-later), uses CommonCrypto on macOS
+    depends_on "zlib-ng-compat"
   end
 
   resource "Authen::SASL" do
@@ -42,8 +45,8 @@ class GitHead < Formula
   end
 
   resource "html" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.54.0.tar.xz"
-    sha256 "7ff72bfdfed4f20563f34416cf27614fb9c35bfad590db0062f2a0a9636514e4"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.55.0.tar.xz"
+    sha256 "d1142c4e28b469d297d6df6519653e92a76c952f55202fde17a72a3b03d49437"
 
     livecheck do
       formula :parent
@@ -51,8 +54,8 @@ class GitHead < Formula
   end
 
   resource "man" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.54.0.tar.xz"
-    sha256 "292062d18f3a215213ea8317ed22b94f02ad9572520b9293164d7db3eb888953"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.55.0.tar.xz"
+    sha256 "a32d432f80df46a14a05d1104c72d5a13fe27e9feba9aa0f017e54131db6b982"
 
     livecheck do
       formula :parent
@@ -63,6 +66,8 @@ class GitHead < Formula
     url "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Net-SMTP-SSL-1.04.tar.gz"
     sha256 "7b29c45add19d3d5084b751f7ba89a8e40479a446ce21cfd9cc741e558332a00"
   end
+
+  deny_network_access! [:build, :postinstall]
 
   def install
     odie "html resource needs to be updated" if build.stable? && version != resource("html").version
@@ -75,16 +80,24 @@ class GitHead < Formula
     ENV["PERL_PATH"] = which("perl")
     ENV["USE_LIBPCRE2"] = "1"
     ENV["INSTALL_SYMLINKS"] = "1"
-    ENV["LIBPCREDIR"] = Formula["pcre2"].opt_prefix
+    ENV["LIBPCREDIR"] = formula_opt_prefix("pcre2")
     ENV["V"] = "1" # build verbosely
 
-    cflags = "-std=c11 -march=native -Ofast -flto"
-    cxxflags = "-std=c++17 -stdlib=libc++ -march=native -Ofast -flto"
-    ldflags = "-march=native -Ofast -flto"
-    ldflags += " -L#{Formula["brotli"].opt_lib} -L#{Formula["c-ares"].opt_lib} -L#{Formula["curl"].opt_lib} -L#{Formula["libidn2"].opt_lib}"
-    ldflags += " -L#{Formula["libmetalink"].opt_lib} -L#{Formula["libssh2"].opt_lib} -L#{Formula["libnghttp2"].opt_lib} -L#{Formula["nghttp3"].opt_lib} -L#{Formula["ngtcp2"].opt_lib}"
-    ldflags += " -L#{Formula["openldap"].opt_lib} -L#{Formula["pcre2"].opt_lib} -L#{Formula["rtmpdump"].opt_lib}"
-    ldflags += " -L#{Formula["zlib"].opt_lib} -L#{Formula["zstd"].opt_lib}"
+    if Hardware::CPU.intel?
+      cflags = "-march=x86-64-v4 -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c2x"
+      cxxflags = "-march=x86-64-v4 -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c++20"
+      ldflags = "-march=x86-64-v4 -O3 -funroll-loops -ffast-math -fforce-addr -flto"
+    else
+      cpu = `sysctl -n machdep.cpu.brand_string | awk '{ print tolower($1"-"$2) }'`.chomp
+      cflags = "-mcpu=#{cpu} -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c2x"
+      cxxflags = "-mcpu=#{cpu} -O3 -funroll-loops -ffast-math -fforce-addr -flto -std=c++20"
+      ldflags = "-mcpu=#{cpu} -O3 -funroll-loops -ffast-math -fforce-addr -flto"
+    end
+    ldflags += " -L#{formula_opt_lib("brotli")} -L#{formula_opt_lib("c-ares")} -L#{formula_opt_lib("curl")}"
+    ldflags += " -L#{formula_opt_lib("libidn2")} -L#{formula_opt_lib("libmetalink")} -L#{formula_opt_lib("libssh2")}"
+    ldflags += " -L#{formula_opt_lib("libnghttp2")} -L#{formula_opt_lib("nghttp3")} -L#{formula_opt_lib("ngtcp2")}"
+    ldflags += " -L#{formula_opt_lib("openldap")} -L#{formula_opt_lib("pcre2")} -L#{formula_opt_lib("rtmpdump")}"
+    ldflags += " -L#{formula_opt_lib("zlib")} -L#{formula_opt_lib("zstd")}"
     ENV.append "CFLAGS", *cflags
     ENV.append "CXXFLAGS", *cxxflags
     ENV.append "LDFLAGS", *ldflags
@@ -117,7 +130,7 @@ class GitHead < Formula
     args += if OS.mac?
       %w[NO_OPENSSL=1 APPLE_COMMON_CRYPTO=1]
     else
-      openssl_prefix = Formula["openssl@1.1"].opt_prefix
+      openssl_prefix = formula_opt_prefix("openssl@3")
 
       %W[NO_APPLE_COMMON_CRYPTO=1 OPENSSLDIR=#{openssl_prefix}]
     end
@@ -136,6 +149,7 @@ class GitHead < Formula
       cd "contrib/credential/osxkeychain" do
         system "make", "CC=#{ENV.cc}",
                        "CFLAGS=#{ENV.cflags}",
+                       "CXXFLAGS=#{ENV.cxxflags}",
                        "LDFLAGS=#{ENV.ldflags}"
         git_core.install "git-credential-osxkeychain"
         system "make", "clean"
@@ -159,6 +173,7 @@ class GitHead < Formula
     cd "contrib/subtree" do
       system "make", "CC=#{ENV.cc}",
                      "CFLAGS=#{ENV.cflags}",
+                     "CXXFLAGS=#{ENV.cxxflags}",
                      "LDFLAGS=#{ENV.ldflags}"
       git_core.install "git-subtree"
     end
@@ -220,9 +235,6 @@ class GitHead < Formula
   end
 
   test do
-    assert_equal version, resource("html").version, "`html` resource needs updating!"
-    assert_equal version, resource("man").version, "`man` resource needs updating!"
-
     system bin/"git", "init"
     %w[haunted house].each { |f| touch testpath/f }
     system bin/"git", "add", "haunted", "house"
@@ -231,16 +243,21 @@ class GitHead < Formula
     system bin/"git", "commit", "-a", "-m", "Initial Commit"
     assert_equal "haunted\nhouse", shell_output("#{bin}/git ls-files").strip
 
+    # Check that our `inreplace` for the `Makefile` does not break.
+    # If this assertion fails, please fix the `inreplace` instead of removing this test.
+    # The failure of this test means that `git` will generate broken launchctl plist files.
+    refute_match HOMEBREW_CELLAR.to_s, shell_output("#{bin}/git --exec-path")
+
+    return unless OS.mac?
+
     # Check Net::SMTP or Net::SMTP::SSL works for git-send-email
-    if OS.mac?
-      %w[foo bar].each { |f| touch testpath/f }
-      system bin/"git", "add", "foo", "bar"
-      system bin/"git", "commit", "-a", "-m", "Second Commit"
-      assert_match "Authentication Required", pipe_output(
-        "#{bin}/git send-email --from=test@example.com --to=dev@null.com " \
-        "--smtp-server=smtp.gmail.com --smtp-server-port=587 " \
-        "--smtp-encryption=tls --confirm=never HEAD^ 2>&1",
-      )
-    end
+    %w[foo bar].each { |f| touch testpath/f }
+    system bin/"git", "add", "foo", "bar"
+    system bin/"git", "commit", "-a", "-m", "Second Commit"
+    assert_match "Authentication Required", pipe_output(
+      "#{bin}/git send-email --from=test@example.com --to=dev@null.com " \
+      "--smtp-server=smtp.gmail.com --smtp-server-port=587 " \
+      "--smtp-encryption=tls --confirm=never HEAD^ 2>&1",
+    )
   end
 end
