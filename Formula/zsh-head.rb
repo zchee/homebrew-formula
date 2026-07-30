@@ -63,7 +63,6 @@ class ZshHead < Formula
            "--enable-multibyte",
            "--enable-pcre",
            "--enable-gdbm",
-           "--enable-unicode9",
            "--disable-etcdir",
            "--disable-dynamic",
            "--enable-year2038"
