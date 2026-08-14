@@ -34,6 +34,13 @@ class GitHead < Formula
   uses_from_macos "expat"
   uses_from_macos "krb5"
 
+  # Don't try to add a libiconv dependency without reading this PR first:
+  # https://github.com/Homebrew/homebrew-core/pull/258461
+
+  on_macos do
+    depends_on "gettext"
+  end
+
   on_linux do
     depends_on "openssl@3" # for git-imap-send (GPL-2.0-or-later), uses CommonCrypto on macOS
     depends_on "zlib-ng-compat"
