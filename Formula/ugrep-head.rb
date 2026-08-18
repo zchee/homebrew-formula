@@ -22,7 +22,6 @@ class UgrepHead < Formula
 
     # hard coded to `Static::cores` is 4 when [__APPLE__ && HAVE_NEON]. `Static::cores = std::thread::hardware_concurrency();` instead of.
     inreplace "src/ugrep.cpp", /(#if defined\(__APPLE__\)) && (defined\(HAVE_NEON\))/, "\\1 && !\\2"
-    system "cat", "src/ugrep.cpp"
 
     args = %W[
       --disable-dependency-tracking
