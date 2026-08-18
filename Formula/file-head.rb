@@ -18,13 +18,12 @@ class FileHead < Formula
 
   keg_only :shadowed_by_macos, "macOS provides"
 
-  depends_on "bzip2" => :build
-  depends_on "libmagic-head" => :build
-  depends_on "lrzip" => :build
-  depends_on "lzlib" => :build
-  depends_on "xz" => :build
-  depends_on "zlib" => :build
-  depends_on "zstd" => :build
+  depends_on "bzip2"
+  depends_on "libmagic-head"
+  depends_on "lzlib"
+  depends_on "xz"
+  depends_on "zlib"
+  depends_on "zstd"
 
   def install
     ENV.prepend "LDFLAGS", "-L#{formula_opt_lib("libmagic-head")} -lmagic"
@@ -39,7 +38,6 @@ class FileHead < Formula
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
                           "--enable-bzlib",
-                          "--enable-lrziplib",
                           "--enable-lz4lib",
                           "--enable-lzlib",
                           "--enable-xzlib",
