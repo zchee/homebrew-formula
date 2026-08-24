@@ -22,7 +22,7 @@ class BeadsRust < Formula
       -C target-feature=#{target_feature}
       -C opt-level=3
       -C codegen-units=1
-      -C lto=fat
+      -C lto=thin
       -C panic=abort
       -C force-frame-pointers=on
       -C embed-bitcode=yes
@@ -35,7 +35,7 @@ class BeadsRust < Formula
     ]
     ENV["RUSTFLAGS"] = rustflags.join(" ")
 
-    system "rustup", "run", "nightly", "cargo", "install", *std_cargo_args
+    system "rustup", "run", "nightly", "cargo", "install", "--verbose", *std_cargo_args
 
     generate_completions_from_executable(bin/"br", "completions")
   end
