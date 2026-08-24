@@ -35,7 +35,7 @@ class BeadsRust < Formula
     ]
     ENV["RUSTFLAGS"] = rustflags.join(" ")
 
-    system "rustup", "run", "nightly", "cargo", "install", "--verbose", *std_cargo_args
+    system "rustup", "run", "nightly", "cargo", "install", *std_cargo_args
 
     generate_completions_from_executable(bin/"br", "completions")
   end
