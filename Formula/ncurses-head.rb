@@ -2,21 +2,15 @@ class NcursesHead < Formula
   desc "Text-based UI library"
   homepage "https://invisible-island.net/ncurses/announce.html"
   head "https://github.com/ThomasDickey/ncurses-snapshots.git", branch: "master"
-  license "MIT"
+  license "X11-distribute-modifications-variant"
 
   depends_on "libtool" => :build
   depends_on "pcre2" => :build
   depends_on "pkg-config" => :build
 
-  on_linux do
-    depends_on "gpatch" => :build
-  end
-
   def install
-    # Workaround for
-    # macOS: mkdir: /usr/lib/pkgconfig:/opt/homebrew/Library/Homebrew/os/mac/pkgconfig/12: Operation not permitted
-    # Linux: configure: error: expected a pathname, not ""
-    (lib/"pkgconfig").mkpath
+    ENV.delete("TERMINFO")
+    ENV.delete("TERMINFO_DIRS")
 
     args = [
       "--prefix=#{prefix}",
@@ -30,10 +24,14 @@ class NcursesHead < Formula
       "--with-gpm=no",
       "--without-ada",
     ]
-    args << "--with-terminfo-dirs=#{share}/terminfo:/etc/terminfo:/lib/terminfo:/usr/share/terminfo" if OS.linux?
+    terminfo_dirs = if OS.mac?
+      "#{opt_share}/terminfo:/usr/share/terminfo"
+    else
+      "#{opt_share}/terminfo:/etc/terminfo:/lib/terminfo:/usr/share/terminfo"
+    end
+    args << "--with-terminfo-dirs=#{terminfo_dirs}"
 
-    ENV["TERMINFO"] = ""
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
     make_libncurses_symlinks
 
