@@ -4,18 +4,18 @@ class UgrepHead < Formula
   license "BSD-3-Clause"
   head "https://github.com/Genivia/ugrep.git", branch: "master"
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "boost" => :build
-  depends_on "brotli" => :build
-  depends_on "bzip2" => :build
-  depends_on "bzip3" => :build
-  depends_on "lz4" => :build
-  depends_on "pcre2" => :build
-  depends_on "xz" => :build
-  depends_on "zlib" => :build
-  depends_on "zstd" => :build
+  depends_on "autoconf" => :head
+  depends_on "automake" => :head
+  depends_on "boost" => :head
+  depends_on "brotli" => :head
+  depends_on "bzip2" => :head
+  depends_on "bzip3" => :head
   depends_on "libtool" => :head
+  depends_on "lz4" => :head
+  depends_on "pcre2" => :head
+  depends_on "xz" => :head
+  depends_on "zlib" => :head
+  depends_on "zstd" => :head
 
   def install
     system "autoreconf", "-fiv"
